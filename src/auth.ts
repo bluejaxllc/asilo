@@ -28,7 +28,9 @@ export const {
         async jwt({ token, user }) {
             // On initial sign in, user is available. Set role directly.
             if (user) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 token.sub = user.id;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 token.role = (user as any).role;
                 return token;
             }
@@ -61,11 +63,12 @@ export const {
                         where: { email }
                     });
 
-                    if (!user || !user.password) return null;
+                    if (!user || !(user as any).password) return null;
 
                     const passwordsMatch = await bcrypt.compare(
                         password,
-                        user.password,
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        (user as any).password,
                     );
 
                     if (passwordsMatch) return user;
