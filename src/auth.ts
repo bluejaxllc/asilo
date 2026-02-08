@@ -25,7 +25,14 @@ export const {
 
             return session;
         },
-        async jwt({ token }) {
+        async jwt({ token, user }) {
+            // On initial sign in, user is available. Set role directly.
+            if (user) {
+                token.sub = user.id;
+                token.role = (user as any).role;
+                return token;
+            }
+
             if (!token.sub) return token;
 
             const existingUser = await db.user.findUnique({
