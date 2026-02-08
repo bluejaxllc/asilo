@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// User model for Staff and Admins
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      String   @default("STAFF") // ADMIN, DOCTOR, NURSE, KITCHEN
+  password  String?
+  image     String?
+  
+  attendance Attendance[]
+  assignedTasks Task[]
+  logs       DailyLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Patient / Resident
+model Patient {
+  id        String   @id @default(cuid())
+  name      String
+  room      String?
+  status    String   @default("Estable") // Estable, Delicado, Hospitalizado
+  age       Int?
+  medicalHistory String?
+  dietaryNeeds   String?
+  
+  logs      DailyLog[]
+  medications PatientMedication[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Tasks for Staff
+model Task {
+  id        String   @id @default(cuid())
+  title     String
+  description String?
+  priority  String   @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  status    String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
+  dueDate   DateTime?
+  
+  assignedToId String?
+  assignedTo   User?   @relation(fields: [assignedToId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Daily Logs (Bitácora)
+model DailyLog {
+  id        String   @id @default(cuid())
+  type      String   // VITALS, FOOD, HYGIENE, INCIDENT
+  notes     String?
+  value     String?  // e.g., "120/80" for BP, "All ate" for Food
+  
+  patientId String?
+  patient   Patient? @relation(fields: [patientId], references: [id])
+  
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  
+  createdAt DateTime @default(now())
+}
+
+// Inventory & Medications
+model Medication {
+  id        String   @id @default(cuid())
+  name      String
+  stock     Int
+  unit      String   // pills, ml, boxes
+  minStock  Int      @default(10)
+  expiryDate DateTime?
+  
+  patients  PatientMedication[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Junction table for Patient <-> Medication
+model PatientMedication {
+  id           String     @id @default(cuid())
+  patientId    String
+  patient      Patient    @relation(fields: [patientId], references: [id])
+  
+  medicationId String
+  medication   Medication @relation(fields: [medicationId], references: [id])
+  
+  dosage       String     // e.g., "1 tablet every 8 hours"
+  schedule     String?    // JSON or simple string text
+  
+  createdAt    DateTime   @default(now())
+}
+
+// Staff Attendance
+model Attendance {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  checkIn   DateTime @default(now())
+  checkOut  DateTime?
+  
+  createdAt DateTime @default(now())
+}
+
+// Notifications (Admin Alerts)
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  type      String   // INFO, WARNING, CRITICAL
+  read      Boolean  @default(false)
+  
+  createdAt DateTime @default(now())
+}
+
