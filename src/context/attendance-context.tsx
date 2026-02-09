@@ -31,7 +31,7 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
                 try {
                     const status = await getAttendanceStatus(session.user.email);
 
-                    if (status?.isClockedIn) {
+                    if (status?.isClockedIn && status.startTime) {
                         setIsClockedIn(true);
                         setStartTime(new Date(status.startTime));
                         localStorage.setItem('attendanceStartTime', new Date(status.startTime).toISOString());
