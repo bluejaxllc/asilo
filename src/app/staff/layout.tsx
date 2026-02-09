@@ -27,7 +27,7 @@ const StaffLayout = ({
                         <div className="max-w-7xl mx-auto flex justify-between items-center">
                             <Link href="/staff">
                                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent cursor-pointer hover:opacity-80 transition-opacity">
-                                    Rinconcito Personal
+                                    .blue_jax Personal
                                 </h1>
                             </Link>
 

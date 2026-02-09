@@ -9,7 +9,7 @@ export default function Home() {
       <header className="px-6 h-16 flex items-center border-b bg-white/50 backdrop-blur-sm sticky top-0 z-50">
         <h1 className="font-bold text-xl flex items-center gap-2 text-blue-900">
           <ShieldCheck className="h-6 w-6 text-blue-600" />
-          Rinconcito de Amor
+          .blue_jax
         </h1>
         <div className="ml-auto flex gap-4">
           <Link href="/auth/login">
@@ -94,7 +94,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="py-6 text-center text-slate-400 text-sm border-t">
-        &copy; 2026 Rinconcito de Amor. Todos los derechos reservados.
+        &copy; 2026 .blue_jax. Todos los derechos reservados.
       </footer>
     </div>
   )

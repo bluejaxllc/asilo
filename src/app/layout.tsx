@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Rinconcito de Amor | Estancia para el Adulto Mayor",
+  title: ".blue_jax | Estancia para el Adulto Mayor",
   description: "Sistema de gestión integral para el cuidado del adulto mayor.",
 };
 

@@ -40,7 +40,7 @@ export default function SettingsPage() {
                         <CardContent className="space-y-4">
                             <div className="grid gap-2">
                                 <Label htmlFor="name">Nombre de la Institución</Label>
-                                <Input id="name" defaultValue="Rinconcito de Amor" />
+                                <Input id="name" defaultValue=".blue_jax" />
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="address">Dirección</Label>
