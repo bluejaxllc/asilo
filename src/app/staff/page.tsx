@@ -94,7 +94,7 @@ export default function StaffPage() {
         <div className="space-y-6">
             <div className={`flex flex-col md:flex-row justify-between items-center p-6 rounded-xl shadow-lg transition-colors duration-500 ${isClockedIn ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white' : 'bg-slate-800 text-slate-100'}`}>
                 <div className="mb-4 md:mb-0">
-                    <h2 className="text-3xl font-bold">Buenos Días, Carlos</h2>
+                    <h2 className="text-3xl font-bold">Buenos Días, {session?.user?.name || "Usuario"}</h2>
                     <p className={`mt-1 text-lg ${isClockedIn ? 'text-blue-100' : 'text-slate-400'}`}>
                         {isClockedIn ? `Tienes ${tasks.filter(t => t.status !== 'COMPLETADO').length} tareas pendientes hoy.` : "Por favor marca tu entrada para ver tus tareas."}
                     </p>
