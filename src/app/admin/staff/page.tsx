@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,11 +22,15 @@ import {
 } from "@/components/ui/dialog";
 import { UserPlus, Clock } from "lucide-react";
 import { StaffForm } from "@/components/admin/staff-form";
+import { getStaffAttendanceHistory } from "@/actions/staff";
 
 export default function StaffPage() {
     const [open, setOpen] = useState(false);
     const [staffWithStatus, setStaffWithStatus] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [historyOpen, setHistoryOpen] = useState(false);
+    const [selectedStaff, setSelectedStaff] = useState<any>(null);
+    const [attendanceHistory, setAttendanceHistory] = useState<any[]>([]);
 
     const fetchStaff = async () => {
         setLoading(true);
@@ -63,6 +67,13 @@ export default function StaffPage() {
     const handleStaffAdded = () => {
         setOpen(false);
         fetchStaff();
+    };
+
+    const handleViewHistory = async (staff: any) => {
+        setSelectedStaff(staff);
+        setHistoryOpen(true);
+        const history = await getStaffAttendanceHistory(staff.id, 30);
+        setAttendanceHistory(history);
     };
 
     return (
@@ -132,7 +143,7 @@ export default function StaffPage() {
                                 </TableCell>
                                 <TableCell>{staff.lastActive}</TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="ghost" size="sm">
+                                    <Button variant="ghost" size="sm" onClick={() => handleViewHistory(staff)}>
                                         <Clock className="mr-2 h-4 w-4" /> Historial
                                     </Button>
                                 </TableCell>
@@ -141,6 +152,61 @@ export default function StaffPage() {
                     </TableBody>
                 </Table>
             </div>
+
+            {/* Attendance History Dialog */}
+            <Dialog open={historyOpen} onOpenChange={setHistoryOpen}>
+                <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Historial de Asistencia - {selectedStaff?.name}</DialogTitle>
+                        <DialogDescription>
+                            Registro de entradas y salidas de los últimos 30 días
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="mt-4">
+                        {attendanceHistory.length === 0 ? (
+                            <p className="text-center text-muted-foreground py-8">
+                                No hay registros de asistencia
+                            </p>
+                        ) : (
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Fecha</TableHead>
+                                        <TableHead>Entrada</TableHead>
+                                        <TableHead>Salida</TableHead>
+                                        <TableHead>Duración</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {attendanceHistory.map((record) => {
+                                        const checkInDate = new Date(record.checkIn);
+                                        const checkOutDate = record.checkOut ? new Date(record.checkOut) : null;
+
+                                        let duration = "En curso";
+                                        if (checkOutDate) {
+                                            const diff = checkOutDate.getTime() - checkInDate.getTime();
+                                            const hours = Math.floor(diff / 3600000);
+                                            const minutes = Math.floor((diff % 3600000) / 60000);
+                                            duration = `${hours}h ${minutes}m`;
+                                        }
+
+                                        return (
+                                            <TableRow key={record.id}>
+                                                <TableCell>{format(checkInDate, "dd/MM/yyyy", { locale: es })}</TableCell>
+                                                <TableCell>{format(checkInDate, "HH:mm", { locale: es })}</TableCell>
+                                                <TableCell>
+                                                    {checkOutDate ? format(checkOutDate, "HH:mm", { locale: es }) : "-"}
+                                                </TableCell>
+                                                <TableCell>{duration}</TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
+                                </TableBody>
+                            </Table>
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
