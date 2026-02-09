@@ -32,10 +32,25 @@ export default function StaffPage() {
         setLoading(true);
         try {
             const response = await fetch('/api/staff');
+
+            if (!response.ok) {
+                console.error('Failed to fetch staff:', response.status);
+                setStaffWithStatus([]);
+                return;
+            }
+
             const data = await response.json();
-            setStaffWithStatus(data);
+
+            // Ensure data is an array
+            if (Array.isArray(data)) {
+                setStaffWithStatus(data);
+            } else {
+                console.error('Invalid response format:', data);
+                setStaffWithStatus([]);
+            }
         } catch (error) {
             console.error('Error fetching staff:', error);
+            setStaffWithStatus([]);
         } finally {
             setLoading(false);
         }
