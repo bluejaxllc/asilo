@@ -1,6 +1,6 @@
+"use client"
 
-import { db } from "@/lib/db";
-import { getLatestTodayAttendance } from "@/actions/attendance";
+import { useState, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
@@ -12,47 +12,43 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import { UserPlus, Clock } from "lucide-react";
+import { StaffForm } from "@/components/admin/staff-form";
 
-export default async function StaffPage() {
-    // 1. Fetch all users with Role not 'ADMIN' (or all staff types)
-    const staffUsers = await db.user.findMany({
-        where: {
-            role: {
-                in: ["STAFF", "DOCTOR", "NURSE", "KITCHEN"]
-            }
-        },
-        orderBy: { name: 'asc' }
-    });
+export default function StaffPage() {
+    const [open, setOpen] = useState(false);
+    const [staffWithStatus, setStaffWithStatus] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    // 2. Enhance with attendance status
-    const staffWithStatus = await Promise.all(staffUsers.map(async (user) => {
-        const attendance = await getLatestTodayAttendance(user.id);
-
-        // Determine status
-        let status = "Fuera de Turno";
-        let statusColor = "bg-gray-100 text-gray-800";
-        let lastActive = "N/A";
-
-        if (attendance) {
-            if (!attendance.checkOut) {
-                status = "Activo";
-                statusColor = "bg-green-100 text-green-800";
-                lastActive = "Entrada: " + formatDistanceToNow(attendance.checkIn, { addSuffix: true, locale: es });
-            } else {
-                status = "Turno Finalizado";
-                statusColor = "bg-blue-100 text-blue-800";
-                lastActive = "Salida: " + formatDistanceToNow(attendance.checkOut, { addSuffix: true, locale: es });
-            }
+    const fetchStaff = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch('/api/staff');
+            const data = await response.json();
+            setStaffWithStatus(data);
+        } catch (error) {
+            console.error('Error fetching staff:', error);
+        } finally {
+            setLoading(false);
         }
+    };
 
-        return {
-            ...user,
-            status,
-            statusColor,
-            lastActive
-        };
-    }));
+    useEffect(() => {
+        fetchStaff();
+    }, []);
+
+    const handleStaffAdded = () => {
+        setOpen(false);
+        fetchStaff();
+    };
 
     return (
         <div className="p-8 space-y-8">
@@ -63,9 +59,22 @@ export default async function StaffPage() {
                         Administre personal, roles y horarios.
                     </p>
                 </div>
-                <Button>
-                    <UserPlus className="mr-2 h-4 w-4" /> Agregar Personal
-                </Button>
+                <Dialog open={open} onOpenChange={setOpen}>
+                    <DialogTrigger asChild>
+                        <Button>
+                            <UserPlus className="mr-2 h-4 w-4" /> Agregar Personal
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Agregar Nuevo Personal</DialogTitle>
+                            <DialogDescription>
+                                Complete el formulario para registrar un nuevo miembro del personal.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <StaffForm onSuccess={handleStaffAdded} />
+                    </DialogContent>
+                </Dialog>
             </div>
 
             <div className="border rounded-md">
@@ -80,7 +89,19 @@ export default async function StaffPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {staffWithStatus.map((staff) => (
+                        {loading ? (
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center py-8">
+                                    Cargando...
+                                </TableCell>
+                            </TableRow>
+                        ) : staffWithStatus.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                                    No hay personal registrado.
+                                </TableCell>
+                            </TableRow>
+                        ) : staffWithStatus.map((staff) => (
                             <TableRow key={staff.id}>
                                 <TableCell className="font-medium">
                                     <div className="flex flex-col">
@@ -102,13 +123,6 @@ export default async function StaffPage() {
                                 </TableCell>
                             </TableRow>
                         ))}
-                        {staffWithStatus.length === 0 && (
-                            <TableRow>
-                                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                                    No hay personal registrado.
-                                </TableCell>
-                            </TableRow>
-                        )}
                     </TableBody>
                 </Table>
             </div>

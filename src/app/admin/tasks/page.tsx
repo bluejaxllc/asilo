@@ -1,3 +1,6 @@
+"use client"
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -8,9 +11,49 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar, ClipboardList } from "lucide-react";
+import { Calendar, ClipboardList, Plus, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 export default function TasksPage() {
+    const [tasks, setTasks] = useState([
+        { id: "1", text: "Limpiar Pasillo A", completed: false },
+        { id: "2", text: "Sanitizar Superficies de Cocina", completed: false },
+        { id: "3", text: "Revisar Extintores", completed: false },
+        { id: "4", text: "Regar Plantas del Jardín", completed: false },
+        { id: "5", text: "Vaciar Botes de Basura (Área Común)", completed: false },
+        { id: "6", text: "Reponer Insumos de Baño (Ala B)", completed: false }
+    ]);
+    const [newTaskText, setNewTaskText] = useState("");
+
+    const handleToggleTask = (id: string) => {
+        setTasks(prev => prev.map(task =>
+            task.id === id ? { ...task, completed: !task.completed } : task
+        ));
+    };
+
+    const handleAddTask = () => {
+        if (!newTaskText.trim()) {
+            toast.error("Por favor ingrese una tarea");
+            return;
+        }
+
+        const newTask = {
+            id: Date.now().toString(),
+            text: newTaskText,
+            completed: false
+        };
+
+        setTasks(prev => [...prev, newTask]);
+        setNewTaskText("");
+        toast.success("Tarea agregada");
+    };
+
+    const handleDeleteTask = (id: string) => {
+        setTasks(prev => prev.filter(task => task.id !== id));
+        toast.success("Tarea eliminada");
+    };
+
     return (
         <div className="p-8 space-y-8">
             <div className="flex items-center justify-between">
@@ -63,24 +106,61 @@ export default function TasksPage() {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                {[
-                                    "Limpiar Pasillo A",
-                                    "Sanitizar Superficies de Cocina",
-                                    "Revisar Extintores",
-                                    "Regar Plantas del Jardín",
-                                    "Vaciar Botes de Basura (Área Común)",
-                                    "Reponer Insumos de Baño (Ala B)"
-                                ].map((task, i) => (
-                                    <div key={i} className="flex items-center space-x-2 border p-3 rounded-md hover:bg-slate-50 transition">
-                                        <Checkbox id={`task-${i}`} />
-                                        <label
-                                            htmlFor={`task-${i}`}
-                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer w-full"
+                                {/* Add new task input */}
+                                <div className="flex gap-2">
+                                    <Input
+                                        placeholder="Nueva tarea de mantenimiento..."
+                                        value={newTaskText}
+                                        onChange={(e) => setNewTaskText(e.target.value)}
+                                        onKeyPress={(e) => {
+                                            if (e.key === 'Enter') {
+                                                handleAddTask();
+                                            }
+                                        }}
+                                    />
+                                    <Button onClick={handleAddTask}>
+                                        <Plus className="h-4 w-4 mr-2" />
+                                        Agregar
+                                    </Button>
+                                </div>
+
+                                {/* Task list */}
+                                <div className="space-y-2">
+                                    {tasks.map((task) => (
+                                        <div
+                                            key={task.id}
+                                            className="flex items-center justify-between space-x-2 border p-3 rounded-md hover:bg-slate-50 transition group"
                                         >
-                                            {task}
-                                        </label>
-                                    </div>
-                                ))}
+                                            <div className="flex items-center space-x-2 flex-1">
+                                                <Checkbox
+                                                    id={`task-${task.id}`}
+                                                    checked={task.completed}
+                                                    onCheckedChange={() => handleToggleTask(task.id)}
+                                                />
+                                                <label
+                                                    htmlFor={`task-${task.id}`}
+                                                    className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer w-full ${task.completed ? 'line-through text-muted-foreground' : ''
+                                                        }`}
+                                                >
+                                                    {task.text}
+                                                </label>
+                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                                onClick={() => handleDeleteTask(task.id)}
+                                            >
+                                                <Trash2 className="h-4 w-4 text-red-500" />
+                                            </Button>
+                                        </div>
+                                    ))}
+                                    {tasks.length === 0 && (
+                                        <div className="text-center py-8 text-muted-foreground">
+                                            No hay tareas. Agregue una nueva tarea arriba.
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
