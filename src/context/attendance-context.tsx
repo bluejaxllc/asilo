@@ -92,6 +92,7 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
                 const now = new Date();
                 setStartTime(now);
                 setIsClockedIn(true);
+                setHasCompletedShift(false); // Reset to allow new shifts
                 localStorage.setItem('attendanceStartTime', now.toISOString());
                 toast.success("Turno iniciado correctamente");
             }
