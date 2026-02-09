@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { FormError } from "@/components/form-error"
 import { FormSuccess } from "@/components/form-success"
+import { addMedication } from "@/actions/medication"
 
 const MedicationSchema = z.object({
     name: z.string().min(1, "El nombre es requerido"),
@@ -52,11 +53,24 @@ export const MedicationForm = ({ onSuccess }: MedicationFormProps) => {
         setError("");
         setSuccess("");
 
-        startTransition(() => {
-            // TODO: Server action
-            console.log(values);
-            setSuccess("Medicamento agregado! (Simulado)");
-            if (onSuccess) onSuccess();
+        startTransition(async () => {
+            const result = await addMedication({
+                name: values.name,
+                stockLevel: Number(values.stockLevel),
+                minStock: Number(values.minStock),
+                unit: values.unit,
+                expiryDate: values.expiryDate
+            });
+
+            if (result.error) {
+                setError(result.error);
+            } else {
+                setSuccess(result.success!);
+                form.reset();
+                if (onSuccess) {
+                    setTimeout(onSuccess, 1000);
+                }
+            }
         });
     };
 

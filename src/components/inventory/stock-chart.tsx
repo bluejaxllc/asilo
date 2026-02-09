@@ -2,21 +2,32 @@
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 
-const data = [
-    { name: 'Paracetamol', stock: 150, min: 20, status: 'OK' },
-    { name: 'Insulina', stock: 2, min: 5, status: 'BAJO' },
-    { name: 'Omeprazol', stock: 0, min: 30, status: 'AGOTADO' },
-    { name: 'Metformina', stock: 85, min: 40, status: 'OK' },
-    { name: 'Vendas 10cm', stock: 12, min: 15, status: 'BAJO' },
-    { name: 'Guantes M', stock: 200, min: 50, status: 'OK' },
-];
+interface StockChartProps {
+    medications: any[];
+}
 
-export const StockChart = () => {
+export const StockChart = ({ medications }: StockChartProps) => {
+    // Transform medications data for chart
+    const chartData = medications.map(med => ({
+        name: med.name.length > 15 ? med.name.substring(0, 12) + '...' : med.name,
+        stock: med.stock,
+        min: med.min,
+        status: med.status
+    }));
+
+    if (chartData.length === 0) {
+        return (
+            <div className="h-[300px] w-full flex items-center justify-center text-muted-foreground">
+                No hay datos para mostrar
+            </div>
+        );
+    }
+
     return (
         <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                    data={data}
+                    data={chartData}
                     margin={{
                         top: 5,
                         right: 30,
@@ -30,7 +41,7 @@ export const StockChart = () => {
                     <Tooltip />
                     <Legend />
                     <Bar dataKey="stock" name="Existencias Actuales" fill="#3b82f6" radius={[4, 4, 0, 0]}>
-                        {data.map((entry, index) => (
+                        {chartData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.status === 'OK' ? '#3b82f6' : entry.status === 'BAJO' ? '#fbbf24' : '#ef4444'} />
                         ))}
                     </Bar>

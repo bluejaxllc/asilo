@@ -1,3 +1,6 @@
+"use client"
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Table,
@@ -21,16 +24,67 @@ import { Plus, AlertTriangle, Pill, BarChart3 } from "lucide-react";
 import { ClientStockChart } from "@/components/inventory/client-stock-chart";
 import { FadeIn } from "@/components/ui/motion-wrapper";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-
-// Mock Data
-const inventory = [
-    { id: "1", name: "Paracetamol 500mg", stock: 150, min: 20, unit: "pastillas", status: "OK" },
-    { id: "2", name: "Insulina Glargina", stock: 2, min: 5, unit: "plumas", status: "BAJO" },
-    { id: "3", name: "Omeprazol 20mg", stock: 0, min: 30, unit: "pastillas", status: "AGOTADO" },
-];
+import { getAllMedications, updateMedicationStock } from "@/actions/medication";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 export default function InventoryPage() {
+    const [inventory, setInventory] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [addOpen, setAddOpen] = useState(false);
+    const [updateOpen, setUpdateOpen] = useState(false);
+    const [selectedMed, setSelectedMed] = useState<any>(null);
+    const [newStock, setNewStock] = useState("");
+
+    const fetchMedications = async () => {
+        setLoading(true);
+        const data = await getAllMedications();
+        setInventory(data);
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        fetchMedications();
+    }, []);
+
+    const handleMedicationAdded = () => {
+        setAddOpen(false);
+        fetchMedications();
+    };
+
+    const handleUpdateStock = async () => {
+        if (!selectedMed || !newStock) return;
+
+        const stockNum = Number(newStock);
+        if (isNaN(stockNum) || stockNum < 0) {
+            toast.error("Ingrese un número válido");
+            return;
+        }
+
+        const result = await updateMedicationStock(selectedMed.id, stockNum);
+
+        if (result.error) {
+            toast.error(result.error);
+        } else {
+            toast.success(result.success!);
+            setUpdateOpen(false);
+            setSelectedMed(null);
+            setNewStock("");
+            fetchMedications();
+        }
+    };
+
+    const openUpdateDialog = (item: any) => {
+        setSelectedMed(item);
+        setNewStock(item.stock.toString());
+        setUpdateOpen(true);
+    };
+
     const lowStockCount = inventory.filter(i => i.status !== "OK").length;
+    const okCount = inventory.filter(i => i.status === "OK").length;
+    const lowCount = inventory.filter(i => i.status === "BAJO").length;
+    const outCount = inventory.filter(i => i.status === "AGOTADO").length;
+    const total = inventory.length || 1;
 
     return (
         <FadeIn className="p-8 space-y-8">
@@ -41,7 +95,7 @@ export default function InventoryPage() {
                         Rastree medicamentos, suministros y alertas de stock.
                     </p>
                 </div>
-                <Dialog>
+                <Dialog open={addOpen} onOpenChange={setAddOpen}>
                     <DialogTrigger asChild>
                         <Button>
                             <Plus className="mr-2 h-4 w-4" /> Agregar Medicamento
@@ -51,7 +105,7 @@ export default function InventoryPage() {
                         <DialogHeader>
                             <DialogTitle>Agregar Nuevo Medicamento</DialogTitle>
                         </DialogHeader>
-                        <MedicationForm />
+                        <MedicationForm onSuccess={handleMedicationAdded} />
                     </DialogContent>
                 </Dialog>
             </div>
@@ -65,7 +119,7 @@ export default function InventoryPage() {
                         <CardDescription>Visualización de stock vs nivel mínimo requerido</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <ClientStockChart />
+                        <ClientStockChart medications={inventory} />
                     </CardContent>
                 </Card>
 
@@ -79,38 +133,41 @@ export default function InventoryPage() {
                                 <div className="h-3 w-3 rounded-full bg-green-500" />
                                 <span className="font-medium text-green-900">En Orden</span>
                             </div>
-                            <span className="font-bold text-green-700 text-xl">85%</span>
+                            <span className="font-bold text-green-700 text-xl">
+                                {Math.round((okCount / total) * 100)}%
+                            </span>
                         </div>
                         <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg border border-yellow-100">
                             <div className="flex items-center gap-3">
                                 <div className="h-3 w-3 rounded-full bg-yellow-500" />
                                 <span className="font-medium text-yellow-900">Stock Bajo</span>
                             </div>
-                            <span className="font-bold text-yellow-700 text-xl">12%</span>
+                            <span className="font-bold text-yellow-700 text-xl">
+                                {Math.round((lowCount / total) * 100)}%
+                            </span>
                         </div>
                         <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-100">
                             <div className="flex items-center gap-3">
                                 <div className="h-3 w-3 rounded-full bg-red-500" />
                                 <span className="font-medium text-red-900">Agotado</span>
                             </div>
-                            <span className="font-bold text-red-700 text-xl">3%</span>
+                            <span className="font-bold text-red-700 text-xl">
+                                {Math.round((outCount / total) * 100)}%
+                            </span>
                         </div>
                     </CardContent>
                 </Card>
             </div>
 
-
-            {
-                lowStockCount > 0 && (
-                    <Alert variant="destructive">
-                        <AlertTriangle className="h-4 w-4" />
-                        <AlertTitle>Alerta de Stock Bajo</AlertTitle>
-                        <AlertDescription>
-                            {lowStockCount} artículos están agotados o por agotarse. Reordene inmediatamente.
-                        </AlertDescription>
-                    </Alert>
-                )
-            }
+            {lowStockCount > 0 && (
+                <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Alerta de Stock Bajo</AlertTitle>
+                    <AlertDescription>
+                        {lowStockCount} artículos están agotados o por agotarse. Reordene inmediatamente.
+                    </AlertDescription>
+                </Alert>
+            )}
 
             <div className="border rounded-md">
                 <Table>
@@ -124,7 +181,19 @@ export default function InventoryPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {inventory.map((item) => (
+                        {loading ? (
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center py-8">
+                                    Cargando inventario...
+                                </TableCell>
+                            </TableRow>
+                        ) : inventory.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                                    No hay medicamentos en el inventario. Agregue uno para comenzar.
+                                </TableCell>
+                            </TableRow>
+                        ) : inventory.map((item) => (
                             <TableRow key={item.id}>
                                 <TableCell className="font-medium flex items-center">
                                     <Pill className="mr-2 h-4 w-4 text-slate-500" />
@@ -138,13 +207,48 @@ export default function InventoryPage() {
                                     {item.status === 'AGOTADO' && <Badge variant="destructive">Agotado</Badge>}
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="ghost" size="sm">Actualizar Stock</Button>
+                                    <Button variant="ghost" size="sm" onClick={() => openUpdateDialog(item)}>
+                                        Actualizar Stock
+                                    </Button>
                                 </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </div>
+
+            {/* Update Stock Dialog */}
+            <Dialog open={updateOpen} onOpenChange={setUpdateOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Actualizar Stock - {selectedMed?.name}</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Stock Actual</label>
+                            <p className="text-2xl font-bold">{selectedMed?.stock} {selectedMed?.unit}</p>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Nuevo Stock</label>
+                            <Input
+                                type="number"
+                                min="0"
+                                value={newStock}
+                                onChange={(e) => setNewStock(e.target.value)}
+                                placeholder="Ingrese nuevo stock"
+                            />
+                        </div>
+                    </div>
+                    <div className="flex justify-end gap-2">
+                        <Button variant="outline" onClick={() => setUpdateOpen(false)}>
+                            Cancelar
+                        </Button>
+                        <Button onClick={handleUpdateStock}>
+                            Guardar
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </FadeIn>
     );
 }
