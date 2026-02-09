@@ -40,3 +40,31 @@ export const createLog = async (data: {
         return { error: "Error al guardar el registro" };
     }
 };
+
+export const getAllLogs = async (limit: number = 50) => {
+    try {
+        const logs = await db.dailyLog.findMany({
+            include: {
+                patient: {
+                    select: {
+                        name: true
+                    }
+                },
+                author: {
+                    select: {
+                        name: true
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            },
+            take: limit
+        });
+
+        return logs;
+    } catch (error) {
+        console.error("Error fetching logs:", error);
+        return [];
+    }
+};

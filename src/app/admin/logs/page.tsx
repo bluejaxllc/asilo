@@ -1,3 +1,6 @@
+"use client"
+
+import { useState, useEffect } from "react";
 import {
     Table,
     TableBody,
@@ -10,16 +13,50 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-// Mock Data
-const logs = [
-    { id: "1", patient: "Maria Garcia", type: "VITALES", desc: "Presión Arterial: 120/80", staff: "Enf. Carla", time: "08:15 AM", date: "Hoy" },
-    { id: "2", patient: "Jose Hernandez", type: "ALIMENTOS", desc: "Desayuno: 50% ingerido", staff: "Cuid. Pedro", time: "08:30 AM", date: "Hoy" },
-    { id: "3", patient: "Ana Lopez", type: "MEDICAMENTOS", desc: "Administró: Enalapril 10mg", staff: "Enf. Carla", time: "09:00 AM", date: "Hoy" },
-    { id: "4", patient: "Maria Garcia", type: "NOTA", desc: "Se quejó de dolor leve en rodilla izquierda", staff: "Dr. Elena", time: "10:00 AM", date: "Hoy" },
-];
+import { getAllLogs } from "@/actions/logs";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 export default function LogsPage() {
+    const [logs, setLogs] = useState<any[]>([]);
+    const [filteredLogs, setFilteredLogs] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchLogs = async () => {
+            setLoading(true);
+            const data = await getAllLogs(100);
+            setLogs(data);
+            setFilteredLogs(data);
+            setLoading(false);
+        };
+        fetchLogs();
+    }, []);
+
+    useEffect(() => {
+        if (searchTerm === "") {
+            setFilteredLogs(logs);
+        } else {
+            const filtered = logs.filter(log =>
+                log.patient?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                log.author?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                log.value?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            setFilteredLogs(filtered);
+        }
+    }, [searchTerm, logs]);
+
+    const getTypeLabel = (type: string) => {
+        const labels: { [key: string]: string } = {
+            'VITALS': 'VITALES',
+            'FOOD': 'ALIMENTOS',
+            'MEDS': 'MEDICAMENTOS',
+            'NOTE': 'NOTA'
+        };
+        return labels[type] || type;
+    };
+
     return (
         <div className="p-8 space-y-6">
             <div>
@@ -32,7 +69,12 @@ export default function LogsPage() {
             <div className="flex gap-4">
                 <div className="relative flex-1 max-w-sm">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Buscar por residente o personal..." className="pl-8" />
+                    <Input
+                        placeholder="Buscar por residente o personal..."
+                        className="pl-8"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                 </div>
                 <Button variant="outline">
                     <Filter className="mr-2 h-4 w-4" /> Filtrar
@@ -52,27 +94,55 @@ export default function LogsPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {logs.map((log) => (
-                            <TableRow key={log.id}>
-                                <TableCell className="whitespace-nowrap flex flex-col">
-                                    <span className="font-bold text-slate-700">{log.time}</span>
-                                    <span className="text-xs text-muted-foreground">{log.date}</span>
+                        {loading ? (
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center py-8">
+                                    Cargando registros...
                                 </TableCell>
-                                <TableCell className="font-medium">{log.patient}</TableCell>
-                                <TableCell>
-                                    <Badge variant="outline" className={
-                                        log.type === 'VITALES' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                                            log.type === 'ALIMENTOS' ? 'bg-orange-50 text-orange-700 border-orange-200' :
-                                                log.type === 'MEDICAMENTOS' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                    'bg-slate-100'
-                                    }>
-                                        {log.type}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell>{log.desc}</TableCell>
-                                <TableCell className="text-muted-foreground text-sm">{log.staff}</TableCell>
                             </TableRow>
-                        ))}
+                        ) : filteredLogs.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                                    {searchTerm ? "No se encontraron registros" : "No hay registros aún"}
+                                </TableCell>
+                            </TableRow>
+                        ) : filteredLogs.map((log) => {
+                            const logDate = new Date(log.createdAt);
+                            const isToday = new Date().toDateString() === logDate.toDateString();
+
+                            return (
+                                <TableRow key={log.id}>
+                                    <TableCell className="whitespace-nowrap flex flex-col">
+                                        <span className="font-bold text-slate-700">
+                                            {format(logDate, "HH:mm", { locale: es })}
+                                        </span>
+                                        <span className="text-xs text-muted-foreground">
+                                            {isToday ? "Hoy" : format(logDate, "dd/MM/yyyy", { locale: es })}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell className="font-medium">{log.patient?.name || "N/A"}</TableCell>
+                                    <TableCell>
+                                        <Badge variant="outline" className={
+                                            log.type === 'VITALS' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                                log.type === 'FOOD' ? 'bg-orange-50 text-orange-700 border-orange-200' :
+                                                    log.type === 'MEDS' ? 'bg-green-50 text-green-700 border-green-200' :
+                                                        'bg-slate-100'
+                                        }>
+                                            {getTypeLabel(log.type)}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex flex-col">
+                                            <span className="font-medium">{log.value}</span>
+                                            {log.notes && (
+                                                <span className="text-xs text-muted-foreground mt-1">{log.notes}</span>
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-muted-foreground text-sm">{log.author?.name || "N/A"}</TableCell>
+                                </TableRow>
+                            );
+                        })}
                     </TableBody>
                 </Table>
             </div>
