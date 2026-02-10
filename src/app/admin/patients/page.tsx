@@ -93,7 +93,7 @@ export default async function PatientsPage() {
                                                 </Button>
                                             </HoverScale>
                                         </Link>
-                                        <Link href={`/admin/patients/${patient.id}#vitals`}>
+                                        <Link href={`/admin/patients/${patient.id}?tab=logs`}>
                                             <HoverScale>
                                                 <Button variant="ghost" size="icon" title="Historial Médico">
                                                     <Activity className="h-4 w-4 text-indigo-600" />

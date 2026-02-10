@@ -24,10 +24,11 @@ import {
     ArrowLeft
 } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { VitalsChart } from "@/components/patients/vitals-chart";
 import { ClinicalNotes } from "@/components/patients/clinical-notes";
 import { FadeIn } from "@/components/ui/motion-wrapper";
+import { useEffect, useState } from "react";
 
 // Mock Data
 const patientData = {
@@ -61,6 +62,16 @@ const patientData = {
 
 export default function PatientDetailsPage() {
     const params = useParams();
+    const searchParams = useSearchParams();
+    const [activeTab, setActiveTab] = useState("overview");
+
+    useEffect(() => {
+        const tab = searchParams.get("tab");
+        if (tab && ["overview", "meds", "logs", "docs"].includes(tab)) {
+            setActiveTab(tab);
+        }
+    }, [searchParams]);
+
     // In real app, fetch patient by params.id
 
     return (
@@ -143,8 +154,8 @@ export default function PatientDetailsPage() {
 
                 {/* Right Column: Tabs for Clinical Data */}
                 <div className="lg:col-span-2">
-                    <Tabs defaultValue="overview" className="space-y-6">
-                        <TabsList className="grid w-full grid-cols-3">
+                    <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+                        <TabsList className="grid w-full grid-cols-4">
                             <TabsTrigger value="overview">Resumen Clínico</TabsTrigger>
                             <TabsTrigger value="meds">Medicamentos</TabsTrigger>
                             <TabsTrigger value="logs">Bitácora Personal</TabsTrigger>
