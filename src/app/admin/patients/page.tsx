@@ -19,15 +19,13 @@ import { PatientForm } from "@/components/patients/patient-form";
 import { UserPlus, FileText, Activity } from "lucide-react";
 import Link from "next/link";
 import { FadeIn, HoverScale } from "@/components/ui/motion-wrapper";
+import { db } from "@/lib/db";
 
-// Mock data
-const patients = [
-    { id: "1", name: "Maria Garcia", room: "101", age: 82, status: "Estable" },
-    { id: "2", name: "Jose Hernandez", room: "102", age: 78, status: "Atención Crítica" },
-    { id: "3", name: "Ana Lopez", room: "103", age: 85, status: "Estable" },
-];
+export default async function PatientsPage() {
+    const patients = await db.patient.findMany({
+        orderBy: { name: 'asc' }
+    });
 
-export default function PatientsPage() {
     return (
         <FadeIn className="p-8 space-y-8">
             <div className="flex items-center justify-between">
@@ -69,11 +67,17 @@ export default function PatientsPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {patients.map((patient) => (
+                        {patients.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                                    No hay residentes registrados. Agregue uno para comenzar.
+                                </TableCell>
+                            </TableRow>
+                        ) : patients.map((patient) => (
                             <TableRow key={patient.id} className="hover:bg-slate-50 transition-colors">
                                 <TableCell className="font-medium">{patient.name}</TableCell>
-                                <TableCell>{patient.room}</TableCell>
-                                <TableCell>{patient.age}</TableCell>
+                                <TableCell>{patient.room || "N/A"}</TableCell>
+                                <TableCell>{patient.age || "N/A"}</TableCell>
                                 <TableCell>
                                     <span className={`px-2 py-1 rounded-full text-xs ${patient.status === 'Estable' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                                         {patient.status}
