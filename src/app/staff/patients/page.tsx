@@ -21,7 +21,41 @@ import { FadeIn, SlideIn, HoverScale } from "@/components/ui/motion-wrapper";
 
 export default async function StaffPatientsPage() {
     const patients = await db.patient.findMany({
-        orderBy: { name: 'asc' }
+        orderBy: { name: 'asc' },
+        include: {
+            dailyLogs: {
+                where: { type: 'VITALS' },
+                orderBy: { createdAt: 'desc' },
+                take: 1
+            }
+        }
+    });
+
+    // Format patients with last vital time
+    const patientsWithVitals = patients.map(p => {
+        const lastVital = p.dailyLogs[0];
+        let lastVitalTime = "--:--";
+
+        if (lastVital) {
+            const now = new Date();
+            const vitalDate = new Date(lastVital.createdAt);
+            const diffMs = now.getTime() - vitalDate.getTime();
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+
+            if (diffHours > 0) {
+                lastVitalTime = `${diffHours}h`;
+            } else if (diffMins > 0) {
+                lastVitalTime = `${diffMins}m`;
+            } else {
+                lastVitalTime = "ahora";
+            }
+        }
+
+        return {
+            ...p,
+            lastVitalTime
+        };
     });
 
     return (
