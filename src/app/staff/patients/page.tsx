@@ -23,7 +23,7 @@ export default async function StaffPatientsPage() {
     const patients = await db.patient.findMany({
         orderBy: { name: 'asc' },
         include: {
-            dailyLogs: {
+            logs: {
                 where: { type: 'VITALS' },
                 orderBy: { createdAt: 'desc' },
                 take: 1
@@ -33,7 +33,7 @@ export default async function StaffPatientsPage() {
 
     // Format patients with last vital time
     const patientsWithVitals = patients.map(p => {
-        const lastVital = p.dailyLogs[0];
+        const lastVital = p.logs[0];
         let lastVitalTime = "--:--";
 
         if (lastVital) {
