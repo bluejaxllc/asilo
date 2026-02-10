@@ -87,7 +87,7 @@ export default async function StaffPatientsPage() {
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 text-center">
                                             <span className="block text-xs font-bold text-slate-400 uppercase">Última Vital</span>
-                                            <span className="block text-lg font-semibold text-slate-700">--:--</span>
+                                            <span className="block text-lg font-semibold text-slate-700">{p.lastVitalTime}</span>
                                         </div>
                                         <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 text-center">
                                             <span className="block text-xs font-bold text-slate-400 uppercase">Dieta</span>
