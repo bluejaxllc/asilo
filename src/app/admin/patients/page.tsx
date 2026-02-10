@@ -20,6 +20,7 @@ import { UserPlus, FileText, Activity } from "lucide-react";
 import Link from "next/link";
 import { FadeIn, HoverScale } from "@/components/ui/motion-wrapper";
 import { db } from "@/lib/db";
+import { DeletePatientButton } from "@/components/patients/delete-patient-button";
 
 export default async function PatientsPage() {
     const patients = await db.patient.findMany({
@@ -99,6 +100,10 @@ export default async function PatientsPage() {
                                                 </Button>
                                             </HoverScale>
                                         </Link>
+                                        <DeletePatientButton
+                                            patientId={patient.id}
+                                            patientName={patient.name}
+                                        />
                                     </div>
                                 </TableCell>
                             </TableRow>
