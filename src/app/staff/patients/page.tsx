@@ -68,7 +68,7 @@ export default async function StaffPatientsPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {patients.map((p, index) => (
+                {patientsWithVitals.map((p, index) => (
                     <SlideIn key={p.id} delay={index * 0.1}>
                         <HoverScale className="h-full">
                             <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300 cursor-pointer border-t-8 border-t-blue-500 h-full flex flex-col">
