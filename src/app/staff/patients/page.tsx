@@ -19,6 +19,9 @@ import { Activity, Pill, Utensils } from "lucide-react";
 import { LogForm } from "@/components/staff/log-form";
 import { FadeIn, SlideIn, HoverScale } from "@/components/ui/motion-wrapper";
 
+export const dynamic = 'force-dynamic';
+
+
 export default async function StaffPatientsPage() {
     const patients = await db.patient.findMany({
         orderBy: { name: 'asc' },

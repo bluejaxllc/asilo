@@ -22,6 +22,9 @@ import { FadeIn, HoverScale } from "@/components/ui/motion-wrapper";
 import { db } from "@/lib/db";
 import { DeletePatientButton } from "@/components/patients/delete-patient-button";
 
+export const dynamic = 'force-dynamic';
+
+
 export default async function PatientsPage() {
     const patients = await db.patient.findMany({
         orderBy: { name: 'asc' }

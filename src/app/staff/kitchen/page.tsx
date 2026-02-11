@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Search, Utensils, AlertTriangle } from "lucide-react";
 import { FadeIn, SlideIn, HoverScale } from "@/components/ui/motion-wrapper";
 
+export const dynamic = 'force-dynamic';
+
 export default async function KitchenPage() {
     const patients = await db.patient.findMany({
         orderBy: { room: 'asc' },

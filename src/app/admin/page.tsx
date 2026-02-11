@@ -3,6 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Activity, Users, ClipboardList, AlertTriangle, UserCheck, Package, AlertCircle } from "lucide-react";
 import { FadeIn, ScaleIn, HoverScale } from "@/components/ui/motion-wrapper";
 
+export const dynamic = 'force-dynamic';
+
+
 export default async function AdminDashboardPage() {
     // 1. Fetch Integration Data
     const totalResidents = await db.patient.count();
