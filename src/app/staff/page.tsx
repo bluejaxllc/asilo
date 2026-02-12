@@ -90,6 +90,14 @@ export default function StaffPage() {
         }
     };
 
+    const [clockOutLoading, setClockOutLoading] = useState(false);
+
+    const handleClockOut = async () => {
+        setClockOutLoading(true);
+        await clockOut();
+        setClockOutLoading(false);
+    };
+
     return (
         <div className="space-y-6">
             <div className={`flex flex-col md:flex-row justify-between items-center p-6 rounded-xl shadow-lg transition-colors duration-500 ${isClockedIn ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white' : 'bg-slate-800 text-slate-100'}`}>
@@ -108,8 +116,9 @@ export default function StaffPage() {
                     </div>
 
                     {isClockedIn ? (
-                        <Button onClick={() => { console.log('Clicking Marcar Salida'); clockOut(); }} variant="secondary" size="lg" className="w-full md:w-auto mt-2 text-blue-700 hover:bg-white shadow-md font-bold text-lg h-14">
-                            <Clock className="mr-2 h-5 w-5" /> Marcar Salida
+                        <Button onClick={handleClockOut} disabled={clockOutLoading} variant="secondary" size="lg" className="w-full md:w-auto mt-2 text-blue-700 hover:bg-white shadow-md font-bold text-lg h-14">
+                            {clockOutLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Clock className="mr-2 h-5 w-5" />}
+                            {clockOutLoading ? "Procesando..." : "Marcar Salida"}
                         </Button>
                     ) : hasCompletedShift ? (
                         <Button disabled variant="outline" size="lg" className="w-full md:w-auto mt-2 bg-gray-200 text-gray-500 border-0 shadow-none font-bold text-lg h-14">

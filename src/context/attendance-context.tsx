@@ -110,19 +110,24 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
         try {
             const result = await checkOut(session.user.email);
             if (result.error) {
-                if (result.error === "No has registrado tu entrada") {
+                // Check for various error messages that imply we are already out
+                if (result.error === "No has registrado ninguna entrada hoy" ||
+                    result.error === "Ya has registrado tu salida para este turno") {
+
                     // Critical State Mismatch Fix: Server thinks we are out, but Client thinks we are in.
                     // Trust the server. Force client to sign out.
                     setIsClockedIn(false);
+                    setHasCompletedShift(true); // Assuming if we are out, shift is done
                     setStartTime(null);
                     localStorage.removeItem('attendanceStartTime');
-                    toast.warning("Sesión de asistencia sincronizada con el servidor.");
+
+                    toast.warning("Sincronizando: Tu turno ya había finalizado.");
                 } else {
                     toast.error(result.error);
                 }
             } else {
                 setIsClockedIn(false);
-                setHasCompletedShift(true); // Mark as completed locally
+                setHasCompletedShift(true);
                 setStartTime(null);
                 localStorage.removeItem('attendanceStartTime');
                 toast.success("Turno finalizado correctamente");
