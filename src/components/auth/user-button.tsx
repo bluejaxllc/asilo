@@ -13,11 +13,11 @@ import {
 } from "@/components/ui/avatar";
 import { User, LogOut } from "lucide-react";
 
-import { logout } from "@/actions/logout";
+import { signOut } from "next-auth/react";
 
 export const UserButton = () => {
     const onClick = () => {
-        logout();
+        signOut();
     };
 
     return (

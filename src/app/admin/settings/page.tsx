@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,94 +12,262 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save } from "lucide-react";
+import { Save, Loader2, Building2, Bell, Database, Shield, Info } from "lucide-react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { getSettings, updateSetting } from "@/actions/settings";
+import { FadeIn, SlideIn } from "@/components/ui/motion-wrapper";
+import { Badge } from "@/components/ui/badge";
 
 export default function SettingsPage() {
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [settings, setSettings] = useState<Record<string, string>>({});
+
+    // Form States
+    const [name, setName] = useState("");
+    const [address, setAddress] = useState("");
+    const [phone, setPhone] = useState("");
+    const [stockAlerts, setStockAlerts] = useState(true);
+    const [incidentAlerts, setIncidentAlerts] = useState(true);
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            setLoading(true);
+            const data = await getSettings();
+            setSettings(data);
+
+            setName(data.institutionName || ".blue_jax");
+            setAddress(data.institutionAddress || "Av. Reforma 123, Col. Centro");
+            setPhone(data.institutionPhone || "(55) 5555-5555");
+            setStockAlerts(data.stockAlerts !== "false");
+            setIncidentAlerts(data.incidentAlerts !== "false");
+
+            setLoading(false);
+        };
+        fetchSettings();
+    }, []);
+
+    const handleSaveGeneral = async () => {
+        setSaving(true);
+        try {
+            await updateSetting("institutionName", name);
+            await updateSetting("institutionAddress", address);
+            await updateSetting("institutionPhone", phone);
+            toast.success("Información general actualizada");
+        } catch (error) {
+            toast.error("Error al guardar cambios");
+        }
+        setSaving(false);
+    };
+
+    const handleSaveNotifications = async () => {
+        setSaving(true);
+        try {
+            await updateSetting("stockAlerts", String(stockAlerts));
+            await updateSetting("incidentAlerts", String(incidentAlerts));
+            toast.success("Preferencias de notificaciones actualizadas");
+        } catch (error) {
+            toast.error("Error al guardar cambios");
+        }
+        setSaving(false);
+    };
+
+    if (loading) {
+        return (
+            <div className="p-8 flex flex-col items-center justify-center min-h-[60vh] gap-3">
+                <div className="h-10 w-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                <p className="text-sm text-muted-foreground">Cargando configuración...</p>
+            </div>
+        );
+    }
+
     return (
-        <div className="p-8 space-y-6">
-            <div>
-                <h2 className="text-3xl font-bold tracking-tight">Configuración</h2>
-                <p className="text-muted-foreground">
-                    Administre los parámetros generales del sistema.
-                </p>
+        <FadeIn className="p-6 md:p-8 space-y-6">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-3xl font-bold tracking-tight">Configuración</h2>
+                    <p className="text-muted-foreground mt-1">
+                        Parámetros generales del sistema y preferencias.
+                    </p>
+                </div>
+                <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200 gap-1.5">
+                    <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                    Sistema Operativo
+                </Badge>
             </div>
 
-            <Tabs defaultValue="general" className="space-y-4">
-                <TabsList>
-                    <TabsTrigger value="general">General</TabsTrigger>
-                    <TabsTrigger value="notifications">Notificaciones</TabsTrigger>
-                    <TabsTrigger value="backup">Respaldo</TabsTrigger>
+            <Tabs defaultValue="general" className="space-y-6">
+                <TabsList className="bg-white border h-11 p-1">
+                    <TabsTrigger value="general" className="gap-1.5 data-[state=active]:bg-slate-900 data-[state=active]:text-white">
+                        <Building2 className="h-3.5 w-3.5" /> General
+                    </TabsTrigger>
+                    <TabsTrigger value="notifications" className="gap-1.5 data-[state=active]:bg-slate-900 data-[state=active]:text-white">
+                        <Bell className="h-3.5 w-3.5" /> Notificaciones
+                    </TabsTrigger>
+                    <TabsTrigger value="backup" className="gap-1.5 data-[state=active]:bg-slate-900 data-[state=active]:text-white">
+                        <Database className="h-3.5 w-3.5" /> Respaldo
+                    </TabsTrigger>
+                    <TabsTrigger value="security" className="gap-1.5 data-[state=active]:bg-slate-900 data-[state=active]:text-white">
+                        <Shield className="h-3.5 w-3.5" /> Seguridad
+                    </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="general">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Información del Asilo</CardTitle>
-                            <CardDescription>
-                                Datos visibles en reportes y encabezados.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Nombre de la Institución</Label>
-                                <Input id="name" defaultValue=".blue_jax" />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="address">Dirección</Label>
-                                <Input id="address" defaultValue="Av. Reforma 123, Col. Centro" />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="phone">Teléfono de Contacto</Label>
-                                <Input id="phone" defaultValue="(55) 5555-5555" />
-                            </div>
-                            <Button className="w-fit">
-                                <Save className="mr-2 h-4 w-4" /> Guardar Cambios
-                            </Button>
-                        </CardContent>
-                    </Card>
+                    <SlideIn delay={0.1}>
+                        <Card className="shadow-sm border-slate-200">
+                            <CardHeader className="border-b bg-slate-50/50">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                                        <Building2 className="h-5 w-5 text-blue-600" />
+                                    </div>
+                                    <div>
+                                        <CardTitle className="text-lg">Información del Asilo</CardTitle>
+                                        <CardDescription>
+                                            Datos visibles en reportes y encabezados del sistema.
+                                        </CardDescription>
+                                    </div>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="p-6 space-y-5">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="name" className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Nombre de la Institución</Label>
+                                    <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="h-11" />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="address" className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Dirección</Label>
+                                    <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} className="h-11" />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="phone" className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Teléfono de Contacto</Label>
+                                    <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="h-11" />
+                                </div>
+                                <div className="pt-2">
+                                    <Button className="bg-blue-600 hover:bg-blue-700 shadow-sm gap-2" onClick={handleSaveGeneral} disabled={saving}>
+                                        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                                        Guardar Cambios
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </SlideIn>
                 </TabsContent>
 
                 <TabsContent value="notifications">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Preferencias de Alertas</CardTitle>
-                            <CardDescription>
-                                Configure cuándo enviar alertas al administrador.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex items-center justify-between space-x-2">
-                                <Label htmlFor="stock-alerts" className="flex flex-col space-y-1">
-                                    <span>Stock Bajo de Medicamentos</span>
-                                    <span className="font-normal text-xs text-muted-foreground">Enviar correo cuando un medicamento baje del mínimo.</span>
-                                </Label>
-                                <Switch id="stock-alerts" defaultChecked />
-                            </div>
-                            <div className="flex items-center justify-between space-x-2">
-                                <Label htmlFor="incident-alerts" className="flex flex-col space-y-1">
-                                    <span>Incidentes Críticos</span>
-                                    <span className="font-normal text-xs text-muted-foreground">Notificación inmediata para reportes de caídas o emergencias.</span>
-                                </Label>
-                                <Switch id="incident-alerts" defaultChecked />
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <SlideIn delay={0.1}>
+                        <Card className="shadow-sm border-slate-200">
+                            <CardHeader className="border-b bg-slate-50/50">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                                        <Bell className="h-5 w-5 text-amber-600" />
+                                    </div>
+                                    <div>
+                                        <CardTitle className="text-lg">Preferencias de Alertas</CardTitle>
+                                        <CardDescription>
+                                            Configure cuándo enviar alertas al administrador.
+                                        </CardDescription>
+                                    </div>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="p-6 space-y-1">
+                                <div className="flex items-center justify-between p-4 rounded-xl hover:bg-slate-50 transition-colors group">
+                                    <Label htmlFor="stock-alerts" className="flex flex-col space-y-1 cursor-pointer">
+                                        <span className="font-semibold text-slate-800">Stock Bajo de Medicamentos</span>
+                                        <span className="font-normal text-xs text-muted-foreground">Enviar correo cuando un medicamento baje del mínimo.</span>
+                                    </Label>
+                                    <Switch id="stock-alerts" checked={stockAlerts} onCheckedChange={setStockAlerts} />
+                                </div>
+                                <div className="flex items-center justify-between p-4 rounded-xl hover:bg-slate-50 transition-colors group">
+                                    <Label htmlFor="incident-alerts" className="flex flex-col space-y-1 cursor-pointer">
+                                        <span className="font-semibold text-slate-800">Incidentes Críticos</span>
+                                        <span className="font-normal text-xs text-muted-foreground">Notificación inmediata para reportes de caídas o emergencias.</span>
+                                    </Label>
+                                    <Switch id="incident-alerts" checked={incidentAlerts} onCheckedChange={setIncidentAlerts} />
+                                </div>
+                                <div className="pt-4 px-4">
+                                    <Button className="bg-blue-600 hover:bg-blue-700 shadow-sm gap-2" onClick={handleSaveNotifications} disabled={saving}>
+                                        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                                        Guardar Preferencias
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </SlideIn>
                 </TabsContent>
 
                 <TabsContent value="backup">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Copia de Seguridad de Datos</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm text-slate-500 mb-4">
-                                Descargue una copia completa de la base de datos de pacientes y registros.
-                            </p>
-                            <Button variant="outline">Descargar Respaldo (.CSV)</Button>
-                        </CardContent>
-                    </Card>
+                    <SlideIn delay={0.1}>
+                        <Card className="shadow-sm border-slate-200">
+                            <CardHeader className="border-b bg-slate-50/50">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center">
+                                        <Database className="h-5 w-5 text-green-600" />
+                                    </div>
+                                    <div>
+                                        <CardTitle className="text-lg">Copia de Seguridad</CardTitle>
+                                        <CardDescription>
+                                            Descargue una copia completa de la base de datos.
+                                        </CardDescription>
+                                    </div>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="p-6">
+                                <div className="bg-slate-50 rounded-xl p-6 border border-dashed border-slate-200 text-center space-y-3">
+                                    <Database className="h-10 w-10 text-slate-300 mx-auto" />
+                                    <div>
+                                        <p className="text-sm font-medium text-slate-700">Exportar Datos del Sistema</p>
+                                        <p className="text-xs text-muted-foreground mt-1">Incluye pacientes, registros médicos y configuración</p>
+                                    </div>
+                                    <Button variant="outline" className="gap-2">
+                                        <Database className="h-3.5 w-3.5" /> Descargar Respaldo (.CSV)
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </SlideIn>
+                </TabsContent>
+
+                <TabsContent value="security">
+                    <SlideIn delay={0.1}>
+                        <Card className="shadow-sm border-slate-200">
+                            <CardHeader className="border-b bg-slate-50/50">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-lg bg-red-100 flex items-center justify-center">
+                                        <Shield className="h-5 w-5 text-red-600" />
+                                    </div>
+                                    <div>
+                                        <CardTitle className="text-lg">Seguridad del Sistema</CardTitle>
+                                        <CardDescription>
+                                            Configuración de acceso y permisos.
+                                        </CardDescription>
+                                    </div>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="p-6">
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3 p-4 bg-green-50 rounded-xl border border-green-100">
+                                        <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                                        <div className="flex-1">
+                                            <p className="text-sm font-medium text-green-800">Autenticación Activa</p>
+                                            <p className="text-xs text-green-600">NextAuth.js con control de roles (ADMIN, STAFF, FAMILY)</p>
+                                        </div>
+                                        <Badge variant="outline" className="bg-green-100 text-green-700 border-green-200">Activo</Badge>
+                                    </div>
+                                    <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                                        <Info className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                                        <div className="flex-1">
+                                            <p className="text-sm font-medium text-blue-800">Middleware de Rutas</p>
+                                            <p className="text-xs text-blue-600">Protección por rol en todas las rutas protegidas</p>
+                                        </div>
+                                        <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-200">Activo</Badge>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </SlideIn>
                 </TabsContent>
             </Tabs>
-        </div>
+        </FadeIn>
     );
 }

@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useState, useTransition } from "react"
 import { useSearchParams } from "next/navigation"
 
-import { LogIn } from "lucide-react"
+import { LogIn, Loader2 } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
 import {
@@ -58,15 +58,15 @@ export const LoginForm = () => {
 
     return (
         <CardWrapper
-            headerLabel="Welcome back"
-            backButtonLabel="Don't have an account?"
+            headerLabel="Bienvenido de nuevo"
+            backButtonLabel="¿No tienes cuenta? Regístrate"
             backButtonHref="/auth/register"
             showSocial
         >
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-6"
+                    className="space-y-5"
                 >
                     <div className="space-y-4">
                         <FormField
@@ -74,13 +74,14 @@ export const LoginForm = () => {
                             name="email"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Email</FormLabel>
+                                    <FormLabel className="text-slate-300 text-sm font-medium">Correo Electrónico</FormLabel>
                                     <FormControl>
                                         <Input
                                             {...field}
                                             disabled={isPending}
-                                            placeholder="john.doe@example.com"
+                                            placeholder="ejemplo@correo.com"
                                             type="email"
+                                            className="h-12 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl"
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -92,13 +93,14 @@ export const LoginForm = () => {
                             name="password"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Password</FormLabel>
+                                    <FormLabel className="text-slate-300 text-sm font-medium">Contraseña</FormLabel>
                                     <FormControl>
                                         <Input
                                             {...field}
                                             disabled={isPending}
-                                            placeholder="******"
+                                            placeholder="••••••••"
                                             type="password"
+                                            className="h-12 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl"
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -111,9 +113,15 @@ export const LoginForm = () => {
                     <Button
                         disabled={isPending}
                         type="submit"
-                        className="w-full"
+                        size="lg"
+                        className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all text-base"
                     >
-                        Login
+                        {isPending ? (
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        ) : (
+                            <LogIn className="mr-2 h-5 w-5" />
+                        )}
+                        {isPending ? "Iniciando..." : "Iniciar Sesión"}
                     </Button>
                 </form>
             </Form>

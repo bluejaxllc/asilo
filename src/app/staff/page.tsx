@@ -1,40 +1,87 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Card,
     CardContent,
-    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
+    CardDescription,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PlayCircle, CheckCircle, Clock, LogIn, Loader2 } from "lucide-react";
+import {
+    PlayCircle,
+    CheckCircle,
+    Clock,
+    LogIn,
+    Loader2,
+    AlertCircle,
+    TrendingUp,
+    ListTodo,
+    Timer,
+} from "lucide-react";
 import { useAttendance } from "@/context/attendance-context";
 import { toast } from "sonner";
-import { FadeIn, SlideIn, HoverScale } from "@/components/ui/motion-wrapper";
+import { FadeIn, SlideIn, ScaleIn } from "@/components/ui/motion-wrapper";
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
 import { getMyTasks, startTask, completeTask } from "@/actions/tasks";
 
-// Initial Mock Data
+type TaskStatus = "PENDIENTE" | "EN PROGRESO" | "COMPLETADO";
 
+interface UITask {
+    id: string;
+    title: string;
+    patient: string;
+    priority: "ALTA" | "MEDIA" | "BAJA";
+    status: TaskStatus;
+    time: string;
+    originalStatus: string;
+}
+
+const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Buenos Días";
+    if (hour < 18) return "Buenas Tardes";
+    return "Buenas Noches";
+};
+
+const priorityConfig: Record<string, { border: string; bg: string; text: string; badge: string }> = {
+    ALTA: { border: "border-l-red-500", bg: "bg-red-50", text: "text-red-700", badge: "bg-red-100 text-red-700 border-red-200" },
+    MEDIA: { border: "border-l-amber-500", bg: "bg-amber-50", text: "text-amber-700", badge: "bg-amber-100 text-amber-700 border-amber-200" },
+    BAJA: { border: "border-l-emerald-500", bg: "bg-emerald-50", text: "text-emerald-700", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+};
 
 export default function StaffPage() {
     const { isClockedIn, hasCompletedShift, clockIn, clockOut, duration } = useAttendance();
     const { data: session } = useSession();
-    const [tasks, setTasks] = useState<any[]>([]); // TODO: Type this properly with Prisma types
+    const [tasks, setTasks] = useState<UITask[]>([]);
     const [loading, setLoading] = useState(false);
 
     const fetchTasks = async () => {
         if (session?.user?.email) {
             setLoading(true);
             const userTasks = await getMyTasks(session.user.email);
-            // Transform Prisma tasks to UI format if needed, or stick to schema
-            // For now, mapping to match UI expectation or adjusting UI
-            setTasks(userTasks);
+
+            const mappedTasks: UITask[] = userTasks.map((t: any) => {
+                let priorityLabel: "ALTA" | "MEDIA" | "BAJA" = "MEDIA";
+                if (t.priority === "URGENT" || t.priority === "HIGH") priorityLabel = "ALTA";
+                if (t.priority === "LOW") priorityLabel = "BAJA";
+
+                return {
+                    id: t.id,
+                    title: t.title,
+                    patient: t.patient?.name || t.description || "General",
+                    priority: priorityLabel,
+                    status: t.status === "IN_PROGRESS" ? "EN PROGRESO" :
+                        t.status === "COMPLETED" ? "COMPLETADO" : "PENDIENTE",
+                    time: t.dueDate ? new Date(t.dueDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Todo el día",
+                    originalStatus: t.status
+                };
+            });
+
+            setTasks(mappedTasks);
             setLoading(false);
         }
     };
@@ -51,7 +98,6 @@ export default function StaffPage() {
             return;
         }
 
-        // Optimistic update
         setTasks(prev => prev.map(t =>
             t.id === taskId ? { ...t, status: "EN PROGRESO" } : t
         ));
@@ -60,7 +106,7 @@ export default function StaffPage() {
             const result = await startTask(taskId, session.user.email);
             if ((result as any).error) {
                 toast.error((result as any).error as string);
-                fetchTasks(); // Revert on error
+                fetchTasks();
             } else {
                 toast.success((result as any).success as string);
             }
@@ -70,7 +116,6 @@ export default function StaffPage() {
     };
 
     const handleCompleteTask = async (taskId: string) => {
-        // Optimistic update
         setTasks(prev => prev.map(t =>
             t.id === taskId ? { ...t, status: "COMPLETADO" } : t
         ));
@@ -98,101 +143,202 @@ export default function StaffPage() {
         setClockOutLoading(false);
     };
 
+    const pendingCount = tasks.filter(t => t.status === "PENDIENTE").length;
+    const inProgressCount = tasks.filter(t => t.status === "EN PROGRESO").length;
+    const completedCount = tasks.filter(t => t.status === "COMPLETADO").length;
+    const activeTasks = tasks.filter(t => t.status !== "COMPLETADO");
+
     return (
-        <div className="space-y-6">
-            <div className={`flex flex-col md:flex-row justify-between items-center p-6 rounded-xl shadow-lg transition-colors duration-500 ${isClockedIn ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white' : 'bg-slate-800 text-slate-100'}`}>
-                <div className="mb-4 md:mb-0">
-                    <h2 className="text-3xl font-bold">Buenos Días, {session?.user?.name || "Usuario"}</h2>
-                    <p className={`mt-1 text-lg ${isClockedIn ? 'text-blue-100' : 'text-slate-400'}`}>
-                        {isClockedIn ? `Tienes ${tasks.filter(t => t.status !== 'COMPLETADO').length} tareas pendientes hoy.` : "Por favor marca tu entrada para ver tus tareas."}
-                    </p>
+        <FadeIn className="space-y-6">
+            {/* Hero Banner */}
+            <div className={`relative overflow-hidden rounded-2xl shadow-xl transition-all duration-700 ${isClockedIn ? 'bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800' : 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900'}`}>
+                {/* Background pattern */}
+                <div className="absolute inset-0 opacity-10">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/2" />
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-1/2 -translate-x-1/2" />
                 </div>
-                <div className="text-right w-full md:w-auto">
-                    <div className="text-sm opacity-80 uppercase tracking-wider font-semibold">
-                        {isClockedIn ? "Turno en Curso" : "Fuera de Turno"}
+
+                <div className="relative p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div>
+                        <p className={`text-sm uppercase tracking-widest font-semibold mb-1 ${isClockedIn ? 'text-blue-200' : 'text-slate-400'}`}>
+                            {isClockedIn ? "Turno en Curso" : "Fuera de Turno"}
+                        </p>
+                        <h2 className="text-3xl md:text-4xl font-bold text-white">
+                            {getGreeting()}, <span className={isClockedIn ? 'text-blue-200' : 'text-slate-300'}>{session?.user?.name || "Usuario"}</span>
+                        </h2>
+                        <p className={`mt-2 text-base ${isClockedIn ? 'text-blue-100' : 'text-slate-400'}`}>
+                            {isClockedIn
+                                ? `Tienes ${activeTasks.length} tarea${activeTasks.length !== 1 ? 's' : ''} pendiente${activeTasks.length !== 1 ? 's' : ''} hoy.`
+                                : "Marca tu entrada para ver tus tareas asignadas."}
+                        </p>
                     </div>
-                    <div className="text-4xl font-mono font-bold my-2">
-                        {isClockedIn ? duration : "--:--:--"}
-                    </div>
 
-                    {isClockedIn ? (
-                        <Button onClick={handleClockOut} disabled={clockOutLoading} variant="secondary" size="lg" className="w-full md:w-auto mt-2 text-blue-700 hover:bg-white shadow-md font-bold text-lg h-14">
-                            {clockOutLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Clock className="mr-2 h-5 w-5" />}
-                            {clockOutLoading ? "Procesando..." : "Marcar Salida"}
-                        </Button>
-                    ) : hasCompletedShift ? (
-                        <Button disabled variant="outline" size="lg" className="w-full md:w-auto mt-2 bg-gray-200 text-gray-500 border-0 shadow-none font-bold text-lg h-14">
-                            <CheckCircle className="mr-2 h-5 w-5" /> Turno Finalizado
-                        </Button>
-                    ) : (
-                        <Button onClick={() => { console.log('Clicking Iniciar Turno'); clockIn(); }} variant="default" size="lg" className="w-full md:w-auto mt-2 bg-green-500 hover:bg-green-600 text-white border-0 shadow-md font-bold text-lg h-14 animate-pulse">
-                            <LogIn className="mr-2 h-5 w-5" /> Iniciar Turno
-                        </Button>
-                    )}
-                </div>
-            </div>
-
-            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${!isClockedIn ? 'opacity-70 grayscale' : ''}`}>
-                {tasks.map((task, index) => {
-                    const isCompleted = task.status === 'COMPLETADO';
-                    const isInProgress = task.status === 'EN PROGRESO';
-
-                    if (isCompleted) return null;
-
-                    return (
-                        <div key={task.id} className="h-full">
-                            <Card className={`h-full flex flex-col border-l-8 shadow-md transition-all duration-300 transform ${isInProgress ? 'border-l-green-500 ring-2 ring-green-500/30' : 'border-l-blue-500'}`}>
-                                <CardHeader className="pb-4">
-                                    <div className="flex justify-between items-start">
-                                        <Badge className="px-3 py-1 text-sm" variant={task.priority === 'ALTA' ? "destructive" : "secondary"}>
-                                            {task.priority}
-                                        </Badge>
-                                        <span className="text-lg font-bold text-slate-500 flex items-center">
-                                            <Clock className="w-4 h-4 mr-1" />
-                                            {task.time}
-                                        </span>
-                                    </div>
-                                    <CardTitle className="text-2xl mt-3 leading-tight">{task.title}</CardTitle>
-                                    <CardDescription className="text-xl font-medium text-slate-700 mt-2">
-                                        {task.patient}
-                                    </CardDescription>
-                                    {isInProgress && (
-                                        <div className="mt-4 p-2 bg-green-50 rounded-lg flex items-center justify-center text-green-700 font-bold animate-pulse">
-                                            <Loader2 className="mr-2 h-5 w-5 animate-spin" /> En Curso...
-                                        </div>
-                                    )}
-                                </CardHeader>
-                                <CardFooter className="pt-auto mt-auto flex gap-3 p-6">
-                                    {!isInProgress && (
-                                        <Button
-                                            className="flex-1 h-16 text-xl font-bold shadow-sm"
-                                            onClick={() => handleStartTask(task.id)}
-                                        >
-                                            <PlayCircle className="mr-2 h-6 w-6" /> Iniciar
-                                        </Button>
-                                    )}
-                                    <Button
-                                        variant={isInProgress ? "default" : "outline"}
-                                        className={`flex-1 h-16 text-xl font-bold shadow-sm ${isInProgress ? 'bg-green-600 hover:bg-green-700 text-white' : ''}`}
-                                        onClick={() => handleCompleteTask(task.id)}
-                                    >
-                                        <CheckCircle className="mr-2 h-6 w-6" /> Listo
-                                    </Button>
-                                </CardFooter>
-                            </Card>
+                    <div className="flex flex-col items-end gap-3 w-full md:w-auto">
+                        <div className={`text-5xl font-mono font-bold tracking-wider ${isClockedIn ? 'text-white' : 'text-slate-500'}`}>
+                            {isClockedIn ? duration : "--:--:--"}
                         </div>
-                    );
-                })}
-            </div>
-            {tasks.every(t => t.status === 'COMPLETADO') && isClockedIn && (
-                <div className="text-center p-16 text-slate-400 bg-slate-50 rounded-xl border-dashed border-2 border-slate-200">
-                    <div className="inline-block p-6 bg-green-100 rounded-full mb-6">
-                        <CheckCircle className="h-20 w-20 text-green-500" />
+
+                        {isClockedIn ? (
+                            <Button
+                                onClick={handleClockOut}
+                                disabled={clockOutLoading}
+                                size="lg"
+                                className="w-full md:w-auto bg-white/15 backdrop-blur-sm hover:bg-white/25 text-white border border-white/20 font-bold text-base h-12 rounded-xl shadow-lg"
+                            >
+                                {clockOutLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Clock className="mr-2 h-5 w-5" />}
+                                {clockOutLoading ? "Procesando..." : "Marcar Salida"}
+                            </Button>
+                        ) : hasCompletedShift ? (
+                            <Button
+                                disabled
+                                size="lg"
+                                className="w-full md:w-auto bg-slate-600/50 text-slate-400 border-0 font-bold text-base h-12 rounded-xl"
+                            >
+                                <CheckCircle className="mr-2 h-5 w-5" /> Turno Finalizado
+                            </Button>
+                        ) : (
+                            <Button
+                                onClick={() => clockIn()}
+                                size="lg"
+                                className="w-full md:w-auto bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white border-0 shadow-lg shadow-emerald-500/30 font-bold text-base h-12 rounded-xl animate-pulse"
+                            >
+                                <LogIn className="mr-2 h-5 w-5" /> Iniciar Turno
+                            </Button>
+                        )}
                     </div>
-                    <h3 className="text-3xl font-bold text-slate-700 mb-2">¡Todo listo por ahora!</h3>
-                    <p className="text-xl text-slate-500">Has completado todas tus tareas asignadas.</p>
+                </div>
+            </div>
+
+            {/* Stat Cards */}
+            {isClockedIn && (
+                <div className="grid gap-4 grid-cols-3">
+                    <ScaleIn delay={0}>
+                        <Card className="border-0 bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-all hover:-translate-y-1">
+                            <CardContent className="p-4 md:p-5">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-amber-100 font-medium">Pendientes</p>
+                                        <p className="text-3xl font-bold mt-1">{pendingCount}</p>
+                                    </div>
+                                    <div className="h-11 w-11 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                        <ListTodo className="h-5 w-5" />
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </ScaleIn>
+
+                    <ScaleIn delay={0.1}>
+                        <Card className="border-0 bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all hover:-translate-y-1">
+                            <CardContent className="p-4 md:p-5">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-blue-100 font-medium">En Progreso</p>
+                                        <p className="text-3xl font-bold mt-1">{inProgressCount}</p>
+                                    </div>
+                                    <div className="h-11 w-11 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                        <Timer className="h-5 w-5" />
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </ScaleIn>
+
+                    <ScaleIn delay={0.2}>
+                        <Card className="border-0 bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all hover:-translate-y-1">
+                            <CardContent className="p-4 md:p-5">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-emerald-100 font-medium">Completadas</p>
+                                        <p className="text-3xl font-bold mt-1">{completedCount}</p>
+                                    </div>
+                                    <div className="h-11 w-11 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                        <CheckCircle className="h-5 w-5" />
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </ScaleIn>
                 </div>
             )}
-        </div>
+
+            {/* Loading */}
+            {loading && (
+                <div className="flex justify-center items-center py-16">
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                    <span className="ml-3 text-blue-500 font-medium">Cargando tareas...</span>
+                </div>
+            )}
+
+            {/* Task Cards */}
+            {!loading && (
+                <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 ${!isClockedIn ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
+                    {activeTasks.map((task, index) => {
+                        const isInProgress = task.status === "EN PROGRESO";
+                        const config = priorityConfig[task.priority];
+
+                        return (
+                            <SlideIn key={task.id} delay={index * 0.08}>
+                                <Card className={`h-full flex flex-col border-l-4 ${config.border} shadow-md hover:shadow-lg transition-all duration-300 ${isInProgress ? 'ring-2 ring-blue-500/20 bg-blue-50/30' : 'bg-white'}`}>
+                                    <CardHeader className="pb-3">
+                                        <div className="flex justify-between items-start">
+                                            <Badge variant="outline" className={`text-xs font-bold px-2.5 py-0.5 ${config.badge}`}>
+                                                {task.priority}
+                                            </Badge>
+                                            <span className="text-sm font-medium text-slate-400 flex items-center gap-1">
+                                                <Clock className="w-3.5 h-3.5" />
+                                                {task.time}
+                                            </span>
+                                        </div>
+                                        <CardTitle className="text-xl mt-3 leading-tight text-slate-800">{task.title}</CardTitle>
+                                        <CardDescription className="text-base font-medium text-slate-600 mt-1">
+                                            {task.patient}
+                                        </CardDescription>
+                                        {isInProgress && (
+                                            <div className="mt-3 p-2.5 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 font-semibold text-sm border border-blue-100">
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> En Curso...
+                                            </div>
+                                        )}
+                                    </CardHeader>
+                                    <CardFooter className="mt-auto flex gap-2.5 p-5 pt-0">
+                                        {!isInProgress && (
+                                            <Button
+                                                className="flex-1 h-14 text-lg font-bold shadow-sm rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                                                onClick={() => handleStartTask(task.id)}
+                                            >
+                                                <PlayCircle className="mr-2 h-5 w-5" /> Iniciar
+                                            </Button>
+                                        )}
+                                        <Button
+                                            variant={isInProgress ? "default" : "outline"}
+                                            className={`flex-1 h-14 text-lg font-bold shadow-sm rounded-xl ${isInProgress ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white' : 'border-2 hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-700'}`}
+                                            onClick={() => handleCompleteTask(task.id)}
+                                        >
+                                            <CheckCircle className="mr-2 h-5 w-5" /> Listo
+                                        </Button>
+                                    </CardFooter>
+                                </Card>
+                            </SlideIn>
+                        );
+                    })}
+                </div>
+            )}
+
+            {/* All Tasks Completed */}
+            {!loading && activeTasks.length === 0 && isClockedIn && (
+                <ScaleIn delay={0.2}>
+                    <div className="text-center py-16 bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl border border-emerald-100 shadow-sm">
+                        <div className="inline-flex p-5 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full mb-5 shadow-lg shadow-emerald-500/20">
+                            <CheckCircle className="h-16 w-16 text-white" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-slate-800 mb-2">¡Todo listo por ahora! 🎉</h3>
+                        <p className="text-lg text-slate-500">Has completado todas tus tareas asignadas.</p>
+                        {completedCount > 0 && (
+                            <p className="text-sm text-emerald-600 font-semibold mt-2">{completedCount} tarea{completedCount !== 1 ? 's' : ''} completada{completedCount !== 1 ? 's' : ''} hoy</p>
+                        )}
+                    </div>
+                </ScaleIn>
+            )}
+        </FadeIn>
     );
 }

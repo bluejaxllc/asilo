@@ -16,6 +16,7 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     }
 
     const { email, password } = validatedFields.data;
+    console.log("Login Action: Attempting login for", email);
 
     // Fetch user to determine role for redirection
     const existingUser = await db.user.findUnique({
@@ -26,6 +27,8 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
 
     if (existingUser && existingUser.role === "ADMIN") {
         redirectUrl = "/admin";
+    } else if (existingUser && existingUser.role === "FAMILY") {
+        redirectUrl = "/family";
     }
 
     try {

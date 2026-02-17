@@ -29,9 +29,12 @@ export const addMedication = async (data: {
     }
 };
 
-export const getAllMedications = async () => {
+export const getAllMedications = async (query?: string) => {
     try {
         const medications = await db.medication.findMany({
+            where: query ? {
+                name: { contains: query, mode: 'insensitive' }
+            } : undefined,
             orderBy: { name: 'asc' }
         });
 
@@ -62,6 +65,26 @@ export const getAllMedications = async () => {
     }
 };
 
+export const logMedicationAdministration = async (patientId: string, medicationName: string, dosage: string) => {
+    try {
+        await db.dailyLog.create({
+            data: {
+                patientId,
+                authorId: "staff-id-placeholder", // Ideally this comes from session
+                type: "MEDS",
+                value: `Administró ${medicationName} (${dosage})`,
+                notes: `Dosis de ${dosage}`
+            }
+        });
+
+        revalidatePath(`/admin/patients/${patientId}`);
+        return { success: true };
+    } catch (error) {
+        console.error("Error logging medication:", error);
+        return { error: "Error al registrar medicamento" };
+    }
+};
+
 export const updateMedicationStock = async (id: string, newStock: number) => {
     try {
         await db.medication.update({
@@ -88,5 +111,24 @@ export const deleteMedication = async (id: string) => {
     } catch (error) {
         console.error("Error deleting medication:", error);
         return { error: "Error al eliminar medicamento" };
+    }
+};
+
+export const assignMedication = async (patientId: string, medicationId: string, dosage: string, schedule: string) => {
+    try {
+        await db.patientMedication.create({
+            data: {
+                patientId,
+                medicationId,
+                dosage,
+                schedule
+            }
+        });
+
+        revalidatePath(`/admin/patients/${patientId}`);
+        return { success: "Medicamento asignado correctamente" };
+    } catch (error) {
+        console.error("Error assigning medication:", error);
+        return { error: "Error al asignar medicamento" };
     }
 };

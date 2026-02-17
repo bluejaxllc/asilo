@@ -5,13 +5,89 @@ import {
     ClipboardList,
     Users,
     LogOut,
-    Utensils
+    Utensils,
+    ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AttendanceProvider } from "@/context/attendance-context";
-import { motion } from "framer-motion";
 import { HoverScale } from "@/components/ui/motion-wrapper";
-import { SessionProvider, signOut } from "next-auth/react";
+import { SessionProvider, useSession, signOut } from "next-auth/react";
+
+const NAV_ITEMS = [
+    { href: "/staff", label: "Mis Tareas", icon: ClipboardList, color: "blue" },
+    { href: "/staff/patients", label: "Residentes", icon: Users, color: "blue" },
+    { href: "/staff/kitchen", label: "Cocina", icon: Utensils, color: "orange" },
+];
+
+function StaffNavbar() {
+    const pathname = usePathname();
+    const { data: session } = useSession();
+
+    const isActive = (href: string) => {
+        if (href === "/staff") return pathname === "/staff";
+        return pathname.startsWith(href);
+    };
+
+    return (
+        <nav className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 shadow-xl sticky top-0 z-50 border-b border-white/5">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6">
+                <div className="flex justify-between items-center h-16">
+                    {/* Logo */}
+                    <Link href="/staff" className="flex items-center gap-2 group">
+                        <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 transition-shadow">
+                            <ShieldCheck className="h-5 w-5 text-white" />
+                        </div>
+                        <span className="text-lg font-bold text-white hidden sm:block">
+                            .blue_jax <span className="text-blue-400 font-normal text-sm">Personal</span>
+                        </span>
+                    </Link>
+
+                    {/* Nav Links */}
+                    <div className="flex items-center gap-1">
+                        {NAV_ITEMS.map((item) => {
+                            const active = isActive(item.href);
+                            const Icon = item.icon;
+                            const colorClasses = item.color === "orange"
+                                ? active
+                                    ? "text-orange-400 bg-orange-500/10 border-orange-400"
+                                    : "text-slate-400 hover:text-orange-400 hover:bg-orange-500/5 border-transparent"
+                                : active
+                                    ? "text-blue-400 bg-blue-500/10 border-blue-400"
+                                    : "text-slate-400 hover:text-blue-400 hover:bg-blue-500/5 border-transparent";
+
+                            return (
+                                <Link key={item.href} href={item.href}>
+                                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border-b-2 transition-all duration-200 ${colorClasses}`}>
+                                        <Icon className="h-5 w-5" />
+                                        <span className="text-sm font-medium hidden md:block">{item.label}</span>
+                                    </div>
+                                </Link>
+                            );
+                        })}
+                    </div>
+
+                    {/* User + Logout */}
+                    <div className="flex items-center gap-3">
+                        {session?.user?.name && (
+                            <span className="text-sm text-slate-400 hidden lg:block">
+                                {session.user.name}
+                            </span>
+                        )}
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-10 w-10 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                            onClick={() => signOut({ callbackUrl: "/" })}
+                        >
+                            <LogOut className="h-5 w-5" />
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    );
+}
 
 const StaffLayout = ({
     children
@@ -21,49 +97,9 @@ const StaffLayout = ({
     return (
         <SessionProvider>
             <AttendanceProvider>
-                <div className="min-h-screen bg-slate-50">
-                    {/* Top Navigation Bar - Touch Friendly */}
-                    <nav className="bg-white shadow-sm p-4 sticky top-0 z-50">
-                        <div className="max-w-7xl mx-auto flex justify-between items-center">
-                            <Link href="/staff">
-                                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent cursor-pointer hover:opacity-80 transition-opacity">
-                                    .blue_jax Personal
-                                </h1>
-                            </Link>
-
-                            <div className="flex gap-4">
-                                <Link href="/staff">
-                                    <div className="flex items-center gap-2 h-12 px-4 rounded-md text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer">
-                                        <ClipboardList className="h-6 w-6" />
-                                        <span className="text-lg font-medium">Mis Tareas</span>
-                                    </div>
-                                </Link>
-                                <Link href="/staff/patients">
-                                    <div className="flex items-center gap-2 h-12 px-4 rounded-md text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer">
-                                        <Users className="h-6 w-6" />
-                                        <span className="text-lg font-medium">Residentes</span>
-                                    </div>
-                                </Link>
-                                <Link href="/staff/kitchen">
-                                    <div className="flex items-center gap-2 h-12 px-4 rounded-md text-slate-600 hover:text-orange-600 hover:bg-orange-50 transition-colors cursor-pointer">
-                                        <Utensils className="h-6 w-6" />
-                                        <span className="text-lg font-medium">Cocina</span>
-                                    </div>
-                                </Link>
-                            </div>
-
-                            <Button
-                                variant="destructive"
-                                size="icon"
-                                className="h-12 w-12 rounded-full shadow-md hover:shadow-lg"
-                                onClick={() => signOut({ callbackUrl: "/" })}
-                            >
-                                <LogOut className="h-6 w-6" />
-                            </Button>
-                        </div>
-                    </nav>
-
-                    <main className="max-w-7xl mx-auto p-6">
+                <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/80">
+                    <StaffNavbar />
+                    <main className="max-w-7xl mx-auto p-4 sm:p-6">
                         {children}
                     </main>
                 </div>

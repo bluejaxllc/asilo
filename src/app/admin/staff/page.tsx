@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { formatDistanceToNow, format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
@@ -20,11 +20,31 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { UserPlus, Clock } from "lucide-react";
+import { UserPlus, Clock, Users, ShieldCheck, UserCheck, AlertCircle } from "lucide-react";
 import { StaffForm } from "@/components/admin/staff-form";
 import { getStaffAttendanceHistory } from "@/actions/staff";
+import { SearchInput } from "@/components/ui/search-input";
+import { useSearchParams } from "next/navigation";
+import { FadeIn, SlideInRow } from "@/components/ui/motion-wrapper";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
+const roleColors: Record<string, string> = {
+    ADMIN: "bg-purple-100 text-purple-700 border-purple-200",
+    STAFF: "bg-blue-100 text-blue-700 border-blue-200",
+    FAMILY: "bg-amber-100 text-amber-700 border-amber-200",
+};
 
 export default function StaffPage() {
+    return (
+        <Suspense fallback={<div className="p-8 flex justify-center"><div className="h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>}>
+            <StaffPageContent />
+        </Suspense>
+    );
+}
+
+function StaffPageContent() {
     const [open, setOpen] = useState(false);
     const [staffWithStatus, setStaffWithStatus] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -32,10 +52,14 @@ export default function StaffPage() {
     const [selectedStaff, setSelectedStaff] = useState<any>(null);
     const [attendanceHistory, setAttendanceHistory] = useState<any[]>([]);
 
+    const searchParams = useSearchParams();
+    const query = searchParams.get('q') || "";
+
     const fetchStaff = async () => {
         setLoading(true);
         try {
-            const response = await fetch('/api/staff');
+            const url = query ? `/api/staff?q=${encodeURIComponent(query)}` : '/api/staff';
+            const response = await fetch(url);
 
             if (!response.ok) {
                 console.error('Failed to fetch staff:', response.status);
@@ -45,7 +69,6 @@ export default function StaffPage() {
 
             const data = await response.json();
 
-            // Ensure data is an array
             if (Array.isArray(data)) {
                 setStaffWithStatus(data);
             } else {
@@ -62,7 +85,7 @@ export default function StaffPage() {
 
     useEffect(() => {
         fetchStaff();
-    }, []);
+    }, [query]);
 
     const handleStaffAdded = () => {
         setOpen(false);
@@ -76,19 +99,23 @@ export default function StaffPage() {
         setAttendanceHistory(history);
     };
 
+    const activeStaffCount = staffWithStatus.filter(s => s.status === "Disponible" || s.status === "Ocupado").length;
+    const familyCount = staffWithStatus.filter(s => s.role === "FAMILY").length;
+
     return (
-        <div className="p-8 space-y-8">
-            <div className="flex items-center justify-between">
+        <FadeIn className="p-6 md:p-8 space-y-6">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight">Gestión de Personal</h2>
-                    <p className="text-muted-foreground">
-                        Administre personal, roles y horarios.
+                    <p className="text-muted-foreground mt-1">
+                        {staffWithStatus.length} usuarios · Administre personal, roles y horarios.
                     </p>
                 </div>
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
-                        <Button>
-                            <UserPlus className="mr-2 h-4 w-4" /> Agregar Personal
+                        <Button className="bg-blue-600 hover:bg-blue-700 shadow-sm gap-2">
+                            <UserPlus className="h-4 w-4" /> Agregar Personal
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
@@ -103,51 +130,130 @@ export default function StaffPage() {
                 </Dialog>
             </div>
 
-            <div className="border rounded-md">
+            {/* Stat Cards */}
+            <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+                <Card className="border-0 bg-gradient-to-br from-slate-700 to-slate-900 text-white shadow-lg shadow-slate-500/10">
+                    <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-xs text-slate-300 font-medium">Total Personal</p>
+                                <p className="text-2xl font-bold mt-0.5">{staffWithStatus.length}</p>
+                            </div>
+                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
+                                <Users className="h-4 w-4 text-slate-300" />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-0 bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/10">
+                    <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-xs text-green-100 font-medium">En Turno</p>
+                                <p className="text-2xl font-bold mt-0.5">{activeStaffCount}</p>
+                            </div>
+                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
+                                <UserCheck className="h-4 w-4 text-green-100" />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-0 bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-500/10">
+                    <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-xs text-amber-100 font-medium">Familiares</p>
+                                <p className="text-2xl font-bold mt-0.5">{familyCount}</p>
+                            </div>
+                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
+                                <ShieldCheck className="h-4 w-4 text-amber-100" />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-0 bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/10">
+                    <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-xs text-blue-100 font-medium">Sin Actividad</p>
+                                <p className="text-2xl font-bold mt-0.5">{staffWithStatus.filter(s => s.status === "Inactivo").length}</p>
+                            </div>
+                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
+                                <AlertCircle className="h-4 w-4 text-blue-100" />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Search */}
+            <div className="bg-white p-3 rounded-xl border shadow-sm">
+                <SearchInput placeholder="Buscar personal por nombre o rol..." />
+            </div>
+
+            {/* Table */}
+            <div className="border rounded-xl bg-white shadow-sm overflow-hidden">
                 <Table>
                     <TableHeader>
-                        <TableRow>
-                            <TableHead>Nombre</TableHead>
-                            <TableHead>Rol</TableHead>
-                            <TableHead>Estado</TableHead>
-                            <TableHead>Última Actividad</TableHead>
-                            <TableHead className="text-right">Acciones</TableHead>
+                        <TableRow className="bg-slate-50/80">
+                            <TableHead className="font-semibold text-slate-600">Personal</TableHead>
+                            <TableHead className="font-semibold text-slate-600">Rol</TableHead>
+                            <TableHead className="font-semibold text-slate-600">Estado</TableHead>
+                            <TableHead className="font-semibold text-slate-600">Última Actividad</TableHead>
+                            <TableHead className="text-right font-semibold text-slate-600">Acciones</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {loading ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="text-center py-8">
-                                    Cargando...
+                                <TableCell colSpan={5} className="text-center py-12">
+                                    <div className="flex flex-col items-center gap-2">
+                                        <div className="h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                                        <span className="text-sm text-muted-foreground">Cargando personal...</span>
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         ) : staffWithStatus.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                                <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
                                     No hay personal registrado.
                                 </TableCell>
                             </TableRow>
-                        ) : staffWithStatus.map((staff) => (
-                            <TableRow key={staff.id}>
+                        ) : staffWithStatus.map((staff, index) => (
+                            <SlideInRow key={staff.id} delay={Math.min(index * 0.04, 1)} className="hover:bg-slate-50/80 transition-colors group">
                                 <TableCell className="font-medium">
-                                    <div className="flex flex-col">
-                                        <span>{staff.name || "Sin Nombre"}</span>
-                                        <span className="text-xs text-muted-foreground">{staff.email}</span>
+                                    <div className="flex items-center gap-3">
+                                        <Avatar className="h-9 w-9 border-2 border-white shadow-sm">
+                                            <AvatarFallback className="bg-gradient-to-br from-slate-100 to-slate-200 text-slate-600 text-xs font-bold">
+                                                {staff.name?.charAt(0) || "U"}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-semibold text-slate-800">{staff.name || "Sin Nombre"}</span>
+                                            <span className="text-xs text-muted-foreground">{staff.email}</span>
+                                        </div>
                                     </div>
                                 </TableCell>
-                                <TableCell>{staff.role}</TableCell>
                                 <TableCell>
-                                    <span className={`px-2 py-1 rounded-full text-xs ${staff.statusColor}`}>
-                                        {staff.status}
-                                    </span>
+                                    <Badge variant="outline" className={`text-[10px] font-semibold px-2 py-0.5 ${roleColors[staff.role] || roleColors.STAFF}`}>
+                                        {staff.role}
+                                    </Badge>
                                 </TableCell>
-                                <TableCell>{staff.lastActive}</TableCell>
+                                <TableCell>
+                                    <Badge className={`${staff.statusColor} hover:${staff.statusColor} border-0 text-xs`}>
+                                        {staff.status}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell className="text-muted-foreground text-sm">{staff.lastActive}</TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="ghost" size="sm" onClick={() => handleViewHistory(staff)}>
-                                        <Clock className="mr-2 h-4 w-4" /> Historial
+                                    <Button variant="ghost" size="sm" onClick={() => handleViewHistory(staff)} className="gap-1.5 text-xs hover:text-blue-600 hover:bg-blue-50">
+                                        <Clock className="h-3.5 w-3.5" /> Historial
                                     </Button>
                                 </TableCell>
-                            </TableRow>
+                            </SlideInRow>
                         ))}
                     </TableBody>
                 </Table>
@@ -157,20 +263,22 @@ export default function StaffPage() {
             <Dialog open={historyOpen} onOpenChange={setHistoryOpen}>
                 <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Historial de Asistencia - {selectedStaff?.name}</DialogTitle>
+                        <DialogTitle>Historial de Asistencia — {selectedStaff?.name}</DialogTitle>
                         <DialogDescription>
                             Registro de entradas y salidas de los últimos 30 días
                         </DialogDescription>
                     </DialogHeader>
                     <div className="mt-4">
                         {attendanceHistory.length === 0 ? (
-                            <p className="text-center text-muted-foreground py-8">
-                                No hay registros de asistencia
-                            </p>
+                            <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
+                                <Clock className="h-10 w-10 mb-3 opacity-20" />
+                                <p className="font-medium">No hay registros de asistencia</p>
+                                <p className="text-xs mt-1">Este usuario no tiene turnos registrados</p>
+                            </div>
                         ) : (
                             <Table>
                                 <TableHeader>
-                                    <TableRow>
+                                    <TableRow className="bg-slate-50">
                                         <TableHead>Fecha</TableHead>
                                         <TableHead>Entrada</TableHead>
                                         <TableHead>Salida</TableHead>
@@ -191,13 +299,17 @@ export default function StaffPage() {
                                         }
 
                                         return (
-                                            <TableRow key={record.id}>
-                                                <TableCell>{format(checkInDate, "dd/MM/yyyy", { locale: es })}</TableCell>
-                                                <TableCell>{format(checkInDate, "HH:mm", { locale: es })}</TableCell>
-                                                <TableCell>
-                                                    {checkOutDate ? format(checkOutDate, "HH:mm", { locale: es }) : "-"}
+                                            <TableRow key={record.id} className="hover:bg-slate-50">
+                                                <TableCell className="font-medium">{format(checkInDate, "dd/MM/yyyy", { locale: es })}</TableCell>
+                                                <TableCell className="text-green-600 font-mono">{format(checkInDate, "HH:mm", { locale: es })}</TableCell>
+                                                <TableCell className="text-red-600 font-mono">
+                                                    {checkOutDate ? format(checkOutDate, "HH:mm", { locale: es }) : <span className="text-green-600 animate-pulse">En turno</span>}
                                                 </TableCell>
-                                                <TableCell>{duration}</TableCell>
+                                                <TableCell>
+                                                    <Badge variant="outline" className="font-mono text-xs">
+                                                        {duration}
+                                                    </Badge>
+                                                </TableCell>
                                             </TableRow>
                                         );
                                     })}
@@ -207,6 +319,6 @@ export default function StaffPage() {
                     </div>
                 </DialogContent>
             </Dialog>
-        </div>
+        </FadeIn>
     );
 }

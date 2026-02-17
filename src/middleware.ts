@@ -12,6 +12,7 @@ const { auth } = NextAuth(authConfig);
 export default auth((req) => {
     const { nextUrl } = req;
     const isLoggedIn = !!req.auth;
+    const role = req.auth?.user?.role;
 
     const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
     const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
@@ -23,11 +24,9 @@ export default auth((req) => {
 
     if (isAuthRoute) {
         if (isLoggedIn) {
-            console.log("Middleware Auth Debug:", JSON.stringify(req.auth?.user, null, 2));
-            const role = req.auth?.user?.role;
-            console.log("Middleware Role:", role);
-            const redirectUrl = role === "ADMIN" ? "/admin" : DEFAULT_LOGIN_REDIRECT;
-            console.log("Redirecting to:", redirectUrl);
+            let redirectUrl = DEFAULT_LOGIN_REDIRECT;
+            if (role === "ADMIN") redirectUrl = "/admin";
+            else if (role === "FAMILY") redirectUrl = "/family";
             return Response.redirect(new URL(redirectUrl, nextUrl));
         }
         return undefined;
@@ -42,6 +41,27 @@ export default auth((req) => {
         const encodedCallbackUrl = encodeURIComponent(callbackUrl);
 
         return Response.redirect(new URL(`/auth/login?callbackUrl=${encodedCallbackUrl}`, nextUrl));
+    }
+
+    // Role-based route guards
+    if (isLoggedIn) {
+        const path = nextUrl.pathname;
+
+        // FAMILY users can ONLY access /family
+        if (role === "FAMILY" && (path.startsWith("/admin") || path.startsWith("/staff"))) {
+            return Response.redirect(new URL("/family", nextUrl));
+        }
+
+        // Non-ADMIN users cannot access /admin
+        if (role !== "ADMIN" && role !== "FAMILY" && path.startsWith("/admin")) {
+            return Response.redirect(new URL("/staff", nextUrl));
+        }
+
+        // Non-FAMILY, non-ADMIN, non-STAFF users trying /family
+        if (role !== "FAMILY" && path.startsWith("/family")) {
+            const fallback = role === "ADMIN" ? "/admin" : "/staff";
+            return Response.redirect(new URL(fallback, nextUrl));
+        }
     }
 
     return undefined;

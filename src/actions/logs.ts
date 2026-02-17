@@ -41,9 +41,19 @@ export const createLog = async (data: {
     }
 };
 
-export const getAllLogs = async (limit: number = 50) => {
+export const getAllLogs = async (limit: number = 50, query?: string) => {
     try {
+        const whereClause = query ? {
+            OR: [
+                { patient: { name: { contains: query, mode: 'insensitive' as const } } },
+                { author: { name: { contains: query, mode: 'insensitive' as const } } },
+                { value: { contains: query, mode: 'insensitive' as const } },
+                { notes: { contains: query, mode: 'insensitive' as const } }
+            ]
+        } : {};
+
         const logs = await db.dailyLog.findMany({
+            where: whereClause,
             include: {
                 patient: {
                     select: {

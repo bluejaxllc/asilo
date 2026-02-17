@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
     AlertDialog,
@@ -21,29 +21,36 @@ import { useRouter } from "next/navigation";
 interface DeletePatientButtonProps {
     patientId: string;
     patientName: string;
+    onSuccess?: () => void;
 }
 
-export function DeletePatientButton({ patientId, patientName }: DeletePatientButtonProps) {
-    const [isDeleting, setIsDeleting] = useState(false);
+export const DeletePatientButton = ({ patientId, patientName, onSuccess }: DeletePatientButtonProps) => {
+    const [open, setOpen] = useState(false);
+    const [isPending, startTransition] = useTransition();
     const router = useRouter();
 
-    const handleDelete = async () => {
-        setIsDeleting(true);
-
-        const result = await deletePatient(patientId);
-
-        if (result.error) {
-            toast.error(result.error);
-        } else {
-            toast.success(result.success!);
-            router.refresh();
-        }
-
-        setIsDeleting(false);
+    const onDelete = () => {
+        startTransition(() => {
+            deletePatient(patientId)
+                .then((data) => {
+                    if (data?.error) {
+                        toast.error(data.error);
+                    } else {
+                        toast.success("Residente eliminado");
+                        setOpen(false);
+                        if (onSuccess) {
+                            onSuccess();
+                        } else {
+                            router.refresh();
+                        }
+                    }
+                })
+                .catch(() => toast.error("Algo salió mal"));
+        });
     };
 
     return (
-        <AlertDialog>
+        <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogTrigger asChild>
                 <Button variant="ghost" size="icon" title="Eliminar Residente">
                     <Trash2 className="h-4 w-4 text-red-600" />
@@ -60,11 +67,14 @@ export function DeletePatientButton({ patientId, patientName }: DeletePatientBut
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancelar</AlertDialogCancel>
                     <AlertDialogAction
-                        onClick={handleDelete}
-                        disabled={isDeleting}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            onDelete();
+                        }}
+                        disabled={isPending}
                         className="bg-red-600 hover:bg-red-700"
                     >
-                        {isDeleting ? "Eliminando..." : "Eliminar"}
+                        {isPending ? "Eliminando..." : "Eliminar"}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Table,
@@ -20,15 +20,27 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { MedicationForm } from "@/components/inventory/medication-form";
-import { Plus, AlertTriangle, Pill, BarChart3 } from "lucide-react";
+import { Plus, AlertTriangle, Pill, BarChart3, Loader2 } from "lucide-react";
 import { ClientStockChart } from "@/components/inventory/client-stock-chart";
-import { FadeIn } from "@/components/ui/motion-wrapper";
+import { FadeIn, SlideInRow } from "@/components/ui/motion-wrapper";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { getAllMedications, updateMedicationStock } from "@/actions/medication";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { SearchInput } from "@/components/ui/search-input";
+import { useSearchParams } from "next/navigation";
 
 export default function InventoryPage() {
+    return (
+        <Suspense fallback={<div className="p-8 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-blue-600" /></div>}>
+            <InventoryPageContent />
+        </Suspense>
+    );
+}
+
+function InventoryPageContent() {
+    const searchParams = useSearchParams();
+    const query = searchParams.get('q') || "";
     const [inventory, setInventory] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [addOpen, setAddOpen] = useState(false);
@@ -38,14 +50,14 @@ export default function InventoryPage() {
 
     const fetchMedications = async () => {
         setLoading(true);
-        const data = await getAllMedications();
+        const data = await getAllMedications(query);
         setInventory(data);
         setLoading(false);
     };
 
     useEffect(() => {
         fetchMedications();
-    }, []);
+    }, [query]);
 
     const handleMedicationAdded = () => {
         setAddOpen(false);
@@ -110,6 +122,10 @@ export default function InventoryPage() {
                 </Dialog>
             </div>
 
+            <div className="flex items-center gap-4 bg-white p-4 rounded-lg border shadow-sm">
+                <SearchInput placeholder="Buscar medicamento..." />
+            </div>
+
             <div className="grid gap-6 md:grid-cols-3">
                 <Card className="md:col-span-2">
                     <CardHeader>
@@ -169,49 +185,63 @@ export default function InventoryPage() {
                 </Alert>
             )}
 
-            <div className="border rounded-md">
+            <div className="border rounded-xl shadow-sm bg-white overflow-hidden">
                 <Table>
-                    <TableHeader>
+                    <TableHeader className="bg-slate-50">
                         <TableRow>
-                            <TableHead>Medicamento</TableHead>
-                            <TableHead>Nivel Stock</TableHead>
-                            <TableHead>Nivel Min.</TableHead>
-                            <TableHead>Estado</TableHead>
-                            <TableHead className="text-right">Acción</TableHead>
+                            <TableHead className="font-semibold text-slate-700">Medicamento</TableHead>
+                            <TableHead className="font-semibold text-slate-700">Nivel Stock</TableHead>
+                            <TableHead className="font-semibold text-slate-700">Nivel Min.</TableHead>
+                            <TableHead className="font-semibold text-slate-700">Estado</TableHead>
+                            <TableHead className="text-right font-semibold text-slate-700">Acción</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {loading ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="text-center py-8">
-                                    Cargando inventario...
+                                <TableCell colSpan={5} className="text-center py-12">
+                                    <div className="flex justify-center items-center gap-2 text-muted-foreground">
+                                        <Loader2 className="h-5 w-5 animate-spin text-blue-600" /> Cargando inventario...
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         ) : inventory.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                                    No hay medicamentos en el inventario. Agregue uno para comenzar.
+                                <TableCell colSpan={5} className="text-center py-16 text-muted-foreground">
+                                    <div className="flex flex-col items-center gap-3">
+                                        <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center">
+                                            <Pill className="h-6 w-6 text-slate-400" />
+                                        </div>
+                                        <p>No hay medicamentos en el inventario.</p>
+                                        <Button variant="outline" size="sm" onClick={() => setAddOpen(true)}>
+                                            Agregar el primero
+                                        </Button>
+                                    </div>
                                 </TableCell>
                             </TableRow>
-                        ) : inventory.map((item) => (
-                            <TableRow key={item.id}>
-                                <TableCell className="font-medium flex items-center">
-                                    <Pill className="mr-2 h-4 w-4 text-slate-500" />
-                                    {item.name}
+                        ) : inventory.map((item, i) => (
+                            <SlideInRow key={item.id} delay={i * 0.05} className="hover:bg-slate-50 transition-colors group border-b">
+                                <TableCell className="font-medium">
+                                    <div className="flex items-center">
+                                        <div className="h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center mr-3 group-hover:bg-blue-100 transition-colors">
+                                            <Pill className="h-4 w-4 text-blue-600" />
+                                        </div>
+                                        <span className="text-slate-700">{item.name}</span>
+                                    </div>
                                 </TableCell>
-                                <TableCell>{item.stock} {item.unit}</TableCell>
-                                <TableCell>{item.min} {item.unit}</TableCell>
+                                <TableCell className="font-mono text-slate-600">{item.stock} <span className="text-xs text-slate-400">{item.unit}</span></TableCell>
+                                <TableCell className="font-mono text-slate-400">{item.min} <span className="text-xs">{item.unit}</span></TableCell>
                                 <TableCell>
-                                    {item.status === 'OK' && <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">En Stock</Badge>}
-                                    {item.status === 'BAJO' && <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Stock Bajo</Badge>}
-                                    {item.status === 'AGOTADO' && <Badge variant="destructive">Agotado</Badge>}
+                                    {item.status === 'OK' && <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 shadow-sm">En Stock</Badge>}
+                                    {item.status === 'BAJO' && <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 shadow-sm animate-pulse">Stock Bajo</Badge>}
+                                    {item.status === 'AGOTADO' && <Badge variant="destructive" className="shadow-sm">Agotado</Badge>}
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="ghost" size="sm" onClick={() => openUpdateDialog(item)}>
-                                        Actualizar Stock
+                                    <Button variant="ghost" size="sm" onClick={() => openUpdateDialog(item)} className="hover:text-blue-600">
+                                        Actualizar
                                     </Button>
                                 </TableCell>
-                            </TableRow>
+                            </SlideInRow>
                         ))}
                     </TableBody>
                 </Table>

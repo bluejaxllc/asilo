@@ -1,18 +1,42 @@
 "use client"
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import type { DailyLog } from '@prisma/client';
 
-const data = [
-    { name: 'Lun', sistolica: 120, diastolica: 80, glucosa: 110 },
-    { name: 'Mar', sistolica: 122, diastolica: 82, glucosa: 105 },
-    { name: 'Mie', sistolica: 118, diastolica: 79, glucosa: 115 },
-    { name: 'Jue', sistolica: 125, diastolica: 85, glucosa: 120 },
-    { name: 'Vie', sistolica: 121, diastolica: 81, glucosa: 108 },
-    { name: 'Sab', sistolica: 119, diastolica: 78, glucosa: 102 },
-    { name: 'Dom', sistolica: 120, diastolica: 80, glucosa: 106 },
-];
+interface VitalsChartProps {
+    logs: DailyLog[];
+}
 
-export const VitalsChart = () => {
+export const VitalsChart = ({ logs = [] }: VitalsChartProps) => {
+    // Process logs to extract BP data
+    const data = logs
+        .filter(log => log.type === 'VITALS' && log.value && log.value.includes('/'))
+        .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+        .map(log => {
+            const [systolic, diastolic] = (log.value || "").split('/').map(Number);
+            const date = new Date(log.createdAt);
+
+            // Format date as "DD/MM HH:mm"
+            const name = `${date.getDate()}/${date.getMonth() + 1} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+
+            return {
+                name,
+                sistolica: !isNaN(systolic) ? systolic : null,
+                diastolica: !isNaN(diastolic) ? diastolic : null,
+                // Attempt to parse glucose if it exists in notes or different format later
+                // For now, we only handle BP as requested
+            };
+        })
+        .filter(item => item.sistolica !== null && item.diastolica !== null);
+
+    if (data.length === 0) {
+        return (
+            <div className="h-[300px] w-full flex items-center justify-center text-muted-foreground">
+                No hay datos de signos vitales disponibles (Formato: 120/80)
+            </div>
+        );
+    }
+
     return (
         <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -26,13 +50,12 @@ export const VitalsChart = () => {
                     }}
                 >
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
+                    <XAxis dataKey="name" fontSize={12} />
                     <YAxis />
                     <Tooltip />
                     <Legend />
                     <Line type="monotone" dataKey="sistolica" stroke="#ef4444" name="P. Sistólica" />
                     <Line type="monotone" dataKey="diastolica" stroke="#f97316" name="P. Diastólica" />
-                    <Line type="monotone" dataKey="glucosa" stroke="#3b82f6" name="Glucosa (mg/dL)" />
                 </LineChart>
             </ResponsiveContainer>
         </div>

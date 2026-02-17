@@ -1,4 +1,8 @@
-import { db } from "@/lib/db";
+"use client";
+
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { getPatients } from "@/actions/patients";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -15,28 +19,47 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Activity, Pill, Utensils } from "lucide-react";
+import { Activity, Pill, Utensils, Loader2, Users, HeartPulse, AlertCircle } from "lucide-react";
 import { LogForm } from "@/components/staff/log-form";
-import { FadeIn, SlideIn, HoverScale } from "@/components/ui/motion-wrapper";
+import { FadeIn, SlideIn, ScaleIn, HoverScale } from "@/components/ui/motion-wrapper";
+import { SearchInput } from "@/components/ui/search-input";
 
-export const dynamic = 'force-dynamic';
+const avatarGradients = [
+    "from-blue-400 to-blue-600",
+    "from-emerald-400 to-emerald-600",
+    "from-violet-400 to-violet-600",
+    "from-amber-400 to-amber-600",
+    "from-rose-400 to-rose-600",
+    "from-cyan-400 to-cyan-600",
+];
 
+export default function StaffPatientsPage() {
+    return (
+        <Suspense fallback={<div className="p-8 flex justify-center"><Loader2 className="h-8 w-8 animate-spin text-blue-500" /></div>}>
+            <StaffPatientsContent />
+        </Suspense>
+    );
+}
 
-export default async function StaffPatientsPage() {
-    const patients = await db.patient.findMany({
-        orderBy: { name: 'asc' },
-        include: {
-            logs: {
-                where: { type: 'VITALS' },
-                orderBy: { createdAt: 'desc' },
-                take: 1
-            }
-        }
-    });
+function StaffPatientsContent() {
+    const searchParams = useSearchParams();
+    const query = searchParams.get('q') || "";
+    const [patients, setPatients] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    // Format patients with last vital time
+    const fetchPatients = async () => {
+        setLoading(true);
+        const data = await getPatients(query);
+        setPatients(data);
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        fetchPatients();
+    }, [query]);
+
     const patientsWithVitals = patients.map(p => {
-        const lastVital = p.logs[0];
+        const lastVital = p.logs?.[0];
         let lastVitalTime = "--:--";
 
         if (lastVital) {
@@ -55,109 +78,185 @@ export default async function StaffPatientsPage() {
             }
         }
 
-        return {
-            ...p,
-            lastVitalTime
-        };
+        return { ...p, lastVitalTime };
     });
+
+    const stableCount = patients.filter(p => p.status === "Estable").length;
+    const attentionCount = patients.filter(p => p.status !== "Estable").length;
 
     return (
         <FadeIn className="space-y-6">
-            <div className="flex items-center justify-between">
-                <h2 className="text-3xl font-bold text-slate-800">Bitácora de Cuidado</h2>
-                <div className="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
-                    Seleccione un residente para registrar actividad
+            {/* Page Header */}
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                    <h2 className="text-3xl font-bold tracking-tight text-slate-800">Bitácora de Cuidado</h2>
+                    <p className="text-muted-foreground mt-1">Seleccione un residente para registrar actividad</p>
+                </div>
+                <div className="w-full md:w-72">
+                    <SearchInput placeholder="Buscar residente..." />
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {patientsWithVitals.map((p, index) => (
-                    <SlideIn key={p.id} delay={index * 0.1}>
-                        <HoverScale className="h-full">
-                            <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300 cursor-pointer border-t-8 border-t-blue-500 h-full flex flex-col">
-                                <CardHeader className="pb-4 bg-slate-50/50">
-                                    <div className="flex justify-between items-start">
-                                        <div className="flex flex-col">
-                                            <CardTitle className="text-3xl font-bold text-slate-800">{p.name}</CardTitle>
-                                            <span className="text-lg text-slate-500 mt-1">Habitación {p.room || "N/A"}</span>
-                                        </div>
-                                        <Badge className={`text-lg px-4 py-1 ${p.status === 'Estable' ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-red-100 text-red-700 hover:bg-red-200'}`}>
-                                            {p.status}
-                                        </Badge>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="py-6 flex-grow">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 text-center">
-                                            <span className="block text-xs font-bold text-slate-400 uppercase">Última Vital</span>
-                                            <span className="block text-lg font-semibold text-slate-700">{p.lastVitalTime}</span>
-                                        </div>
-                                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 text-center">
-                                            <span className="block text-xs font-bold text-slate-400 uppercase">Dieta</span>
-                                            <span className="block text-lg font-semibold text-slate-700">{p.dietaryNeeds || "General"}</span>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                                <CardFooter className="grid grid-cols-3 gap-3 p-4 bg-slate-50/30">
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button variant="outline" className="flex flex-col h-24 gap-2 border-2 hover:border-blue-500 hover:bg-blue-50 active:scale-95 transition-all" title="Registrar Vitales">
-                                                <div className="p-2 bg-blue-100 rounded-full text-blue-600">
-                                                    <Activity className="h-6 w-6" />
-                                                </div>
-                                                <span className="text-sm font-bold text-slate-600">Vitales</span>
-                                            </Button>
-                                        </DialogTrigger>
-                                        <DialogContent className="sm:max-w-[500px]">
-                                            <DialogHeader>
-                                                <DialogTitle className="text-2xl">Registrar Signos Vitales</DialogTitle>
-                                                <div className="text-muted-foreground">Residente: {p.name}</div>
-                                            </DialogHeader>
-                                            <LogForm initialType="VITALS" patientName={p.name} patientId={p.id} />
-                                        </DialogContent>
-                                    </Dialog>
+            {/* Stat Cards */}
+            <div className="grid gap-4 grid-cols-3">
+                <ScaleIn delay={0}>
+                    <Card className="border-0 bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all hover:-translate-y-1">
+                        <CardContent className="p-4 md:p-5">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-blue-100 font-medium">Total</p>
+                                    <p className="text-3xl font-bold mt-1">{patients.length}</p>
+                                </div>
+                                <div className="h-11 w-11 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                    <Users className="h-5 w-5" />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </ScaleIn>
 
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button variant="outline" className="flex flex-col h-24 gap-2 border-2 hover:border-orange-500 hover:bg-orange-50 active:scale-95 transition-all" title="Registrar Alimentos">
-                                                <div className="p-2 bg-orange-100 rounded-full text-orange-600">
-                                                    <Utensils className="h-6 w-6" />
-                                                </div>
-                                                <span className="text-sm font-bold text-slate-600">Alimentos</span>
-                                            </Button>
-                                        </DialogTrigger>
-                                        <DialogContent className="sm:max-w-[500px]">
-                                            <DialogHeader>
-                                                <DialogTitle className="text-2xl">Registrar Alimentación</DialogTitle>
-                                                <div className="text-muted-foreground">Residente: {p.name}</div>
-                                            </DialogHeader>
-                                            <LogForm initialType="FOOD" patientName={p.name} patientId={p.id} />
-                                        </DialogContent>
-                                    </Dialog>
+                <ScaleIn delay={0.1}>
+                    <Card className="border-0 bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all hover:-translate-y-1">
+                        <CardContent className="p-4 md:p-5">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm text-emerald-100 font-medium">Estables</p>
+                                    <p className="text-3xl font-bold mt-1">{stableCount}</p>
+                                </div>
+                                <div className="h-11 w-11 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                    <HeartPulse className="h-5 w-5" />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </ScaleIn>
 
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button variant="outline" className="flex flex-col h-24 gap-2 border-2 hover:border-green-500 hover:bg-green-50 active:scale-95 transition-all" title="Registrar Medicamentos">
-                                                <div className="p-2 bg-green-100 rounded-full text-green-600">
-                                                    <Pill className="h-6 w-6" />
-                                                </div>
-                                                <span className="text-sm font-bold text-slate-600">Meds</span>
-                                            </Button>
-                                        </DialogTrigger>
-                                        <DialogContent className="sm:max-w-[500px]">
-                                            <DialogHeader>
-                                                <DialogTitle className="text-2xl">Administrar Medicamento</DialogTitle>
-                                                <div className="text-muted-foreground">Residente: {p.name}</div>
-                                            </DialogHeader>
-                                            <LogForm initialType="MEDS" patientName={p.name} patientId={p.id} />
-                                        </DialogContent>
-                                    </Dialog>
-                                </CardFooter>
-                            </Card>
-                        </HoverScale>
-                    </SlideIn>
-                ))}
+                <ScaleIn delay={0.2}>
+                    <Card className={`border-0 text-white shadow-lg transition-all hover:-translate-y-1 ${attentionCount > 0 ? 'bg-gradient-to-br from-red-500 to-red-700 shadow-red-500/20 hover:shadow-red-500/40' : 'bg-gradient-to-br from-slate-500 to-slate-700 shadow-slate-500/20 hover:shadow-slate-500/40'}`}>
+                        <CardContent className="p-4 md:p-5">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className={`text-sm font-medium ${attentionCount > 0 ? 'text-red-100' : 'text-slate-200'}`}>Atención</p>
+                                    <p className="text-3xl font-bold mt-1">{attentionCount}</p>
+                                </div>
+                                <div className="h-11 w-11 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                    <AlertCircle className="h-5 w-5" />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </ScaleIn>
             </div>
+
+            {/* Patient Cards */}
+            {loading ? (
+                <div className="flex justify-center items-center py-16">
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                    <span className="ml-3 text-blue-500 font-medium">Cargando residentes...</span>
+                </div>
+            ) : patients.length === 0 ? (
+                <div className="text-center py-16 text-muted-foreground bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                    {query ? "No se encontraron residentes." : "No hay residentes asignados."}
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {patientsWithVitals.map((p, index) => (
+                        <SlideIn key={p.id} delay={index * 0.06}>
+                            <HoverScale className="h-full">
+                                <Card className="shadow-md hover:shadow-xl transition-all duration-300 border-0 h-full flex flex-col bg-white rounded-2xl overflow-hidden">
+                                    {/* Card Header with Avatar */}
+                                    <CardHeader className="pb-3 bg-slate-50/80 border-b border-slate-100">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${avatarGradients[index % avatarGradients.length]} flex items-center justify-center text-white font-bold text-lg shadow-sm`}>
+                                                {p.name?.charAt(0)}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <CardTitle className="text-xl font-bold text-slate-800 truncate">{p.name}</CardTitle>
+                                                <span className="text-sm text-slate-500 font-mono">Hab. {p.room || "N/A"}</span>
+                                            </div>
+                                            <Badge className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${p.status === 'Estable' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-red-100 text-red-700 border-red-200'}`} variant="outline">
+                                                <span className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${p.status === 'Estable' ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                                                {p.status}
+                                            </Badge>
+                                        </div>
+                                    </CardHeader>
+
+                                    {/* Quick Info */}
+                                    <CardContent className="py-4 flex-grow">
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="bg-blue-50/80 p-3 rounded-xl text-center border border-blue-100/50">
+                                                <span className="block text-[10px] font-bold text-blue-400 uppercase tracking-wider">Última Vital</span>
+                                                <span className="block text-lg font-bold text-blue-700 mt-0.5">{p.lastVitalTime}</span>
+                                            </div>
+                                            <div className="bg-orange-50/80 p-3 rounded-xl text-center border border-orange-100/50">
+                                                <span className="block text-[10px] font-bold text-orange-400 uppercase tracking-wider">Dieta</span>
+                                                <span className="block text-sm font-bold text-orange-700 mt-0.5 truncate">{p.dietaryNeeds || "General"}</span>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+
+                                    {/* Action Buttons */}
+                                    <CardFooter className="grid grid-cols-3 gap-2.5 p-4 bg-slate-50/30 border-t border-slate-100">
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button variant="outline" className="flex flex-col h-20 gap-1.5 border-2 border-slate-200 hover:border-blue-400 hover:bg-blue-50 active:scale-95 transition-all rounded-xl" title="Registrar Vitales">
+                                                    <div className="p-1.5 bg-blue-100 rounded-lg text-blue-600">
+                                                        <Activity className="h-5 w-5" />
+                                                    </div>
+                                                    <span className="text-xs font-bold text-slate-600">Vitales</span>
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-[500px]">
+                                                <DialogHeader>
+                                                    <DialogTitle className="text-2xl">Registrar Signos Vitales</DialogTitle>
+                                                    <div className="text-muted-foreground">Residente: {p.name}</div>
+                                                </DialogHeader>
+                                                <LogForm initialType="VITALS" patientName={p.name} patientId={p.id} />
+                                            </DialogContent>
+                                        </Dialog>
+
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button variant="outline" className="flex flex-col h-20 gap-1.5 border-2 border-slate-200 hover:border-orange-400 hover:bg-orange-50 active:scale-95 transition-all rounded-xl" title="Registrar Alimentos">
+                                                    <div className="p-1.5 bg-orange-100 rounded-lg text-orange-600">
+                                                        <Utensils className="h-5 w-5" />
+                                                    </div>
+                                                    <span className="text-xs font-bold text-slate-600">Alimentos</span>
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-[500px]">
+                                                <DialogHeader>
+                                                    <DialogTitle className="text-2xl">Registrar Alimentación</DialogTitle>
+                                                    <div className="text-muted-foreground">Residente: {p.name}</div>
+                                                </DialogHeader>
+                                                <LogForm initialType="FOOD" patientName={p.name} patientId={p.id} />
+                                            </DialogContent>
+                                        </Dialog>
+
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button variant="outline" className="flex flex-col h-20 gap-1.5 border-2 border-slate-200 hover:border-emerald-400 hover:bg-emerald-50 active:scale-95 transition-all rounded-xl" title="Registrar Medicamentos">
+                                                    <div className="p-1.5 bg-emerald-100 rounded-lg text-emerald-600">
+                                                        <Pill className="h-5 w-5" />
+                                                    </div>
+                                                    <span className="text-xs font-bold text-slate-600">Meds</span>
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-[500px]">
+                                                <DialogHeader>
+                                                    <DialogTitle className="text-2xl">Administrar Medicamento</DialogTitle>
+                                                    <div className="text-muted-foreground">Residente: {p.name}</div>
+                                                </DialogHeader>
+                                                <LogForm initialType="MEDS" patientName={p.name} patientId={p.id} />
+                                            </DialogContent>
+                                        </Dialog>
+                                    </CardFooter>
+                                </Card>
+                            </HoverScale>
+                        </SlideIn>
+                    ))}
+                </div>
+            )}
         </FadeIn>
     );
 }

@@ -127,7 +127,7 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
                 }
             } else {
                 setIsClockedIn(false);
-                setHasCompletedShift(true);
+                setHasCompletedShift(false); // Allow starting a new shift immediately
                 setStartTime(null);
                 localStorage.removeItem('attendanceStartTime');
                 toast.success("Turno finalizado correctamente");

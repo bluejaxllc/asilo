@@ -13,13 +13,18 @@ model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String?
-  role      String   @default("STAFF") // ADMIN, DOCTOR, NURSE, KITCHEN
+  role      String   @default("STAFF") // ADMIN, DOCTOR, NURSE, KITCHEN, FAMILY
   password  String?
   image     String?
   
   attendance Attendance[]
   assignedTasks Task[]
   logs       DailyLog[]
+  sentMessages FamilyMessage[] @relation("SentMessages")
+
+  // Relation to Patient (for Family Members)
+  patientId String?
+  patient   Patient? @relation(fields: [patientId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -37,6 +42,11 @@ model Patient {
   
   logs      DailyLog[]
   medications PatientMedication[]
+  tasks     Task[]
+  
+  // Family Members linked to this patient
+  familyMembers User[]
+  familyMessages FamilyMessage[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -53,6 +63,9 @@ model Task {
   
   assignedToId String?
   assignedTo   User?   @relation(fields: [assignedToId], references: [id])
+  
+  patientId   String?
+  patient     Patient? @relation(fields: [patientId], references: [id])
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -127,3 +140,25 @@ model Notification {
   createdAt DateTime @default(now())
 }
 
+// System Settings (Key-Value Store)
+model SystemSetting {
+  key   String @id
+  value String
+  
+  updatedAt DateTime @updatedAt
+}
+
+// Family Messages (Family <-> Staff communication about a patient)
+model FamilyMessage {
+  id          String   @id @default(cuid())
+  content     String
+  isFromFamily Boolean @default(true)
+  
+  fromUserId  String
+  fromUser    User     @relation("SentMessages", fields: [fromUserId], references: [id])
+  
+  patientId   String
+  patient     Patient  @relation(fields: [patientId], references: [id])
+  
+  createdAt   DateTime @default(now())
+}

@@ -13,6 +13,18 @@ export const {
     signOut,
 } = NextAuth({
     ...authConfig,
+    trustHost: true,
+    cookies: {
+        sessionToken: {
+            name: `authjs.session-token`,
+            options: {
+                httpOnly: true,
+                sameSite: 'lax',
+                path: '/',
+                secure: process.env.NODE_ENV === "production",
+            },
+        },
+    },
     callbacks: {
         async session({ session, token }) {
             if (token.sub && session.user) {
@@ -20,7 +32,7 @@ export const {
             }
 
             if (token.role && session.user) {
-                session.user.role = token.role as "ADMIN" | "STAFF" | "DOCTOR" | "NURSE" | "KITCHEN";
+                session.user.role = token.role as "ADMIN" | "STAFF" | "DOCTOR" | "NURSE" | "KITCHEN" | "FAMILY";
             }
 
             return session;
@@ -62,6 +74,8 @@ export const {
                     const user = await db.user.findUnique({
                         where: { email }
                     });
+
+                    console.log("Auth Authorize: User found:", user ? user.email : "No user");
 
                     if (!user || !(user as any).password) return null;
 

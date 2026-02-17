@@ -19,18 +19,10 @@ import { Button } from "@/components/ui/button"
 import { FormError } from "@/components/form-error"
 import { FormSuccess } from "@/components/form-success"
 
-// This would typically be in @/schemas
-const PatientSchema = z.object({
-    firstName: z.string().min(1, "El nombre es requerido"),
-    lastName: z.string().min(1, "El apellido es requerido"),
-    dateOfBirth: z.string().optional(),
-    roomNumber: z.string().optional(),
-    medicalHistory: z.string().optional(),
-    dietaryRequirements: z.string().optional(),
-    allergies: z.string().optional(),
-    emergencyContactName: z.string().optional(),
-    emergencyContactPhone: z.string().optional(),
-});
+import { createPatient } from "@/actions/patients";
+import { PatientSchema } from "@/schemas";
+
+// Removed local schema definition
 
 interface PatientFormProps {
     onSuccess?: () => void;
@@ -60,10 +52,18 @@ export const PatientForm = ({ onSuccess }: PatientFormProps) => {
         setSuccess("");
 
         startTransition(() => {
-            // TODO: Call server action to create patient
-            console.log(values);
-            setSuccess("Residente creado exitosamente! (Simulado)");
-            if (onSuccess) onSuccess();
+            createPatient(values)
+                .then((data: { error?: string, success?: string }) => {
+                    if (data.error) {
+                        setError(data.error);
+                    }
+                    if (data.success) {
+                        setSuccess(data.success);
+                        form.reset(); // Clear form
+                        if (onSuccess) onSuccess();
+                    }
+                })
+                .catch(() => setError("Algo salió mal!"));
         });
     };
 

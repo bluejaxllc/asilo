@@ -5,13 +5,20 @@ import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import bcrypt from "bcryptjs";
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
+        const { searchParams } = new URL(request.url);
+        const query = searchParams.get('q');
+
         const staffUsers = await db.user.findMany({
             where: {
                 role: {
                     in: ["STAFF", "DOCTOR", "NURSE", "KITCHEN"]
-                }
+                },
+                name: query ? {
+                    contains: query,
+                    mode: 'insensitive'
+                } : undefined
             },
             orderBy: { name: 'asc' }
         });
@@ -55,12 +62,20 @@ export async function GET() {
 
 export async function POST(req: Request) {
     try {
-        const { name, email, role, password } = await req.json();
+        const { name, email, role, password, patientId } = await req.json();
 
         // Validate required fields
         if (!name || !email || !role || !password) {
             return NextResponse.json(
                 { error: 'Todos los campos son requeridos' },
+                { status: 400 }
+            );
+        }
+
+        // Validate patientId for FAMILY role
+        if (role === 'FAMILY' && !patientId) {
+            return NextResponse.json(
+                { error: 'Debe vincular un residente al familiar' },
                 { status: 400 }
             );
         }
@@ -86,7 +101,8 @@ export async function POST(req: Request) {
                 name,
                 email,
                 password: hashedPassword,
-                role
+                role,
+                ...(patientId ? { patientId } : {})
             }
         });
 
