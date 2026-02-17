@@ -38,15 +38,22 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
             redirectTo: redirectUrl,
         })
     } catch (error) {
+        console.error("Login Error:", error);
         if (error instanceof AuthError) {
             switch (error.type) {
                 case "CredentialsSignin":
                     return { error: "Credenciales inválidas!" }
                 default:
-                    return { error: "Algó salió mal!" }
+                    return { error: "Algo salió mal!" }
             }
         }
 
-        throw error;
+        // NEXT_REDIRECT is thrown by signIn on success — must re-throw it
+        if (error && typeof error === 'object' && 'digest' in error) {
+            throw error;
+        }
+
+        // Catch-all for unexpected errors
+        return { error: "Error del servidor. Intente de nuevo." };
     }
 };
