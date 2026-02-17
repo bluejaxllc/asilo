@@ -150,6 +150,23 @@ async function main() {
     console.log(`Residents populated: ${createdResidents.length}`)
 
 
+    // --- 3.5 FAMILY USER ---
+    const firstPatient = createdResidents[0]
+    const familyUser = await prisma.user.upsert({
+        where: { email: 'familiar@asilo.com' },
+        update: { patientId: firstPatient.id },
+        create: {
+            email: 'familiar@asilo.com',
+            name: 'Ana Maria Garcia (Hija)',
+            role: 'FAMILY',
+            password,
+            patientId: firstPatient.id,
+            image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=FamilyAna'
+        },
+    })
+    console.log(`Family user created: ${familyUser.email} → linked to ${firstPatient.name}`)
+
+
     // --- 4. TASKS ---
     const taskTitles = [
         'Toma de Glucosa', 'Aeso Matutino', 'Administrar Insulina', 'Caminata en Jardín',
