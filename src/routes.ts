@@ -6,6 +6,7 @@
 export const publicRoutes = [
     "/",
     "/api/antigravity/run",
+    "/api/debug-auth",
 ];
 
 /**

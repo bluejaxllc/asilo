@@ -2,9 +2,11 @@
 
 import * as z from "zod";
 import bcrypt from "bcryptjs";
+import { AuthError } from "next-auth";
 
 import { db } from "@/lib/db";
 import { RegisterSchema } from "@/schemas";
+import { signIn } from "@/auth";
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
     const validatedFields = RegisterSchema.safeParse(values);
@@ -30,9 +32,21 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
             name,
             email,
             password: hashedPassword,
-            role: "STAFF", // Default role for new accounts
+            role: "STAFF",
         },
     });
 
-    return { success: "Cuenta creada exitosamente!" };
+    // Auto sign-in after registration
+    try {
+        await signIn("credentials", {
+            email,
+            password,
+            redirectTo: "/staff",
+        });
+    } catch (error) {
+        if (error instanceof AuthError) {
+            return { success: "Cuenta creada. Por favor inicia sesión." };
+        }
+        throw error; // Re-throw NEXT_REDIRECT
+    }
 };
