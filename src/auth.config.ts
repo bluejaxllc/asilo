@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials"
 import { LoginSchema } from "@/schemas"
 
 export default {
+    trustHost: true,
     providers: [
         Credentials
     ],
