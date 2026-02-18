@@ -18,8 +18,11 @@ export default auth((req) => {
     const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
     const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
+    // Debug logging for Vercel function logs
+    console.log(`[MW] path=${nextUrl.pathname} loggedIn=${isLoggedIn} role=${role} isApiAuth=${isApiAuthRoute} isPublic=${isPublicRoute} isAuth=${isAuthRoute}`);
+
     if (isApiAuthRoute) {
-        return undefined; // Do nothing, let it pass
+        return undefined;
     }
 
     if (isAuthRoute) {
@@ -27,6 +30,7 @@ export default auth((req) => {
             let redirectUrl = DEFAULT_LOGIN_REDIRECT;
             if (role === "ADMIN") redirectUrl = "/admin";
             else if (role === "FAMILY") redirectUrl = "/family";
+            console.log(`[MW] Auth route, logged in, redirecting to ${redirectUrl}`);
             return Response.redirect(new URL(redirectUrl, nextUrl));
         }
         return undefined;
@@ -37,9 +41,8 @@ export default auth((req) => {
         if (nextUrl.search) {
             callbackUrl += nextUrl.search;
         }
-
         const encodedCallbackUrl = encodeURIComponent(callbackUrl);
-
+        console.log(`[MW] Not logged in, not public. Redirecting to login. callback=${callbackUrl}`);
         return Response.redirect(new URL(`/auth/login?callbackUrl=${encodedCallbackUrl}`, nextUrl));
     }
 
@@ -47,17 +50,14 @@ export default auth((req) => {
     if (isLoggedIn) {
         const path = nextUrl.pathname;
 
-        // FAMILY users can ONLY access /family
         if (role === "FAMILY" && (path.startsWith("/admin") || path.startsWith("/staff"))) {
             return Response.redirect(new URL("/family", nextUrl));
         }
 
-        // Non-ADMIN users cannot access /admin
         if (role !== "ADMIN" && role !== "FAMILY" && path.startsWith("/admin")) {
             return Response.redirect(new URL("/staff", nextUrl));
         }
 
-        // Non-FAMILY, non-ADMIN, non-STAFF users trying /family
         if (role !== "FAMILY" && path.startsWith("/family")) {
             const fallback = role === "ADMIN" ? "/admin" : "/staff";
             return Response.redirect(new URL(fallback, nextUrl));
@@ -67,7 +67,6 @@ export default auth((req) => {
     return undefined;
 })
 
-// Optionally, don't invoke Middleware on some paths
 export const config = {
     matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
 }
