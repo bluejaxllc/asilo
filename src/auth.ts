@@ -14,17 +14,6 @@ export const {
 } = NextAuth({
     ...authConfig,
     trustHost: true,
-    cookies: {
-        sessionToken: {
-            name: `authjs.session-token`,
-            options: {
-                httpOnly: true,
-                sameSite: 'lax',
-                path: '/',
-                secure: process.env.NODE_ENV === "production",
-            },
-        },
-    },
     callbacks: {
         async session({ session, token }) {
             if (token.sub && session.user) {
