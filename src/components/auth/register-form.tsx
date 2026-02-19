@@ -69,13 +69,13 @@ export const RegisterForm = () => {
                             name="name"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-slate-300 text-sm font-medium">Nombre Completo</FormLabel>
+                                    <FormLabel className="text-muted-foreground text-sm font-medium">Nombre Completo</FormLabel>
                                     <FormControl>
                                         <Input
                                             {...field}
                                             disabled={isPending}
                                             placeholder="Juan Pérez"
-                                            className="h-12 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl"
+                                            className="h-12 bg-card/5 border-border text-white placeholder:text-muted-foreground focus:border-blue-500 focus:ring-blue-500/20 rounded-xl"
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -87,14 +87,14 @@ export const RegisterForm = () => {
                             name="email"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-slate-300 text-sm font-medium">Correo Electrónico</FormLabel>
+                                    <FormLabel className="text-muted-foreground text-sm font-medium">Correo Electrónico</FormLabel>
                                     <FormControl>
                                         <Input
                                             {...field}
                                             disabled={isPending}
                                             placeholder="ejemplo@correo.com"
                                             type="email"
-                                            className="h-12 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl"
+                                            className="h-12 bg-card/5 border-border text-white placeholder:text-muted-foreground focus:border-blue-500 focus:ring-blue-500/20 rounded-xl"
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -106,14 +106,14 @@ export const RegisterForm = () => {
                             name="password"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-slate-300 text-sm font-medium">Contraseña</FormLabel>
+                                    <FormLabel className="text-muted-foreground text-sm font-medium">Contraseña</FormLabel>
                                     <FormControl>
                                         <Input
                                             {...field}
                                             disabled={isPending}
                                             placeholder="••••••••"
                                             type="password"
-                                            className="h-12 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl"
+                                            className="h-12 bg-card/5 border-border text-white placeholder:text-muted-foreground focus:border-blue-500 focus:ring-blue-500/20 rounded-xl"
                                         />
                                     </FormControl>
                                     <FormMessage />

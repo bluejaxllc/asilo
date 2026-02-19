@@ -53,7 +53,7 @@ export const DeletePatientButton = ({ patientId, patientName, onSuccess }: Delet
         <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogTrigger asChild>
                 <Button variant="ghost" size="icon" title="Eliminar Residente">
-                    <Trash2 className="h-4 w-4 text-red-600" />
+                    <Trash2 className="h-4 w-4 text-red-400" />
                 </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>

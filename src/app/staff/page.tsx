@@ -48,9 +48,9 @@ const getGreeting = () => {
 };
 
 const priorityConfig: Record<string, { border: string; bg: string; text: string; badge: string }> = {
-    ALTA: { border: "border-l-red-500", bg: "bg-red-50", text: "text-red-700", badge: "bg-red-100 text-red-700 border-red-200" },
-    MEDIA: { border: "border-l-amber-500", bg: "bg-amber-50", text: "text-amber-700", badge: "bg-amber-100 text-amber-700 border-amber-200" },
-    BAJA: { border: "border-l-emerald-500", bg: "bg-emerald-50", text: "text-emerald-700", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+    ALTA: { border: "border-l-red-500", bg: "bg-red-500/10", text: "text-red-400", badge: "bg-red-500/15 text-red-400 border-red-500/20" },
+    MEDIA: { border: "border-l-amber-500", bg: "bg-amber-500/10", text: "text-amber-400", badge: "bg-amber-500/15 text-amber-400 border-amber-500/20" },
+    BAJA: { border: "border-l-emerald-500", bg: "bg-emerald-500/10", text: "text-emerald-400", badge: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20" },
 };
 
 export default function StaffPage() {
@@ -151,22 +151,22 @@ export default function StaffPage() {
     return (
         <FadeIn className="space-y-6">
             {/* Hero Banner */}
-            <div className={`relative overflow-hidden rounded-2xl shadow-xl transition-all duration-700 ${isClockedIn ? 'bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800' : 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900'}`}>
+            <div className={`relative overflow-hidden rounded-2xl shadow-xl transition-all duration-700 ${isClockedIn ? 'bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800' : 'bg-gradient-to-br from-zinc-700 via-zinc-800 to-zinc-900'}`}>
                 {/* Background pattern */}
                 <div className="absolute inset-0 opacity-10">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/2" />
-                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-1/2 -translate-x-1/2" />
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-card rounded-full -translate-y-1/2 translate-x-1/2" />
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-card rounded-full translate-y-1/2 -translate-x-1/2" />
                 </div>
 
                 <div className="relative p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div>
-                        <p className={`text-sm uppercase tracking-widest font-semibold mb-1 ${isClockedIn ? 'text-blue-200' : 'text-slate-400'}`}>
+                        <p className={`text-sm uppercase tracking-widest font-semibold mb-1 ${isClockedIn ? 'text-blue-200' : 'text-muted-foreground'}`}>
                             {isClockedIn ? "Turno en Curso" : "Fuera de Turno"}
                         </p>
                         <h2 className="text-3xl md:text-4xl font-bold text-white">
-                            {getGreeting()}, <span className={isClockedIn ? 'text-blue-200' : 'text-slate-300'}>{session?.user?.name || "Usuario"}</span>
+                            {getGreeting()}, <span className={isClockedIn ? 'text-blue-200' : 'text-muted-foreground'}>{session?.user?.name || "Usuario"}</span>
                         </h2>
-                        <p className={`mt-2 text-base ${isClockedIn ? 'text-blue-100' : 'text-slate-400'}`}>
+                        <p className={`mt-2 text-base ${isClockedIn ? 'text-blue-100' : 'text-muted-foreground'}`}>
                             {isClockedIn
                                 ? `Tienes ${activeTasks.length} tarea${activeTasks.length !== 1 ? 's' : ''} pendiente${activeTasks.length !== 1 ? 's' : ''} hoy.`
                                 : "Marca tu entrada para ver tus tareas asignadas."}
@@ -174,7 +174,7 @@ export default function StaffPage() {
                     </div>
 
                     <div className="flex flex-col items-end gap-3 w-full md:w-auto">
-                        <div className={`text-5xl font-mono font-bold tracking-wider ${isClockedIn ? 'text-white' : 'text-slate-500'}`}>
+                        <div className={`text-5xl font-mono font-bold tracking-wider ${isClockedIn ? 'text-white' : 'text-muted-foreground'}`}>
                             {isClockedIn ? duration : "--:--:--"}
                         </div>
 
@@ -183,7 +183,7 @@ export default function StaffPage() {
                                 onClick={handleClockOut}
                                 disabled={clockOutLoading}
                                 size="lg"
-                                className="w-full md:w-auto bg-white/15 backdrop-blur-sm hover:bg-white/25 text-white border border-white/20 font-bold text-base h-12 rounded-xl shadow-lg"
+                                className="w-full md:w-auto bg-card/15 backdrop-blur-sm hover:bg-card/25 text-white border border-border font-bold text-base h-12 rounded-xl shadow-lg"
                             >
                                 {clockOutLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Clock className="mr-2 h-5 w-5" />}
                                 {clockOutLoading ? "Procesando..." : "Marcar Salida"}
@@ -192,7 +192,7 @@ export default function StaffPage() {
                             <Button
                                 disabled
                                 size="lg"
-                                className="w-full md:w-auto bg-slate-600/50 text-slate-400 border-0 font-bold text-base h-12 rounded-xl"
+                                className="w-full md:w-auto bg-zinc-700/50 text-muted-foreground border-0 font-bold text-base h-12 rounded-xl"
                             >
                                 <CheckCircle className="mr-2 h-5 w-5" /> Turno Finalizado
                             </Button>
@@ -220,7 +220,7 @@ export default function StaffPage() {
                                         <p className="text-sm text-amber-100 font-medium">Pendientes</p>
                                         <p className="text-3xl font-bold mt-1">{pendingCount}</p>
                                     </div>
-                                    <div className="h-11 w-11 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                    <div className="h-11 w-11 bg-card/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
                                         <ListTodo className="h-5 w-5" />
                                     </div>
                                 </div>
@@ -236,7 +236,7 @@ export default function StaffPage() {
                                         <p className="text-sm text-blue-100 font-medium">En Progreso</p>
                                         <p className="text-3xl font-bold mt-1">{inProgressCount}</p>
                                     </div>
-                                    <div className="h-11 w-11 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                    <div className="h-11 w-11 bg-card/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
                                         <Timer className="h-5 w-5" />
                                     </div>
                                 </div>
@@ -252,7 +252,7 @@ export default function StaffPage() {
                                         <p className="text-sm text-emerald-100 font-medium">Completadas</p>
                                         <p className="text-3xl font-bold mt-1">{completedCount}</p>
                                     </div>
-                                    <div className="h-11 w-11 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                    <div className="h-11 w-11 bg-card/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
                                         <CheckCircle className="h-5 w-5" />
                                     </div>
                                 </div>
@@ -279,23 +279,23 @@ export default function StaffPage() {
 
                         return (
                             <SlideIn key={task.id} delay={index * 0.08}>
-                                <Card className={`h-full flex flex-col border-l-4 ${config.border} shadow-md hover:shadow-lg transition-all duration-300 ${isInProgress ? 'ring-2 ring-blue-500/20 bg-blue-50/30' : 'bg-white'}`}>
+                                <Card className={`h-full flex flex-col border-l-4 ${config.border} shadow-md hover:shadow-lg transition-all duration-300 ${isInProgress ? 'ring-2 ring-blue-500/20 bg-blue-500/30' : 'bg-card'}`}>
                                     <CardHeader className="pb-3">
                                         <div className="flex justify-between items-start">
                                             <Badge variant="outline" className={`text-xs font-bold px-2.5 py-0.5 ${config.badge}`}>
                                                 {task.priority}
                                             </Badge>
-                                            <span className="text-sm font-medium text-slate-400 flex items-center gap-1">
+                                            <span className="text-sm font-medium text-muted-foreground flex items-center gap-1">
                                                 <Clock className="w-3.5 h-3.5" />
                                                 {task.time}
                                             </span>
                                         </div>
-                                        <CardTitle className="text-xl mt-3 leading-tight text-slate-800">{task.title}</CardTitle>
-                                        <CardDescription className="text-base font-medium text-slate-600 mt-1">
+                                        <CardTitle className="text-xl mt-3 leading-tight text-foreground">{task.title}</CardTitle>
+                                        <CardDescription className="text-base font-medium text-muted-foreground mt-1">
                                             {task.patient}
                                         </CardDescription>
                                         {isInProgress && (
-                                            <div className="mt-3 p-2.5 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 font-semibold text-sm border border-blue-100">
+                                            <div className="mt-3 p-2.5 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400 font-semibold text-sm border border-blue-500/20">
                                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" /> En Curso...
                                             </div>
                                         )}
@@ -311,7 +311,7 @@ export default function StaffPage() {
                                         )}
                                         <Button
                                             variant={isInProgress ? "default" : "outline"}
-                                            className={`flex-1 h-14 text-lg font-bold shadow-sm rounded-xl ${isInProgress ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white' : 'border-2 hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-700'}`}
+                                            className={`flex-1 h-14 text-lg font-bold shadow-sm rounded-xl ${isInProgress ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white' : 'border-2 hover:border-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-400'}`}
                                             onClick={() => handleCompleteTask(task.id)}
                                         >
                                             <CheckCircle className="mr-2 h-5 w-5" /> Listo
@@ -327,14 +327,14 @@ export default function StaffPage() {
             {/* All Tasks Completed */}
             {!loading && activeTasks.length === 0 && isClockedIn && (
                 <ScaleIn delay={0.2}>
-                    <div className="text-center py-16 bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl border border-emerald-100 shadow-sm">
+                    <div className="text-center py-16 bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl border border-emerald-500/20 shadow-sm">
                         <div className="inline-flex p-5 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full mb-5 shadow-lg shadow-emerald-500/20">
                             <CheckCircle className="h-16 w-16 text-white" />
                         </div>
-                        <h3 className="text-2xl font-bold text-slate-800 mb-2">¡Todo listo por ahora! 🎉</h3>
-                        <p className="text-lg text-slate-500">Has completado todas tus tareas asignadas.</p>
+                        <h3 className="text-2xl font-bold text-foreground mb-2">¡Todo listo por ahora! 🎉</h3>
+                        <p className="text-lg text-muted-foreground">Has completado todas tus tareas asignadas.</p>
                         {completedCount > 0 && (
-                            <p className="text-sm text-emerald-600 font-semibold mt-2">{completedCount} tarea{completedCount !== 1 ? 's' : ''} completada{completedCount !== 1 ? 's' : ''} hoy</p>
+                            <p className="text-sm text-emerald-400 font-semibold mt-2">{completedCount} tarea{completedCount !== 1 ? 's' : ''} completada{completedCount !== 1 ? 's' : ''} hoy</p>
                         )}
                     </div>
                 </ScaleIn>

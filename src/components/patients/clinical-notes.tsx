@@ -45,14 +45,14 @@ export const ClinicalNotes = ({ notes, patientId }: ClinicalNotesProps) => {
         <div className="space-y-6">
             <div className="flex justify-between items-center border-b pb-4">
                 <div>
-                    <h3 className="text-lg font-bold text-slate-800">Notas de Evolución</h3>
-                    <p className="text-sm text-slate-500">Historial clínico y reportes de guardia.</p>
+                    <h3 className="text-lg font-bold text-foreground">Notas de Evolución</h3>
+                    <p className="text-sm text-muted-foreground">Historial clínico y reportes de guardia.</p>
                 </div>
                 <Button
                     onClick={() => setIsAdding(!isAdding)}
                     className={cn(
                         "transition-all duration-300",
-                        isAdding ? "bg-red-100 text-red-700 hover:bg-red-200" : "bg-blue-600 hover:bg-blue-700"
+                        isAdding ? "bg-red-500/15 text-red-400 hover:bg-red-200" : "bg-blue-600 hover:bg-blue-700"
                     )}
                 >
                     {isAdding ? "Cancelar" : <><Plus className="h-4 w-4 mr-2" /> Nueva Nota</>}
@@ -60,10 +60,10 @@ export const ClinicalNotes = ({ notes, patientId }: ClinicalNotesProps) => {
             </div>
 
             {isAdding && (
-                <div className="p-4 border rounded-xl bg-slate-50/50 shadow-inner space-y-4 animate-in fade-in slide-in-from-top-2">
+                <div className="p-4 border rounded-xl bg-muted/50 shadow-inner space-y-4 animate-in fade-in slide-in-from-top-2">
                     <Textarea
                         placeholder="Escriba los detalles de la evolución del paciente, signos vitales relevantes o incidencias..."
-                        className="min-h-[120px] bg-white text-base resize-none focus-visible:ring-blue-500"
+                        className="min-h-[120px] bg-card text-base resize-none focus-visible:ring-blue-500"
                         value={noteText}
                         onChange={(e) => setNoteText(e.target.value)}
                         disabled={isPending}
@@ -80,36 +80,36 @@ export const ClinicalNotes = ({ notes, patientId }: ClinicalNotesProps) => {
 
             <div className="space-y-4">
                 {notes.length === 0 ? (
-                    <div className="text-center py-12 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                        <div className="mx-auto w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-3">
-                            <Plus className="h-6 w-6 text-slate-400" />
+                    <div className="text-center py-12 bg-card/[0.02] rounded-xl border border-dashed border-border">
+                        <div className="mx-auto w-12 h-12 bg-muted/60 rounded-full flex items-center justify-center mb-3">
+                            <Plus className="h-6 w-6 text-muted-foreground" />
                         </div>
-                        <h4 className="text-sm font-medium text-slate-900">Sin notas registradas</h4>
-                        <p className="text-sm text-slate-500 mt-1">Comience agregando una nueva nota de evolución.</p>
+                        <h4 className="text-sm font-medium text-foreground">Sin notas registradas</h4>
+                        <p className="text-sm text-muted-foreground mt-1">Comience agregando una nueva nota de evolución.</p>
                     </div>
                 ) : (
                     notes.map((note) => (
-                        <div key={note.id} className="group flex gap-4 p-4 border rounded-xl hover:bg-slate-50/50 transition-colors bg-white shadow-sm hover:shadow-md">
+                        <div key={note.id} className="group flex gap-4 p-4 border rounded-xl hover:bg-muted/50 transition-colors bg-card shadow-sm hover:shadow-md">
                             <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
-                                <AvatarFallback className="bg-blue-100 text-blue-700 font-bold">
+                                <AvatarFallback className="bg-blue-500/15 text-blue-400 font-bold">
                                     {note.author?.name?.charAt(0) || "U"}
                                 </AvatarFallback>
                             </Avatar>
                             <div className="flex-1 space-y-1.5">
                                 <div className="flex justify-between items-start">
                                     <div className="flex items-center gap-2">
-                                        <span className="font-semibold text-slate-900">
+                                        <span className="font-semibold text-foreground">
                                             {note.author?.name || "Usuario Desconocido"}
                                         </span>
-                                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-5 font-medium bg-slate-100 text-slate-600 border-slate-200">
+                                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-5 font-medium bg-muted/60 text-muted-foreground border-border">
                                             {note.author?.role || "STAFF"}
                                         </Badge>
                                     </div>
-                                    <time className="text-xs text-slate-400 font-medium tabular-nums">
+                                    <time className="text-xs text-muted-foreground font-medium tabular-nums">
                                         {new Date(note.createdAt).toLocaleDateString()} • {new Date(note.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </time>
                                 </div>
-                                <p className="text-slate-700 text-sm leading-relaxed whitespace-pre-wrap">
+                                <p className="text-secondary-foreground text-sm leading-relaxed whitespace-pre-wrap">
                                     {note.value}
                                 </p>
                             </div>

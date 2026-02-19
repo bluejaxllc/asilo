@@ -64,16 +64,16 @@ export const StaffCalendar = ({ tasks }: CalendarProps) => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-7 gap-px bg-slate-200 border rounded-lg overflow-hidden">
+            <div className="grid grid-cols-7 gap-px bg-card/40 border border-border rounded-lg overflow-hidden">
                 {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day) => (
-                    <div key={day} className="bg-slate-50 p-2 text-center text-sm font-medium text-slate-500">
+                    <div key={day} className="bg-background p-2 text-center text-sm font-medium text-muted-foreground">
                         {day}
                     </div>
                 ))}
 
                 {/* Add empty cells for start of month padding if needed - simplified for now to just show days */}
                 {Array.from({ length: firstDay.getDay() }).map((_, i) => (
-                    <div key={`padding-${i}`} className="bg-white min-h-[120px]" />
+                    <div key={`padding-${i}`} className="bg-card min-h-[120px]" />
                 ))}
 
                 {days.map((day, dayIdx) => {
@@ -83,14 +83,14 @@ export const StaffCalendar = ({ tasks }: CalendarProps) => {
                         <div
                             key={day.toString()}
                             className={cn(
-                                "bg-white min-h-[120px] p-2 hover:bg-slate-50 transition-colors relative group",
-                                isToday(day) && "bg-blue-50/30"
+                                "bg-card min-h-[120px] p-2 hover:bg-accent/50 transition-colors relative group",
+                                isToday(day) && "bg-blue-500/5"
                             )}
                         >
                             <div className="flex justify-between items-start mb-1">
                                 <span className={cn(
                                     "text-sm font-medium h-7 w-7 flex items-center justify-center rounded-full",
-                                    isToday(day) ? "bg-blue-600 text-white" : "text-slate-700"
+                                    isToday(day) ? "bg-blue-600 text-white" : "text-secondary-foreground"
                                 )}>
                                     {format(day, "d")}
                                 </span>
@@ -110,8 +110,8 @@ export const StaffCalendar = ({ tasks }: CalendarProps) => {
                                                     className={cn(
                                                         "text-xs p-1.5 rounded border truncate cursor-pointer",
                                                         task.status === "COMPLETED"
-                                                            ? "bg-slate-100 text-slate-500 line-through border-slate-200"
-                                                            : "bg-white border-blue-100 text-blue-700 hover:border-blue-300 shadow-sm"
+                                                            ? "bg-card/50 text-muted-foreground line-through border-border"
+                                                            : "bg-blue-500/10 border-blue-500/20 text-blue-400 hover:border-blue-400/40"
                                                     )}
                                                 >
                                                     {task.title}

@@ -197,7 +197,7 @@ export const LoginForm = () => {
     return (
         <div className="w-[440px] max-w-full mx-auto">
             {/* Card */}
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-black/30 border border-white/10 bg-white/[0.03] backdrop-blur-xl">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-black/30 border border-border bg-card/[0.03] backdrop-blur-xl">
                 {/* Gradient top accent */}
                 <div className={`h-1.5 bg-gradient-to-r ${theme.accentBar}`} />
 
@@ -207,7 +207,7 @@ export const LoginForm = () => {
                         <Icon className="h-8 w-8 text-white" />
                     </div>
                     <h1 className="text-2xl font-bold text-white mb-2">{theme.title}</h1>
-                    <p className="text-sm text-slate-400 leading-relaxed">{theme.subtitle}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{theme.subtitle}</p>
                 </div>
 
                 {/* Form */}
@@ -223,14 +223,14 @@ export const LoginForm = () => {
                                     name="email"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-slate-300 text-sm font-medium">Correo Electrónico</FormLabel>
+                                            <FormLabel className="text-muted-foreground text-sm font-medium">Correo Electrónico</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     {...field}
                                                     disabled={isPending}
                                                     placeholder="ejemplo@correo.com"
                                                     type="email"
-                                                    className={`h-12 bg-white/5 border-white/10 text-white placeholder:text-slate-500 ${theme.inputFocus} rounded-xl transition-colors`}
+                                                    className={`h-12 bg-card/5 border-border text-white placeholder:text-muted-foreground ${theme.inputFocus} rounded-xl transition-colors`}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -242,14 +242,14 @@ export const LoginForm = () => {
                                     name="password"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-slate-300 text-sm font-medium">Contraseña</FormLabel>
+                                            <FormLabel className="text-muted-foreground text-sm font-medium">Contraseña</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     {...field}
                                                     disabled={isPending}
                                                     placeholder="••••••••"
                                                     type="password"
-                                                    className={`h-12 bg-white/5 border-white/10 text-white placeholder:text-slate-500 ${theme.inputFocus} rounded-xl transition-colors`}
+                                                    className={`h-12 bg-card/5 border-border text-white placeholder:text-muted-foreground ${theme.inputFocus} rounded-xl transition-colors`}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -280,10 +280,10 @@ export const LoginForm = () => {
 
                 {/* Footer */}
                 <div className="px-8 pb-8">
-                    <div className="border-t border-white/10 pt-5 text-center">
+                    <div className="border-t border-border pt-5 text-center">
                         <a
                             href="/"
-                            className="text-sm text-slate-400 hover:text-white transition-colors"
+                            className="text-sm text-muted-foreground hover:text-white transition-colors"
                         >
                             {theme.backLabel}
                         </a>

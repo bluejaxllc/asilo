@@ -107,15 +107,15 @@ export const StaffForm = ({ onSuccess }: StaffFormProps) => {
             </Select>
 
             {formData.role === "FAMILY" && (
-                <div className="space-y-2 p-3 bg-orange-50 rounded-lg border border-orange-100">
-                    <p className="text-xs font-medium text-orange-700 flex items-center gap-1">
+                <div className="space-y-2 p-3 bg-orange-500/10 rounded-lg border border-orange-500/20">
+                    <p className="text-xs font-medium text-orange-400 flex items-center gap-1">
                         <Heart className="h-3 w-3" /> Vincular con Residente
                     </p>
                     <Select
                         value={formData.patientId}
                         onValueChange={(value) => setFormData({ ...formData, patientId: value })}
                     >
-                        <SelectTrigger className="bg-white">
+                        <SelectTrigger className="bg-card">
                             <SelectValue placeholder="Seleccionar Residente" />
                         </SelectTrigger>
                         <SelectContent>
@@ -130,7 +130,7 @@ export const StaffForm = ({ onSuccess }: StaffFormProps) => {
             )}
 
             <p className="text-sm text-muted-foreground">
-                Contraseña por defecto: <code className="bg-slate-100 px-2 py-1 rounded">123456</code>
+                Contraseña por defecto: <code className="bg-muted/60 px-2 py-1 rounded">123456</code>
             </p>
             <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Registrando..." : formData.role === "FAMILY" ? "Registrar Familiar" : "Registrar Personal"}

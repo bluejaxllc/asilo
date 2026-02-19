@@ -89,7 +89,7 @@ function StaffPatientsContent() {
             {/* Page Header */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-slate-800">Bitácora de Cuidado</h2>
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground">Bitácora de Cuidado</h2>
                     <p className="text-muted-foreground mt-1">Seleccione un residente para registrar actividad</p>
                 </div>
                 <div className="w-full md:w-72">
@@ -107,7 +107,7 @@ function StaffPatientsContent() {
                                     <p className="text-sm text-blue-100 font-medium">Total</p>
                                     <p className="text-3xl font-bold mt-1">{patients.length}</p>
                                 </div>
-                                <div className="h-11 w-11 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                <div className="h-11 w-11 bg-card/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
                                     <Users className="h-5 w-5" />
                                 </div>
                             </div>
@@ -123,7 +123,7 @@ function StaffPatientsContent() {
                                     <p className="text-sm text-emerald-100 font-medium">Estables</p>
                                     <p className="text-3xl font-bold mt-1">{stableCount}</p>
                                 </div>
-                                <div className="h-11 w-11 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                <div className="h-11 w-11 bg-card/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
                                     <HeartPulse className="h-5 w-5" />
                                 </div>
                             </div>
@@ -132,14 +132,14 @@ function StaffPatientsContent() {
                 </ScaleIn>
 
                 <ScaleIn delay={0.2}>
-                    <Card className={`border-0 text-white shadow-lg transition-all hover:-translate-y-1 ${attentionCount > 0 ? 'bg-gradient-to-br from-red-500 to-red-700 shadow-red-500/20 hover:shadow-red-500/40' : 'bg-gradient-to-br from-slate-500 to-slate-700 shadow-slate-500/20 hover:shadow-slate-500/40'}`}>
+                    <Card className={`border-0 text-white shadow-lg transition-all hover:-translate-y-1 ${attentionCount > 0 ? 'bg-gradient-to-br from-red-500 to-red-700 shadow-red-500/20 hover:shadow-red-500/40' : 'bg-gradient-to-br from-zinc-700 to-zinc-900 shadow-zinc-500/20 hover:shadow-zinc-500/40'}`}>
                         <CardContent className="p-4 md:p-5">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className={`text-sm font-medium ${attentionCount > 0 ? 'text-red-100' : 'text-slate-200'}`}>Atención</p>
                                     <p className="text-3xl font-bold mt-1">{attentionCount}</p>
                                 </div>
-                                <div className="h-11 w-11 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                <div className="h-11 w-11 bg-card/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
                                     <AlertCircle className="h-5 w-5" />
                                 </div>
                             </div>
@@ -155,7 +155,7 @@ function StaffPatientsContent() {
                     <span className="ml-3 text-blue-500 font-medium">Cargando residentes...</span>
                 </div>
             ) : patients.length === 0 ? (
-                <div className="text-center py-16 text-muted-foreground bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                <div className="text-center py-16 text-muted-foreground bg-card/[0.02] rounded-2xl border border-dashed border-border">
                     {query ? "No se encontraron residentes." : "No hay residentes asignados."}
                 </div>
             ) : (
@@ -163,19 +163,19 @@ function StaffPatientsContent() {
                     {patientsWithVitals.map((p, index) => (
                         <SlideIn key={p.id} delay={index * 0.06}>
                             <HoverScale className="h-full">
-                                <Card className="shadow-md hover:shadow-xl transition-all duration-300 border-0 h-full flex flex-col bg-white rounded-2xl overflow-hidden">
+                                <Card className="shadow-md hover:shadow-xl transition-all duration-300 border-0 h-full flex flex-col bg-card rounded-2xl overflow-hidden">
                                     {/* Card Header with Avatar */}
-                                    <CardHeader className="pb-3 bg-slate-50/80 border-b border-slate-100">
+                                    <CardHeader className="pb-3 bg-card border-b border-border/60">
                                         <div className="flex items-center gap-3">
                                             <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${avatarGradients[index % avatarGradients.length]} flex items-center justify-center text-white font-bold text-lg shadow-sm`}>
                                                 {p.name?.charAt(0)}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <CardTitle className="text-xl font-bold text-slate-800 truncate">{p.name}</CardTitle>
-                                                <span className="text-sm text-slate-500 font-mono">Hab. {p.room || "N/A"}</span>
+                                                <CardTitle className="text-xl font-bold text-foreground truncate">{p.name}</CardTitle>
+                                                <span className="text-sm text-muted-foreground font-mono">Hab. {p.room || "N/A"}</span>
                                             </div>
-                                            <Badge className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${p.status === 'Estable' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-red-100 text-red-700 border-red-200'}`} variant="outline">
-                                                <span className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${p.status === 'Estable' ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                                            <Badge className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${p.status === 'Estable' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' : 'bg-red-500/15 text-red-400 border-red-500/20'}`} variant="outline">
+                                                <span className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${p.status === 'Estable' ? 'bg-emerald-500/100' : 'bg-red-500/100'}`} />
                                                 {p.status}
                                             </Badge>
                                         </div>
@@ -184,26 +184,26 @@ function StaffPatientsContent() {
                                     {/* Quick Info */}
                                     <CardContent className="py-4 flex-grow">
                                         <div className="grid grid-cols-2 gap-3">
-                                            <div className="bg-blue-50/80 p-3 rounded-xl text-center border border-blue-100/50">
+                                            <div className="bg-blue-500/80 p-3 rounded-xl text-center border border-blue-500/50">
                                                 <span className="block text-[10px] font-bold text-blue-400 uppercase tracking-wider">Última Vital</span>
-                                                <span className="block text-lg font-bold text-blue-700 mt-0.5">{p.lastVitalTime}</span>
+                                                <span className="block text-lg font-bold text-blue-400 mt-0.5">{p.lastVitalTime}</span>
                                             </div>
-                                            <div className="bg-orange-50/80 p-3 rounded-xl text-center border border-orange-100/50">
+                                            <div className="bg-orange-500/80 p-3 rounded-xl text-center border border-orange-500/50">
                                                 <span className="block text-[10px] font-bold text-orange-400 uppercase tracking-wider">Dieta</span>
-                                                <span className="block text-sm font-bold text-orange-700 mt-0.5 truncate">{p.dietaryNeeds || "General"}</span>
+                                                <span className="block text-sm font-bold text-orange-400 mt-0.5 truncate">{p.dietaryNeeds || "General"}</span>
                                             </div>
                                         </div>
                                     </CardContent>
 
                                     {/* Action Buttons */}
-                                    <CardFooter className="grid grid-cols-3 gap-2.5 p-4 bg-slate-50/30 border-t border-slate-100">
+                                    <CardFooter className="grid grid-cols-3 gap-2.5 p-4 bg-card border-t border-border/60">
                                         <Dialog>
                                             <DialogTrigger asChild>
-                                                <Button variant="outline" className="flex flex-col h-20 gap-1.5 border-2 border-slate-200 hover:border-blue-400 hover:bg-blue-50 active:scale-95 transition-all rounded-xl" title="Registrar Vitales">
-                                                    <div className="p-1.5 bg-blue-100 rounded-lg text-blue-600">
+                                                <Button variant="outline" className="flex flex-col h-20 gap-1.5 border-2 border-border hover:border-blue-400 hover:bg-blue-500/10 active:scale-95 transition-all rounded-xl" title="Registrar Vitales">
+                                                    <div className="p-1.5 bg-blue-500/15 rounded-lg text-blue-400">
                                                         <Activity className="h-5 w-5" />
                                                     </div>
-                                                    <span className="text-xs font-bold text-slate-600">Vitales</span>
+                                                    <span className="text-xs font-bold text-muted-foreground">Vitales</span>
                                                 </Button>
                                             </DialogTrigger>
                                             <DialogContent className="sm:max-w-[500px]">
@@ -217,11 +217,11 @@ function StaffPatientsContent() {
 
                                         <Dialog>
                                             <DialogTrigger asChild>
-                                                <Button variant="outline" className="flex flex-col h-20 gap-1.5 border-2 border-slate-200 hover:border-orange-400 hover:bg-orange-50 active:scale-95 transition-all rounded-xl" title="Registrar Alimentos">
-                                                    <div className="p-1.5 bg-orange-100 rounded-lg text-orange-600">
+                                                <Button variant="outline" className="flex flex-col h-20 gap-1.5 border-2 border-border hover:border-orange-400 hover:bg-orange-500/10 active:scale-95 transition-all rounded-xl" title="Registrar Alimentos">
+                                                    <div className="p-1.5 bg-orange-500/15 rounded-lg text-orange-400">
                                                         <Utensils className="h-5 w-5" />
                                                     </div>
-                                                    <span className="text-xs font-bold text-slate-600">Alimentos</span>
+                                                    <span className="text-xs font-bold text-muted-foreground">Alimentos</span>
                                                 </Button>
                                             </DialogTrigger>
                                             <DialogContent className="sm:max-w-[500px]">
@@ -235,11 +235,11 @@ function StaffPatientsContent() {
 
                                         <Dialog>
                                             <DialogTrigger asChild>
-                                                <Button variant="outline" className="flex flex-col h-20 gap-1.5 border-2 border-slate-200 hover:border-emerald-400 hover:bg-emerald-50 active:scale-95 transition-all rounded-xl" title="Registrar Medicamentos">
-                                                    <div className="p-1.5 bg-emerald-100 rounded-lg text-emerald-600">
+                                                <Button variant="outline" className="flex flex-col h-20 gap-1.5 border-2 border-border hover:border-emerald-400 hover:bg-emerald-500/10 active:scale-95 transition-all rounded-xl" title="Registrar Medicamentos">
+                                                    <div className="p-1.5 bg-emerald-500/15 rounded-lg text-emerald-400">
                                                         <Pill className="h-5 w-5" />
                                                     </div>
-                                                    <span className="text-xs font-bold text-slate-600">Meds</span>
+                                                    <span className="text-xs font-bold text-muted-foreground">Meds</span>
                                                 </Button>
                                             </DialogTrigger>
                                             <DialogContent className="sm:max-w-[500px]">

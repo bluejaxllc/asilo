@@ -56,15 +56,15 @@ export default async function KitchenPage({ searchParams }: KitchenPageProps) {
             {/* Page Header */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-slate-800">Cocina y Dietas</h2>
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground">Cocina y Dietas</h2>
                     <p className="text-muted-foreground mt-1">
                         Supervisión de requerimientos dietéticos y distribución de alimentos.
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border shadow-sm">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-xl border shadow-sm">
                         <MealIcon className={cn("h-5 w-5", meal.color)} />
-                        <span className="text-sm font-semibold text-slate-700">{meal.label}</span>
+                        <span className="text-sm font-semibold text-secondary-foreground">{meal.label}</span>
                     </div>
                 </div>
             </div>
@@ -79,7 +79,7 @@ export default async function KitchenPage({ searchParams }: KitchenPageProps) {
                                     <p className="text-sm text-blue-100 font-medium">Residentes</p>
                                     <p className="text-3xl font-bold mt-1">{patients.length}</p>
                                 </div>
-                                <div className="h-11 w-11 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                <div className="h-11 w-11 bg-card/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
                                     <Users className="h-5 w-5" />
                                 </div>
                             </div>
@@ -95,7 +95,7 @@ export default async function KitchenPage({ searchParams }: KitchenPageProps) {
                                     <p className="text-sm text-orange-100 font-medium">Dietas Especiales</p>
                                     <p className="text-3xl font-bold mt-1">{specialDietCount}</p>
                                 </div>
-                                <div className="h-11 w-11 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                <div className="h-11 w-11 bg-card/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
                                     <Salad className="h-5 w-5" />
                                 </div>
                             </div>
@@ -111,7 +111,7 @@ export default async function KitchenPage({ searchParams }: KitchenPageProps) {
                                     <p className={`text-sm font-medium ${allergyCount > 0 ? 'text-red-100' : 'text-emerald-100'}`}>Alertas Alergia</p>
                                     <p className="text-3xl font-bold mt-1">{allergyCount}</p>
                                 </div>
-                                <div className="h-11 w-11 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                <div className="h-11 w-11 bg-card/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
                                     <AlertTriangle className="h-5 w-5" />
                                 </div>
                             </div>
@@ -121,14 +121,14 @@ export default async function KitchenPage({ searchParams }: KitchenPageProps) {
             </div>
 
             {/* Search */}
-            <div className="flex items-center gap-4 bg-white p-4 rounded-xl border shadow-sm">
+            <div className="flex items-center gap-4 bg-card p-4 rounded-xl border shadow-sm">
                 <SearchInput placeholder="Buscar residente o habitación..." />
             </div>
 
             {/* Diet Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {patients.length === 0 ? (
-                    <div className="col-span-full text-center py-16 text-muted-foreground bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                    <div className="col-span-full text-center py-16 text-muted-foreground bg-card/[0.02] rounded-2xl border border-dashed border-border">
                         No se encontraron residentes.
                     </div>
                 ) : patients.map((p, i) => {
@@ -139,7 +139,7 @@ export default async function KitchenPage({ searchParams }: KitchenPageProps) {
                         <SlideIn key={p.id} delay={i * 0.04}>
                             <HoverScale>
                                 <Card className={cn(
-                                    "h-full shadow-md hover:shadow-lg transition-all duration-300 border-0 bg-white rounded-2xl overflow-hidden",
+                                    "h-full shadow-md hover:shadow-lg transition-all duration-300 border-0 bg-card rounded-2xl overflow-hidden",
                                     hasAllergy ? "ring-2 ring-red-200" : ""
                                 )}>
                                     {/* Top color bar */}
@@ -153,27 +153,27 @@ export default async function KitchenPage({ searchParams }: KitchenPageProps) {
                                     <CardHeader className="pb-3">
                                         <div className="flex justify-between items-start">
                                             <div>
-                                                <CardTitle className="text-xl font-bold text-slate-800">{p.name}</CardTitle>
-                                                <p className="text-sm font-mono text-slate-500 mt-0.5">Hab. {p.room}</p>
+                                                <CardTitle className="text-xl font-bold text-foreground">{p.name}</CardTitle>
+                                                <p className="text-sm font-mono text-muted-foreground mt-0.5">Hab. {p.room}</p>
                                             </div>
-                                            <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200 text-xs">
+                                            <Badge variant="outline" className="bg-card/[0.02] text-muted-foreground border-border text-xs">
                                                 {p.status}
                                             </Badge>
                                         </div>
                                     </CardHeader>
                                     <CardContent className="space-y-3 pt-0">
                                         <div>
-                                            <div className="flex items-center gap-2 mb-2 text-slate-500 font-medium text-xs uppercase tracking-wider">
+                                            <div className="flex items-center gap-2 mb-2 text-muted-foreground font-medium text-xs uppercase tracking-wider">
                                                 <Utensils className="h-3.5 w-3.5 text-orange-500" />
                                                 <span>Régimen Alimenticio</span>
                                             </div>
                                             <div className={cn(
                                                 "p-3 rounded-xl border",
-                                                hasSpecialDiet ? "bg-orange-50/80 border-orange-100" : "bg-emerald-50/80 border-emerald-100"
+                                                hasSpecialDiet ? "bg-orange-500/80 border-orange-500/20" : "bg-emerald-500/80 border-emerald-500/20"
                                             )}>
                                                 <span className={cn(
                                                     "text-base font-bold block",
-                                                    hasSpecialDiet ? "text-orange-700" : "text-emerald-700"
+                                                    hasSpecialDiet ? "text-orange-400" : "text-emerald-400"
                                                 )}>
                                                     {p.dietaryNeeds || "Normal / Sin Restricciones"}
                                                 </span>
@@ -181,13 +181,13 @@ export default async function KitchenPage({ searchParams }: KitchenPageProps) {
                                         </div>
 
                                         {hasAllergy && (
-                                            <div className="bg-red-50 p-3 rounded-xl border border-red-100 flex items-start gap-3">
-                                                <div className="p-1 bg-red-100 rounded-lg mt-0.5">
-                                                    <AlertTriangle className="h-4 w-4 text-red-600" />
+                                            <div className="bg-red-500/10 p-3 rounded-xl border border-red-500/20 flex items-start gap-3">
+                                                <div className="p-1 bg-red-500/15 rounded-lg mt-0.5">
+                                                    <AlertTriangle className="h-4 w-4 text-red-400" />
                                                 </div>
                                                 <div>
-                                                    <div className="text-[10px] font-bold text-red-600 uppercase tracking-widest mb-0.5">Alerta de Alergia</div>
-                                                    <div className="text-xs text-red-700 leading-snug">
+                                                    <div className="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-0.5">Alerta de Alergia</div>
+                                                    <div className="text-xs text-red-400 leading-snug">
                                                         Verificar expediente clínico para detalles específicos.
                                                     </div>
                                                 </div>

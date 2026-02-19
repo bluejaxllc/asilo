@@ -45,9 +45,9 @@ import {
 import { toast } from "sonner";
 
 const TYPE_CONFIG: Record<string, { label: string; icon: any; color: string; bg: string; activeBg: string; dot: string }> = {
-    INFO: { label: "Información", icon: Info, color: "text-blue-600", bg: "bg-blue-50", activeBg: "bg-blue-600 text-white", dot: "bg-blue-500" },
-    WARNING: { label: "Advertencia", icon: AlertTriangle, color: "text-amber-600", bg: "bg-amber-50", activeBg: "bg-amber-500 text-white", dot: "bg-amber-500" },
-    CRITICAL: { label: "Crítico", icon: AlertCircle, color: "text-red-600", bg: "bg-red-50", activeBg: "bg-red-600 text-white", dot: "bg-red-500" },
+    INFO: { label: "Información", icon: Info, color: "text-blue-400", bg: "bg-blue-500/10", activeBg: "bg-blue-600 text-white", dot: "bg-blue-500/100" },
+    WARNING: { label: "Advertencia", icon: AlertTriangle, color: "text-amber-400", bg: "bg-amber-500/10", activeBg: "bg-amber-500/100 text-white", dot: "bg-amber-500/100" },
+    CRITICAL: { label: "Crítico", icon: AlertCircle, color: "text-red-400", bg: "bg-red-500/10", activeBg: "bg-red-600 text-white", dot: "bg-red-500/100" },
 };
 
 export default function NotificationsPage() {
@@ -185,15 +185,15 @@ export default function NotificationsPage() {
 
             {/* Summary Cards */}
             <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
-                <Card className="border-0 bg-gradient-to-br from-slate-700 to-slate-900 text-white shadow-lg shadow-slate-500/10">
+                <Card className="border-0 bg-gradient-to-br from-zinc-700 to-zinc-900 text-white shadow-lg shadow-zinc-500/10">
                     <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-xs text-slate-300 font-medium">Total</p>
+                                <p className="text-xs text-muted-foreground font-medium">Total</p>
                                 <p className="text-2xl font-bold mt-0.5">{notifications.length}</p>
                             </div>
-                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
-                                <Bell className="h-4 w-4 text-slate-300" />
+                            <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">
+                                <Bell className="h-4 w-4 text-muted-foreground" />
                             </div>
                         </div>
                     </CardContent>
@@ -206,7 +206,7 @@ export default function NotificationsPage() {
                                 <p className="text-xs text-blue-100 font-medium">Sin Leer</p>
                                 <p className="text-2xl font-bold mt-0.5">{unreadCount}</p>
                             </div>
-                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
+                            <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">
                                 <BellOff className="h-4 w-4 text-blue-100" />
                             </div>
                         </div>
@@ -220,7 +220,7 @@ export default function NotificationsPage() {
                                 <p className="text-xs text-amber-100 font-medium">Advertencias</p>
                                 <p className="text-2xl font-bold mt-0.5">{typeCounts["WARNING"] || 0}</p>
                             </div>
-                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
+                            <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">
                                 <AlertTriangle className="h-4 w-4 text-amber-100" />
                             </div>
                         </div>
@@ -234,7 +234,7 @@ export default function NotificationsPage() {
                                 <p className="text-xs text-red-100 font-medium">Críticos</p>
                                 <p className="text-2xl font-bold mt-0.5">{typeCounts["CRITICAL"] || 0}</p>
                             </div>
-                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
+                            <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">
                                 <AlertCircle className="h-4 w-4 text-red-100" />
                             </div>
                         </div>
@@ -260,8 +260,8 @@ export default function NotificationsPage() {
                             key={tab.key}
                             onClick={() => setActiveFilter(tab.key)}
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${isActive
-                                    ? (cfg?.activeBg || "bg-slate-800 text-white") + " shadow-sm"
-                                    : (cfg?.bg || "bg-slate-100") + " " + (cfg?.color || "text-slate-600") + " hover:opacity-80"
+                                ? (cfg?.activeBg || "bg-zinc-700 text-white") + " shadow-sm"
+                                : (cfg?.bg || "bg-muted/60") + " " + (cfg?.color || "text-muted-foreground") + " hover:opacity-80"
                                 }`}
                         >
                             <tab.icon className="h-3 w-3" />
@@ -284,7 +284,7 @@ export default function NotificationsPage() {
                 ) : notifications.length === 0 ? (
                     <div className="text-center py-16">
                         <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-3 opacity-30" />
-                        <p className="text-sm font-medium text-slate-600">No hay notificaciones</p>
+                        <p className="text-sm font-medium text-muted-foreground">No hay notificaciones</p>
                         <p className="text-xs text-muted-foreground mt-1">Las alertas del sistema aparecerán aquí.</p>
                     </div>
                 ) : (
@@ -293,7 +293,7 @@ export default function NotificationsPage() {
                         const Icon = cfg.icon;
                         return (
                             <SlideIn key={n.id} delay={Math.min(index * 0.04, 0.8)}>
-                                <Card className={`border shadow-sm transition-all hover:shadow-md ${!n.read ? "bg-white border-l-4 border-l-blue-500" : "bg-slate-50/50 opacity-80"}`}>
+                                <Card className={`border shadow-sm transition-all hover:shadow-md ${!n.read ? "bg-card border-l-4 border-l-blue-500" : "bg-card opacity-80"}`}>
                                     <CardContent className="p-4">
                                         <div className="flex items-start gap-4">
                                             <div className={`h-10 w-10 rounded-xl ${cfg.bg} flex items-center justify-center flex-shrink-0 mt-0.5`}>
@@ -301,18 +301,18 @@ export default function NotificationsPage() {
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <h4 className={`font-semibold text-sm ${!n.read ? "text-slate-900" : "text-slate-600"}`}>
+                                                    <h4 className={`font-semibold text-sm ${!n.read ? "text-foreground" : "text-muted-foreground"}`}>
                                                         {n.title}
                                                     </h4>
                                                     <Badge variant="outline" className={`text-[10px] px-1.5 py-0 border-0 ${cfg.bg} ${cfg.color}`}>
                                                         {cfg.label}
                                                     </Badge>
                                                     {!n.read && (
-                                                        <span className="h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" />
+                                                        <span className="h-2 w-2 rounded-full bg-blue-500/100 flex-shrink-0" />
                                                     )}
                                                 </div>
                                                 <p className="text-xs text-muted-foreground line-clamp-2">{n.message}</p>
-                                                <p className="text-[10px] text-slate-400 mt-1.5">
+                                                <p className="text-[10px] text-muted-foreground mt-1.5">
                                                     {new Date(n.createdAt).toLocaleString("es-MX", {
                                                         day: "numeric",
                                                         month: "short",
@@ -326,7 +326,7 @@ export default function NotificationsPage() {
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        className="h-8 w-8 hover:text-green-600 hover:bg-green-50"
+                                                        className="h-8 w-8 hover:text-emerald-400 hover:bg-emerald-500/10"
                                                         onClick={() => handleMarkRead(n.id)}
                                                         title="Marcar como leída"
                                                     >
@@ -336,7 +336,7 @@ export default function NotificationsPage() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-8 w-8 hover:text-red-600 hover:bg-red-50"
+                                                    className="h-8 w-8 hover:text-red-400 hover:bg-red-500/10"
                                                     onClick={() => handleDelete(n.id)}
                                                     title="Eliminar"
                                                 >

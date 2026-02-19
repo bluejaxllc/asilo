@@ -92,35 +92,35 @@ export default function SettingsPage() {
                         Parámetros generales del sistema y preferencias.
                     </p>
                 </div>
-                <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200 gap-1.5">
-                    <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 gap-1.5">
+                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500/100 animate-pulse" />
                     Sistema Operativo
                 </Badge>
             </div>
 
             <Tabs defaultValue="general" className="space-y-6">
-                <TabsList className="bg-white border h-11 p-1">
-                    <TabsTrigger value="general" className="gap-1.5 data-[state=active]:bg-slate-900 data-[state=active]:text-white">
+                <TabsList className="bg-card border h-11 p-1">
+                    <TabsTrigger value="general" className="gap-1.5 data-[state=active]:bg-background data-[state=active]:text-foreground">
                         <Building2 className="h-3.5 w-3.5" /> General
                     </TabsTrigger>
-                    <TabsTrigger value="notifications" className="gap-1.5 data-[state=active]:bg-slate-900 data-[state=active]:text-white">
+                    <TabsTrigger value="notifications" className="gap-1.5 data-[state=active]:bg-background data-[state=active]:text-foreground">
                         <Bell className="h-3.5 w-3.5" /> Notificaciones
                     </TabsTrigger>
-                    <TabsTrigger value="backup" className="gap-1.5 data-[state=active]:bg-slate-900 data-[state=active]:text-white">
+                    <TabsTrigger value="backup" className="gap-1.5 data-[state=active]:bg-background data-[state=active]:text-foreground">
                         <Database className="h-3.5 w-3.5" /> Respaldo
                     </TabsTrigger>
-                    <TabsTrigger value="security" className="gap-1.5 data-[state=active]:bg-slate-900 data-[state=active]:text-white">
+                    <TabsTrigger value="security" className="gap-1.5 data-[state=active]:bg-background data-[state=active]:text-foreground">
                         <Shield className="h-3.5 w-3.5" /> Seguridad
                     </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="general">
                     <SlideIn delay={0.1}>
-                        <Card className="shadow-sm border-slate-200">
-                            <CardHeader className="border-b bg-slate-50/50">
+                        <Card className="shadow-sm border-border">
+                            <CardHeader className="border-b bg-card">
                                 <div className="flex items-center gap-3">
-                                    <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                                        <Building2 className="h-5 w-5 text-blue-600" />
+                                    <div className="h-10 w-10 rounded-lg bg-blue-500/15 flex items-center justify-center">
+                                        <Building2 className="h-5 w-5 text-blue-400" />
                                     </div>
                                     <div>
                                         <CardTitle className="text-lg">Información del Asilo</CardTitle>
@@ -156,11 +156,11 @@ export default function SettingsPage() {
 
                 <TabsContent value="notifications">
                     <SlideIn delay={0.1}>
-                        <Card className="shadow-sm border-slate-200">
-                            <CardHeader className="border-b bg-slate-50/50">
+                        <Card className="shadow-sm border-border">
+                            <CardHeader className="border-b bg-card">
                                 <div className="flex items-center gap-3">
-                                    <div className="h-10 w-10 rounded-lg bg-amber-100 flex items-center justify-center">
-                                        <Bell className="h-5 w-5 text-amber-600" />
+                                    <div className="h-10 w-10 rounded-lg bg-amber-500/15 flex items-center justify-center">
+                                        <Bell className="h-5 w-5 text-amber-400" />
                                     </div>
                                     <div>
                                         <CardTitle className="text-lg">Preferencias de Alertas</CardTitle>
@@ -171,16 +171,16 @@ export default function SettingsPage() {
                                 </div>
                             </CardHeader>
                             <CardContent className="p-6 space-y-1">
-                                <div className="flex items-center justify-between p-4 rounded-xl hover:bg-slate-50 transition-colors group">
+                                <div className="flex items-center justify-between p-4 rounded-xl hover:bg-accent/50 transition-colors group">
                                     <Label htmlFor="stock-alerts" className="flex flex-col space-y-1 cursor-pointer">
-                                        <span className="font-semibold text-slate-800">Stock Bajo de Medicamentos</span>
+                                        <span className="font-semibold text-foreground">Stock Bajo de Medicamentos</span>
                                         <span className="font-normal text-xs text-muted-foreground">Enviar correo cuando un medicamento baje del mínimo.</span>
                                     </Label>
                                     <Switch id="stock-alerts" checked={stockAlerts} onCheckedChange={setStockAlerts} />
                                 </div>
-                                <div className="flex items-center justify-between p-4 rounded-xl hover:bg-slate-50 transition-colors group">
+                                <div className="flex items-center justify-between p-4 rounded-xl hover:bg-accent/50 transition-colors group">
                                     <Label htmlFor="incident-alerts" className="flex flex-col space-y-1 cursor-pointer">
-                                        <span className="font-semibold text-slate-800">Incidentes Críticos</span>
+                                        <span className="font-semibold text-foreground">Incidentes Críticos</span>
                                         <span className="font-normal text-xs text-muted-foreground">Notificación inmediata para reportes de caídas o emergencias.</span>
                                     </Label>
                                     <Switch id="incident-alerts" checked={incidentAlerts} onCheckedChange={setIncidentAlerts} />
@@ -198,11 +198,11 @@ export default function SettingsPage() {
 
                 <TabsContent value="backup">
                     <SlideIn delay={0.1}>
-                        <Card className="shadow-sm border-slate-200">
-                            <CardHeader className="border-b bg-slate-50/50">
+                        <Card className="shadow-sm border-border">
+                            <CardHeader className="border-b bg-card">
                                 <div className="flex items-center gap-3">
-                                    <div className="h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center">
-                                        <Database className="h-5 w-5 text-green-600" />
+                                    <div className="h-10 w-10 rounded-lg bg-emerald-500/15 flex items-center justify-center">
+                                        <Database className="h-5 w-5 text-emerald-400" />
                                     </div>
                                     <div>
                                         <CardTitle className="text-lg">Copia de Seguridad</CardTitle>
@@ -213,10 +213,10 @@ export default function SettingsPage() {
                                 </div>
                             </CardHeader>
                             <CardContent className="p-6">
-                                <div className="bg-slate-50 rounded-xl p-6 border border-dashed border-slate-200 text-center space-y-3">
-                                    <Database className="h-10 w-10 text-slate-300 mx-auto" />
+                                <div className="bg-card/[0.02] rounded-xl p-6 border border-dashed border-border text-center space-y-3">
+                                    <Database className="h-10 w-10 text-muted-foreground mx-auto" />
                                     <div>
-                                        <p className="text-sm font-medium text-slate-700">Exportar Datos del Sistema</p>
+                                        <p className="text-sm font-medium text-secondary-foreground">Exportar Datos del Sistema</p>
                                         <p className="text-xs text-muted-foreground mt-1">Incluye pacientes, registros médicos y configuración</p>
                                     </div>
                                     <Button variant="outline" className="gap-2">
@@ -230,11 +230,11 @@ export default function SettingsPage() {
 
                 <TabsContent value="security">
                     <SlideIn delay={0.1}>
-                        <Card className="shadow-sm border-slate-200">
-                            <CardHeader className="border-b bg-slate-50/50">
+                        <Card className="shadow-sm border-border">
+                            <CardHeader className="border-b bg-card">
                                 <div className="flex items-center gap-3">
-                                    <div className="h-10 w-10 rounded-lg bg-red-100 flex items-center justify-center">
-                                        <Shield className="h-5 w-5 text-red-600" />
+                                    <div className="h-10 w-10 rounded-lg bg-red-500/15 flex items-center justify-center">
+                                        <Shield className="h-5 w-5 text-red-400" />
                                     </div>
                                     <div>
                                         <CardTitle className="text-lg">Seguridad del Sistema</CardTitle>
@@ -246,21 +246,21 @@ export default function SettingsPage() {
                             </CardHeader>
                             <CardContent className="p-6">
                                 <div className="space-y-4">
-                                    <div className="flex items-center gap-3 p-4 bg-green-50 rounded-xl border border-green-100">
-                                        <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                                    <div className="flex items-center gap-3 p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                                        <div className="h-2 w-2 rounded-full bg-emerald-500/100 animate-pulse" />
                                         <div className="flex-1">
-                                            <p className="text-sm font-medium text-green-800">Autenticación Activa</p>
-                                            <p className="text-xs text-green-600">NextAuth.js con control de roles (ADMIN, STAFF, FAMILY)</p>
+                                            <p className="text-sm font-medium text-emerald-400">Autenticación Activa</p>
+                                            <p className="text-xs text-emerald-400">NextAuth.js con control de roles (ADMIN, STAFF, FAMILY)</p>
                                         </div>
-                                        <Badge variant="outline" className="bg-green-100 text-green-700 border-green-200">Activo</Badge>
+                                        <Badge variant="outline" className="bg-emerald-500/15 text-emerald-400 border-emerald-500/20">Activo</Badge>
                                     </div>
-                                    <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                                    <div className="flex items-center gap-3 p-4 bg-blue-500/10 rounded-xl border border-blue-500/20">
                                         <Info className="h-4 w-4 text-blue-500 flex-shrink-0" />
                                         <div className="flex-1">
-                                            <p className="text-sm font-medium text-blue-800">Middleware de Rutas</p>
-                                            <p className="text-xs text-blue-600">Protección por rol en todas las rutas protegidas</p>
+                                            <p className="text-sm font-medium text-blue-400">Middleware de Rutas</p>
+                                            <p className="text-xs text-blue-400">Protección por rol en todas las rutas protegidas</p>
                                         </div>
-                                        <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-200">Activo</Badge>
+                                        <Badge variant="outline" className="bg-blue-500/15 text-blue-400 border-blue-500/20">Activo</Badge>
                                     </div>
                                 </div>
                             </CardContent>

@@ -22,29 +22,35 @@ import {
     Utensils,
     CalendarDays,
     User,
-    Stethoscope
+    Stethoscope,
+    MessageCircle
 } from "lucide-react";
 import Link from "next/link";
 import { VitalsChart } from "@/components/patients/vitals-chart";
 import { ClinicalNotes } from "@/components/patients/clinical-notes";
+import { PatientMessages } from "@/components/patients/patient-messages";
 import { FadeIn } from "@/components/ui/motion-wrapper";
 import { getPatientById } from "@/actions/patients";
+import { getMessages } from "@/actions/family-messages";
 import { redirect } from "next/navigation";
 import { AssignMedicationDialog } from "@/components/patients/assign-medication-dialog";
 import { AdministerMedButton } from "@/components/patients/administer-med-button";
 import { cn } from "@/lib/utils";
 
 const logTypeConfig: Record<string, { label: string; icon: any; color: string; bg: string }> = {
-    VITALS: { label: "Vitales", icon: Activity, color: "text-blue-600", bg: "bg-blue-100" },
-    FOOD: { label: "Alimentos", icon: Utensils, color: "text-orange-600", bg: "bg-orange-100" },
-    MEDS: { label: "Meds", icon: Pill, color: "text-green-600", bg: "bg-green-100" },
-    NOTE: { label: "Nota", icon: FileText, color: "text-purple-600", bg: "bg-purple-100" },
-    INCIDENT: { label: "Incidente", icon: AlertTriangle, color: "text-red-600", bg: "bg-red-100" },
+    VITALS: { label: "Vitales", icon: Activity, color: "text-blue-400", bg: "bg-blue-500/15" },
+    FOOD: { label: "Alimentos", icon: Utensils, color: "text-orange-400", bg: "bg-orange-500/15" },
+    MEDS: { label: "Meds", icon: Pill, color: "text-emerald-400", bg: "bg-emerald-500/15" },
+    NOTE: { label: "Nota", icon: FileText, color: "text-violet-400", bg: "bg-violet-500/15" },
+    INCIDENT: { label: "Incidente", icon: AlertTriangle, color: "text-red-400", bg: "bg-red-500/15" },
 };
 
 export default async function PatientDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
-    const patient = await getPatientById(id);
+    const [patient, messages] = await Promise.all([
+        getPatientById(id),
+        getMessages(id)
+    ]);
 
     if (!patient) {
         return (
@@ -152,17 +158,17 @@ export default async function PatientDetailsPage({ params }: { params: Promise<{
                             <CardContent className="space-y-4">
                                 <div>
                                     <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Historial Médico</span>
-                                    <p className="text-sm mt-1 whitespace-pre-wrap text-slate-700">{patient.medicalHistory || "Sin registro"}</p>
+                                    <p className="text-sm mt-1 whitespace-pre-wrap text-secondary-foreground">{patient.medicalHistory || "Sin registro"}</p>
                                 </div>
                                 <Separator />
                                 <div>
                                     <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Necesidades Dietéticas</span>
-                                    <p className="text-sm mt-1 text-slate-700">{patient.dietaryNeeds || "Sin restricciones"}</p>
+                                    <p className="text-sm mt-1 text-secondary-foreground">{patient.dietaryNeeds || "Sin restricciones"}</p>
                                 </div>
                                 <Separator />
                                 <div>
                                     <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Contacto de Emergencia</span>
-                                    <p className="text-sm mt-1 text-slate-700">{(patient.medicalHistory?.match(/CONTACTO:\s*(.+)/)?.[1]) || "No registrado"}</p>
+                                    <p className="text-sm mt-1 text-secondary-foreground">{(patient.medicalHistory?.match(/CONTACTO:\s*(.+)/)?.[1]) || "No registrado"}</p>
                                 </div>
                             </CardContent>
                         </Card>
@@ -181,8 +187,8 @@ export default async function PatientDetailsPage({ params }: { params: Promise<{
                                 <TabsTrigger value="logs" className="gap-1.5">
                                     <CalendarDays className="h-3.5 w-3.5" /> Bitácora
                                 </TabsTrigger>
-                                <TabsTrigger value="docs" className="gap-1.5">
-                                    <FileText className="h-3.5 w-3.5" /> Docs
+                                <TabsTrigger value="messages" className="gap-1.5">
+                                    <MessageCircle className="h-3.5 w-3.5" /> Mensajes
                                 </TabsTrigger>
                             </TabsList>
 
@@ -222,13 +228,13 @@ export default async function PatientDetailsPage({ params }: { params: Promise<{
                                         <div className="space-y-3">
                                             {patient.medications && patient.medications.length > 0 ? (
                                                 patient.medications.map((pm: any, i: number) => (
-                                                    <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl bg-slate-50 hover:bg-white transition-colors border border-slate-100 hover:border-slate-200 hover:shadow-sm">
+                                                    <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-border hover:shadow-sm">
                                                         <div className="flex items-start gap-3">
-                                                            <div className="p-2 bg-blue-50 rounded-lg">
+                                                            <div className="p-2 bg-blue-500/15 rounded-lg">
                                                                 <Pill className="h-5 w-5 text-blue-500" />
                                                             </div>
                                                             <div>
-                                                                <h4 className="font-semibold text-slate-800">{pm.medication.name}</h4>
+                                                                <h4 className="font-semibold text-foreground">{pm.medication.name}</h4>
                                                                 <p className="text-sm text-muted-foreground">{pm.dosage}</p>
                                                             </div>
                                                         </div>
@@ -271,7 +277,7 @@ export default async function PatientDetailsPage({ params }: { params: Promise<{
                                                         const config = logTypeConfig[log.type] || logTypeConfig.NOTE;
                                                         const Icon = config.icon;
                                                         return (
-                                                            <div key={i} className="flex gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors group">
+                                                            <div key={i} className="flex gap-3 p-3 rounded-lg hover:bg-accent/50 transition-colors group">
                                                                 <div className={`h-8 w-8 rounded-lg ${config.bg} flex items-center justify-center flex-shrink-0 mt-0.5`}>
                                                                     <Icon className={`h-4 w-4 ${config.color}`} />
                                                                 </div>
@@ -281,11 +287,11 @@ export default async function PatientDetailsPage({ params }: { params: Promise<{
                                                                             {config.label}
                                                                         </Badge>
                                                                         {log.value && (
-                                                                            <span className="text-sm font-semibold text-slate-700">{log.value}</span>
+                                                                            <span className="text-sm font-semibold text-secondary-foreground">{log.value}</span>
                                                                         )}
                                                                     </div>
                                                                     <p className="text-xs text-muted-foreground truncate">{log.notes || "Sin notas"}</p>
-                                                                    <p className="text-[10px] text-slate-400 mt-0.5">
+                                                                    <p className="text-[10px] text-muted-foreground mt-0.5">
                                                                         {log.author?.name || "Desconocido"} · {new Date(log.createdAt).toLocaleString('es-MX', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                                                     </p>
                                                                 </div>
@@ -304,17 +310,13 @@ export default async function PatientDetailsPage({ params }: { params: Promise<{
                                 </Card>
                             </TabsContent>
 
-                            <TabsContent value="docs">
+                            <TabsContent value="messages">
                                 <Card className="border shadow-sm">
-                                    <CardHeader>
-                                        <CardTitle className="text-base">Documentos y Contratos</CardTitle>
-                                        <CardDescription>Archivos legales y administrativos</CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="text-center py-10">
-                                            <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2 opacity-40" />
-                                            <p className="text-sm text-muted-foreground">Módulo de documentos en desarrollo</p>
-                                        </div>
+                                    <CardContent className="pt-6">
+                                        <PatientMessages
+                                            patientId={patient.id}
+                                            initialMessages={messages as any}
+                                        />
                                     </CardContent>
                                 </Card>
                             </TabsContent>

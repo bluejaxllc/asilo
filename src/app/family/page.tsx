@@ -94,10 +94,10 @@ export default function FamilyPage() {
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case "Estable": return "bg-green-100 text-green-700 border-green-200";
-            case "Delicado": return "bg-amber-100 text-amber-700 border-amber-200";
-            case "Hospitalizado": return "bg-red-100 text-red-700 border-red-200";
-            default: return "bg-slate-100 text-slate-700 border-slate-200";
+            case "Estable": return "bg-emerald-500/15 text-emerald-400 border-emerald-500/20";
+            case "Delicado": return "bg-amber-500/15 text-amber-400 border-amber-500/20";
+            case "Hospitalizado": return "bg-red-500/15 text-red-400 border-red-500/20";
+            default: return "bg-zinc-500/15 text-muted-foreground border-border";
         }
     };
 
@@ -140,7 +140,7 @@ export default function FamilyPage() {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh] gap-3">
                 <AlertCircle className="h-12 w-12 text-red-400" />
-                <p className="text-lg font-semibold text-slate-700">{error || "Sin paciente asignado"}</p>
+                <p className="text-lg font-semibold text-secondary-foreground">{error || "Sin paciente asignado"}</p>
                 <p className="text-sm text-muted-foreground">Contacte al administrador para vincular su cuenta.</p>
             </div>
         );
@@ -157,7 +157,7 @@ export default function FamilyPage() {
             <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-2xl p-6 text-white shadow-xl shadow-blue-500/20">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                        <div className="h-16 w-16 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center text-2xl font-bold shadow-inner">
+                        <div className="h-16 w-16 rounded-2xl bg-card/10 backdrop-blur-sm flex items-center justify-center text-2xl font-bold shadow-inner">
                             {patient.name.charAt(0)}
                         </div>
                         <div>
@@ -184,7 +184,7 @@ export default function FamilyPage() {
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
+            <div className="flex gap-1 bg-card p-1 rounded-xl">
                 {TABS.map((tab) => {
                     const isActive = activeTab === tab.key;
                     const Icon = tab.icon;
@@ -193,14 +193,14 @@ export default function FamilyPage() {
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
                             className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${isActive
-                                    ? "bg-white shadow-sm text-slate-800"
-                                    : "text-slate-500 hover:text-slate-700"
+                                ? "bg-card shadow-sm text-foreground"
+                                : "text-muted-foreground hover:text-secondary-foreground"
                                 }`}
                         >
                             <Icon className="h-4 w-4" />
                             <span className="hidden sm:inline">{tab.label}</span>
                             {tab.key === "messages" && messages.length > 0 && (
-                                <span className="ml-1 h-5 w-5 rounded-full bg-blue-500 text-white text-[10px] font-bold flex items-center justify-center">
+                                <span className="ml-1 h-5 w-5 rounded-full bg-blue-500/100 text-white text-[10px] font-bold flex items-center justify-center">
                                     {messages.length}
                                 </span>
                             )}
@@ -222,17 +222,17 @@ export default function FamilyPage() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-3">
-                                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                    <span className="text-sm text-slate-600">Estado</span>
+                                <div className="flex items-center justify-between p-3 bg-card/[0.02] rounded-lg">
+                                    <span className="text-sm text-muted-foreground">Estado</span>
                                     <Badge className={`${getStatusColor(patient.status)} border`}>{patient.status}</Badge>
                                 </div>
-                                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                    <span className="text-sm text-slate-600">Dieta</span>
-                                    <span className="text-sm font-semibold text-slate-800">{patient.dietaryNeeds || "Normal"}</span>
+                                <div className="flex items-center justify-between p-3 bg-card/[0.02] rounded-lg">
+                                    <span className="text-sm text-muted-foreground">Dieta</span>
+                                    <span className="text-sm font-semibold text-foreground">{patient.dietaryNeeds || "Normal"}</span>
                                 </div>
-                                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                    <span className="text-sm text-slate-600">Medicamentos</span>
-                                    <span className="text-sm font-semibold text-blue-600">{medications.length} activos</span>
+                                <div className="flex items-center justify-between p-3 bg-card/[0.02] rounded-lg">
+                                    <span className="text-sm text-muted-foreground">Medicamentos</span>
+                                    <span className="text-sm font-semibold text-blue-400">{medications.length} activos</span>
                                 </div>
                             </CardContent>
                         </Card>
@@ -248,16 +248,16 @@ export default function FamilyPage() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-3">
-                                <div className="p-4 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border">
-                                    <p className="font-semibold text-slate-800">{emergencyName}</p>
+                                <div className="p-4 bg-card/[0.03] rounded-xl border border-border">
+                                    <p className="font-semibold text-foreground">{emergencyName}</p>
                                     {emergencyPhone && (
-                                        <p className="text-sm text-blue-600 mt-1 font-mono">{emergencyPhone}</p>
+                                        <p className="text-sm text-blue-400 mt-1 font-mono">{emergencyPhone}</p>
                                     )}
                                 </div>
                                 {patient.medicalHistory && (
-                                    <div className="p-3 bg-amber-50 rounded-lg border border-amber-100">
-                                        <p className="text-xs text-amber-700 font-medium mb-1">Historial Médico</p>
-                                        <p className="text-sm text-amber-900 line-clamp-3">
+                                    <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                                        <p className="text-xs text-amber-400 font-medium mb-1">Historial Médico</p>
+                                        <p className="text-sm text-amber-300/80 line-clamp-3">
                                             {patient.medicalHistory.replace(/CONTACTO:.*$/, "").trim() || "Sin datos"}
                                         </p>
                                     </div>
@@ -282,15 +282,15 @@ export default function FamilyPage() {
                                 ) : (
                                     <div className="space-y-2">
                                         {activity.slice(0, 5).map((log) => (
-                                            <div key={log.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
-                                                <div className="h-8 w-8 rounded-lg bg-white border flex items-center justify-center">
+                                            <div key={log.id} className="flex items-center gap-3 p-3 bg-card/[0.02] rounded-lg hover:bg-card transition-colors">
+                                                <div className="h-8 w-8 rounded-lg bg-card border flex items-center justify-center">
                                                     {getLogIcon(log.type)}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-xs font-semibold text-slate-500">{getLogTypeName(log.type)}</span>
+                                                        <span className="text-xs font-semibold text-muted-foreground">{getLogTypeName(log.type)}</span>
                                                     </div>
-                                                    <p className="text-sm text-slate-800 truncate">{log.value || log.notes || "—"}</p>
+                                                    <p className="text-sm text-foreground truncate">{log.value || log.notes || "—"}</p>
                                                 </div>
                                                 <span className="text-[11px] text-muted-foreground whitespace-nowrap">
                                                     {new Date(log.createdAt).toLocaleString("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
@@ -325,8 +325,8 @@ export default function FamilyPage() {
                                 <div className="space-y-2">
                                     {activity.map((log, i) => (
                                         <SlideIn key={log.id} delay={Math.min(i * 0.04, 0.8)}>
-                                            <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors">
-                                                <div className="h-10 w-10 rounded-xl bg-white border flex items-center justify-center flex-shrink-0 shadow-sm">
+                                            <div className="flex items-start gap-3 p-4 bg-card/[0.02] rounded-xl border border-border/60 hover:border-border transition-colors">
+                                                <div className="h-10 w-10 rounded-xl bg-card border flex items-center justify-center flex-shrink-0 shadow-sm">
                                                     {getLogIcon(log.type)}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
@@ -336,7 +336,7 @@ export default function FamilyPage() {
                                                             por {log.author?.name || "Personal"}
                                                         </span>
                                                     </div>
-                                                    <p className="text-sm font-medium text-slate-800">{log.value || "—"}</p>
+                                                    <p className="text-sm font-medium text-foreground">{log.value || "—"}</p>
                                                     {log.notes && <p className="text-xs text-muted-foreground mt-0.5">{log.notes}</p>}
                                                 </div>
                                                 <span className="text-[11px] text-muted-foreground whitespace-nowrap flex-shrink-0">
@@ -372,22 +372,22 @@ export default function FamilyPage() {
                                 <div className="grid gap-3 sm:grid-cols-2">
                                     {medications.map((med, i) => (
                                         <SlideIn key={med.id} delay={Math.min(i * 0.1, 0.5)}>
-                                            <div className="p-4 rounded-xl border-2 border-green-100 bg-green-50/30 hover:border-green-200 transition-all">
+                                            <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/30 transition-all">
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="h-8 w-8 rounded-lg bg-green-100 flex items-center justify-center">
-                                                            <Pill className="h-4 w-4 text-green-600" />
+                                                        <div className="h-8 w-8 rounded-lg bg-emerald-500/15 flex items-center justify-center">
+                                                            <Pill className="h-4 w-4 text-emerald-400" />
                                                         </div>
-                                                        <h4 className="font-semibold text-slate-800">{med.medication.name}</h4>
+                                                        <h4 className="font-semibold text-foreground">{med.medication.name}</h4>
                                                     </div>
-                                                    <Badge variant="outline" className="text-[10px] bg-white">{med.medication.unit}</Badge>
+                                                    <Badge variant="outline" className="text-[10px] bg-card/50 text-secondary-foreground border-border">{med.medication.unit}</Badge>
                                                 </div>
                                                 <div className="space-y-1.5 ml-10">
-                                                    <p className="text-sm text-slate-600">
+                                                    <p className="text-sm text-muted-foreground">
                                                         <span className="font-medium">Dosis:</span> {med.dosage}
                                                     </p>
                                                     {med.schedule && (
-                                                        <p className="text-sm text-slate-600">
+                                                        <p className="text-sm text-muted-foreground">
                                                             <span className="font-medium">Horario:</span> {med.schedule}
                                                         </p>
                                                     )}
@@ -428,14 +428,14 @@ export default function FamilyPage() {
                                             className={`flex ${msg.isFromFamily ? "justify-end" : "justify-start"}`}
                                         >
                                             <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${msg.isFromFamily
-                                                    ? "bg-blue-600 text-white rounded-br-md"
-                                                    : "bg-slate-100 text-slate-800 rounded-bl-md"
+                                                ? "bg-blue-600 text-white rounded-br-md"
+                                                : "bg-card text-foreground rounded-bl-md"
                                                 }`}>
-                                                <p className={`text-xs font-medium mb-0.5 ${msg.isFromFamily ? "text-blue-100" : "text-slate-500"}`}>
+                                                <p className={`text-xs font-medium mb-0.5 ${msg.isFromFamily ? "text-blue-100" : "text-muted-foreground"}`}>
                                                     {msg.isFromFamily ? "Tú" : msg.fromUser?.name || "Personal"}
                                                 </p>
                                                 <p className="text-sm">{msg.content}</p>
-                                                <p className={`text-[10px] mt-1 ${msg.isFromFamily ? "text-blue-200" : "text-slate-400"}`}>
+                                                <p className={`text-[10px] mt-1 ${msg.isFromFamily ? "text-blue-200" : "text-muted-foreground"}`}>
                                                     {new Date(msg.createdAt).toLocaleString("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                                                 </p>
                                             </div>

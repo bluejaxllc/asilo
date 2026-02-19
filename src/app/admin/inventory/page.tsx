@@ -32,7 +32,7 @@ import { useSearchParams } from "next/navigation";
 
 export default function InventoryPage() {
     return (
-        <Suspense fallback={<div className="p-8 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-blue-600" /></div>}>
+        <Suspense fallback={<div className="p-8 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-blue-400" /></div>}>
             <InventoryPageContent />
         </Suspense>
     );
@@ -122,7 +122,7 @@ function InventoryPageContent() {
                 </Dialog>
             </div>
 
-            <div className="flex items-center gap-4 bg-white p-4 rounded-lg border shadow-sm">
+            <div className="flex items-center gap-4 bg-card p-4 rounded-lg border shadow-sm">
                 <SearchInput placeholder="Buscar medicamento..." />
             </div>
 
@@ -144,30 +144,30 @@ function InventoryPageContent() {
                         <CardTitle>Resumen de Estado</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-100">
+                        <div className="flex items-center justify-between p-4 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
                             <div className="flex items-center gap-3">
-                                <div className="h-3 w-3 rounded-full bg-green-500" />
-                                <span className="font-medium text-green-900">En Orden</span>
+                                <div className="h-3 w-3 rounded-full bg-emerald-500/100" />
+                                <span className="font-medium text-emerald-200">En Orden</span>
                             </div>
-                            <span className="font-bold text-green-700 text-xl">
+                            <span className="font-bold text-emerald-400 text-xl">
                                 {Math.round((okCount / total) * 100)}%
                             </span>
                         </div>
-                        <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg border border-yellow-100">
+                        <div className="flex items-center justify-between p-4 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
                             <div className="flex items-center gap-3">
-                                <div className="h-3 w-3 rounded-full bg-yellow-500" />
-                                <span className="font-medium text-yellow-900">Stock Bajo</span>
+                                <div className="h-3 w-3 rounded-full bg-yellow-500/100" />
+                                <span className="font-medium text-yellow-300">Stock Bajo</span>
                             </div>
-                            <span className="font-bold text-yellow-700 text-xl">
+                            <span className="font-bold text-yellow-400 text-xl">
                                 {Math.round((lowCount / total) * 100)}%
                             </span>
                         </div>
-                        <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-100">
+                        <div className="flex items-center justify-between p-4 bg-red-500/10 rounded-lg border border-red-500/20">
                             <div className="flex items-center gap-3">
-                                <div className="h-3 w-3 rounded-full bg-red-500" />
-                                <span className="font-medium text-red-900">Agotado</span>
+                                <div className="h-3 w-3 rounded-full bg-red-500/100" />
+                                <span className="font-medium text-red-300">Agotado</span>
                             </div>
-                            <span className="font-bold text-red-700 text-xl">
+                            <span className="font-bold text-red-400 text-xl">
                                 {Math.round((outCount / total) * 100)}%
                             </span>
                         </div>
@@ -185,15 +185,15 @@ function InventoryPageContent() {
                 </Alert>
             )}
 
-            <div className="border rounded-xl shadow-sm bg-white overflow-hidden">
+            <div className="border rounded-xl shadow-sm bg-card overflow-hidden">
                 <Table>
-                    <TableHeader className="bg-slate-50">
+                    <TableHeader className="bg-card/[0.02]">
                         <TableRow>
-                            <TableHead className="font-semibold text-slate-700">Medicamento</TableHead>
-                            <TableHead className="font-semibold text-slate-700">Nivel Stock</TableHead>
-                            <TableHead className="font-semibold text-slate-700">Nivel Min.</TableHead>
-                            <TableHead className="font-semibold text-slate-700">Estado</TableHead>
-                            <TableHead className="text-right font-semibold text-slate-700">Acción</TableHead>
+                            <TableHead className="font-semibold text-secondary-foreground">Medicamento</TableHead>
+                            <TableHead className="font-semibold text-secondary-foreground">Nivel Stock</TableHead>
+                            <TableHead className="font-semibold text-secondary-foreground">Nivel Min.</TableHead>
+                            <TableHead className="font-semibold text-secondary-foreground">Estado</TableHead>
+                            <TableHead className="text-right font-semibold text-secondary-foreground">Acción</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -201,7 +201,7 @@ function InventoryPageContent() {
                             <TableRow>
                                 <TableCell colSpan={5} className="text-center py-12">
                                     <div className="flex justify-center items-center gap-2 text-muted-foreground">
-                                        <Loader2 className="h-5 w-5 animate-spin text-blue-600" /> Cargando inventario...
+                                        <Loader2 className="h-5 w-5 animate-spin text-blue-400" /> Cargando inventario...
                                     </div>
                                 </TableCell>
                             </TableRow>
@@ -209,8 +209,8 @@ function InventoryPageContent() {
                             <TableRow>
                                 <TableCell colSpan={5} className="text-center py-16 text-muted-foreground">
                                     <div className="flex flex-col items-center gap-3">
-                                        <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center">
-                                            <Pill className="h-6 w-6 text-slate-400" />
+                                        <div className="h-12 w-12 rounded-full bg-card flex items-center justify-center">
+                                            <Pill className="h-6 w-6 text-muted-foreground" />
                                         </div>
                                         <p>No hay medicamentos en el inventario.</p>
                                         <Button variant="outline" size="sm" onClick={() => setAddOpen(true)}>
@@ -220,24 +220,24 @@ function InventoryPageContent() {
                                 </TableCell>
                             </TableRow>
                         ) : inventory.map((item, i) => (
-                            <SlideInRow key={item.id} delay={i * 0.05} className="hover:bg-slate-50 transition-colors group border-b">
+                            <SlideInRow key={item.id} delay={i * 0.05} className="hover:bg-accent/50 transition-colors group border-b">
                                 <TableCell className="font-medium">
                                     <div className="flex items-center">
-                                        <div className="h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center mr-3 group-hover:bg-blue-100 transition-colors">
-                                            <Pill className="h-4 w-4 text-blue-600" />
+                                        <div className="h-8 w-8 rounded-full bg-blue-500/10 flex items-center justify-center mr-3 group-hover:bg-blue-500/15 transition-colors">
+                                            <Pill className="h-4 w-4 text-blue-400" />
                                         </div>
-                                        <span className="text-slate-700">{item.name}</span>
+                                        <span className="text-secondary-foreground">{item.name}</span>
                                     </div>
                                 </TableCell>
-                                <TableCell className="font-mono text-slate-600">{item.stock} <span className="text-xs text-slate-400">{item.unit}</span></TableCell>
-                                <TableCell className="font-mono text-slate-400">{item.min} <span className="text-xs">{item.unit}</span></TableCell>
+                                <TableCell className="font-mono text-muted-foreground">{item.stock} <span className="text-xs text-muted-foreground">{item.unit}</span></TableCell>
+                                <TableCell className="font-mono text-muted-foreground">{item.min} <span className="text-xs">{item.unit}</span></TableCell>
                                 <TableCell>
-                                    {item.status === 'OK' && <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 shadow-sm">En Stock</Badge>}
-                                    {item.status === 'BAJO' && <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 shadow-sm animate-pulse">Stock Bajo</Badge>}
+                                    {item.status === 'OK' && <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-sm">En Stock</Badge>}
+                                    {item.status === 'BAJO' && <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/20 shadow-sm animate-pulse">Stock Bajo</Badge>}
                                     {item.status === 'AGOTADO' && <Badge variant="destructive" className="shadow-sm">Agotado</Badge>}
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="ghost" size="sm" onClick={() => openUpdateDialog(item)} className="hover:text-blue-600">
+                                    <Button variant="ghost" size="sm" onClick={() => openUpdateDialog(item)} className="hover:text-blue-400">
                                         Actualizar
                                     </Button>
                                 </TableCell>

@@ -37,7 +37,7 @@ export function UserNav() {
                         <AvatarFallback>{initials}</AvatarFallback>
                     </Avatar>
                     {isClockedIn && (
-                        <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white" />
+                        <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-emerald-500 border-2 border-background shadow-lg shadow-emerald-500/30" />
                     )}
                 </Button>
             </DropdownMenuTrigger>
@@ -58,7 +58,7 @@ export function UserNav() {
                                 {isClockedIn ? "TURNO ACTIVO" : "FUERA DE TURNO"}
                             </span>
                             {isClockedIn && (
-                                <span className="text-xs font-mono font-medium text-green-600">
+                                <span className="text-xs font-mono font-medium text-emerald-400">
                                     {duration}
                                 </span>
                             )}

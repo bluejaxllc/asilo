@@ -112,7 +112,7 @@ export default function ReportsPage() {
                                 <p className="text-xs text-blue-100 font-medium">Registros</p>
                                 <p className="text-2xl font-bold mt-0.5">{stats?.totalLogs || 0}</p>
                             </div>
-                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
+                            <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">
                                 <Activity className="h-4 w-4 text-blue-100" />
                             </div>
                         </div>
@@ -126,7 +126,7 @@ export default function ReportsPage() {
                                 <p className="text-xs text-green-100 font-medium">Tareas Completadas</p>
                                 <p className="text-2xl font-bold mt-0.5">{stats?.completedTasks || 0}</p>
                             </div>
-                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
+                            <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">
                                 <ClipboardCheck className="h-4 w-4 text-green-100" />
                             </div>
                         </div>
@@ -140,7 +140,7 @@ export default function ReportsPage() {
                                 <p className="text-xs text-violet-100 font-medium">Residentes</p>
                                 <p className="text-2xl font-bold mt-0.5">{stats?.totalPatients || 0}</p>
                             </div>
-                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
+                            <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">
                                 <Users className="h-4 w-4 text-violet-100" />
                             </div>
                         </div>
@@ -154,22 +154,22 @@ export default function ReportsPage() {
                                 <p className="text-xs text-amber-100 font-medium">Meds Administrados</p>
                                 <p className="text-2xl font-bold mt-0.5">{stats?.medsAdministered || 0}</p>
                             </div>
-                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
+                            <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">
                                 <Pill className="h-4 w-4 text-amber-100" />
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="border-0 bg-gradient-to-br from-slate-700 to-slate-900 text-white shadow-lg shadow-slate-500/10">
+                <Card className="border-0 bg-gradient-to-br from-zinc-700 to-zinc-900 text-white shadow-lg shadow-zinc-500/10">
                     <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-xs text-slate-300 font-medium">Personal</p>
+                                <p className="text-xs text-muted-foreground font-medium">Personal</p>
                                 <p className="text-2xl font-bold mt-0.5">{stats?.totalStaff || 0}</p>
                             </div>
-                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
-                                <UserCheck className="h-4 w-4 text-slate-300" />
+                            <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">
+                                <UserCheck className="h-4 w-4 text-muted-foreground" />
                             </div>
                         </div>
                     </CardContent>
@@ -204,14 +204,16 @@ export default function ReportsPage() {
                                             <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
-                                    <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200" />
-                                    <XAxis dataKey="label" tick={{ fontSize: 11 }} className="text-slate-500" />
-                                    <YAxis tick={{ fontSize: 11 }} className="text-slate-500" />
+                                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                                    <XAxis dataKey="label" tick={{ fontSize: 11 }} className="text-muted-foreground" />
+                                    <YAxis tick={{ fontSize: 11 }} className="text-muted-foreground" />
                                     <Tooltip
                                         contentStyle={{
                                             borderRadius: "12px",
-                                            border: "1px solid #e2e8f0",
-                                            boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
+                                            border: "1px solid var(--border)",
+                                            backgroundColor: "var(--card)",
+                                            color: "var(--card-foreground)",
+                                            boxShadow: "0 4px 6px -1px rgba(0,0,0,0.15)",
                                             fontSize: "12px",
                                         }}
                                     />
@@ -244,11 +246,11 @@ export default function ReportsPage() {
                             <div className="border rounded-lg overflow-hidden">
                                 <Table>
                                     <TableHeader>
-                                        <TableRow className="bg-slate-50/80">
-                                            <TableHead className="font-semibold text-slate-600">Nombre</TableHead>
-                                            <TableHead className="font-semibold text-slate-600 text-center">Rol</TableHead>
-                                            <TableHead className="font-semibold text-slate-600 text-center">Registros</TableHead>
-                                            <TableHead className="font-semibold text-slate-600 text-center">Tareas</TableHead>
+                                        <TableRow className="bg-card">
+                                            <TableHead className="font-semibold text-muted-foreground">Nombre</TableHead>
+                                            <TableHead className="font-semibold text-muted-foreground text-center">Rol</TableHead>
+                                            <TableHead className="font-semibold text-muted-foreground text-center">Registros</TableHead>
+                                            <TableHead className="font-semibold text-muted-foreground text-center">Tareas</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -259,21 +261,21 @@ export default function ReportsPage() {
                                                 </TableCell>
                                             </TableRow>
                                         ) : staffPerf.map((s, i) => (
-                                            <SlideInRow key={s.id} delay={Math.min(i * 0.04, 0.5)} className="hover:bg-slate-50/80 transition-colors">
+                                            <SlideInRow key={s.id} delay={Math.min(i * 0.04, 0.5)} className="hover:bg-card transition-colors">
                                                 <TableCell className="font-medium text-sm">{s.name}</TableCell>
                                                 <TableCell className="text-center">
                                                     <Badge variant="outline" className={cn(
                                                         "text-[10px] font-semibold px-2",
-                                                        s.role === "ADMIN" ? "bg-purple-50 text-purple-700 border-purple-200" : "bg-blue-50 text-blue-700 border-blue-200"
+                                                        s.role === "ADMIN" ? "bg-violet-500/10 text-violet-400 border-violet-500/20" : "bg-blue-500/10 text-blue-400 border-blue-500/20"
                                                     )}>
                                                         {s.role}
                                                     </Badge>
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    <span className="font-semibold text-blue-600">{s.logsCount}</span>
+                                                    <span className="font-semibold text-blue-400">{s.logsCount}</span>
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    <span className="font-semibold text-green-600">{s.tasksCompleted}</span>
+                                                    <span className="font-semibold text-emerald-400">{s.tasksCompleted}</span>
                                                 </TableCell>
                                             </SlideInRow>
                                         ))}
@@ -307,26 +309,26 @@ export default function ReportsPage() {
                                             className={cn(
                                                 "p-3 rounded-xl border-2 transition-all hover:shadow-md",
                                                 room.status === "Estable"
-                                                    ? "border-green-200 bg-green-50/50"
-                                                    : "border-red-200 bg-red-50/50"
+                                                    ? "border-emerald-500/20 bg-emerald-500/10"
+                                                    : "border-red-500/20 bg-red-500/10"
                                             )}
                                         >
                                             <div className="flex items-center justify-between mb-1.5">
-                                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Hab.</span>
+                                                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Hab.</span>
                                                 <Badge
                                                     variant="outline"
                                                     className={cn(
                                                         "text-[10px] px-1.5 py-0 border-0",
-                                                        room.status === "Estable" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                                                        room.status === "Estable" ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"
                                                     )}
                                                 >
                                                     {room.status}
                                                 </Badge>
                                             </div>
-                                            <p className="text-lg font-bold text-slate-800">{room.room}</p>
+                                            <p className="text-lg font-bold text-foreground">{room.room}</p>
                                             <div className="mt-1.5 space-y-0.5">
                                                 {room.patients.map((name: string) => (
-                                                    <p key={name} className="text-xs text-slate-600 truncate">{name}</p>
+                                                    <p key={name} className="text-xs text-muted-foreground truncate">{name}</p>
                                                 ))}
                                             </div>
                                         </div>

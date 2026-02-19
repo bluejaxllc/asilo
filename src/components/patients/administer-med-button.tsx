@@ -36,7 +36,7 @@ export const AdministerMedButton = ({ patientId, medicationName, dosage }: Admin
         <Button
             size="sm"
             variant={justAdministered ? "secondary" : "default"}
-            className={cn("gap-2 transition-all", justAdministered && "bg-green-100 text-green-700 hover:bg-green-200")}
+            className={cn("gap-2 transition-all", justAdministered && "bg-emerald-500/15 text-emerald-400 hover:bg-green-200")}
             onClick={handleAdminister}
             disabled={isPending || justAdministered}
         >

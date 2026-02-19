@@ -28,7 +28,7 @@ export const CardWrapper = ({
 }: CardWrapperProps) => {
     return (
         <ScaleIn>
-            <Card className="w-[420px] max-w-full mx-auto shadow-2xl shadow-black/30 border-white/10 bg-white/[0.03] backdrop-blur-xl rounded-2xl overflow-hidden">
+            <Card className="w-[420px] max-w-full mx-auto shadow-2xl shadow-black/30 border-border bg-card/[0.03] backdrop-blur-xl rounded-2xl overflow-hidden">
                 {/* Gradient top accent */}
                 <div className="h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
 

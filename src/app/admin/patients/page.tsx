@@ -115,7 +115,7 @@ function PatientsPageContent() {
                                 <p className="text-xs text-blue-100 font-medium">Total Residentes</p>
                                 <p className="text-2xl font-bold mt-0.5">{patients.length}</p>
                             </div>
-                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
+                            <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">
                                 <Users className="h-4 w-4 text-blue-100" />
                             </div>
                         </div>
@@ -129,7 +129,7 @@ function PatientsPageContent() {
                                 <p className="text-xs text-emerald-100 font-medium">Estables</p>
                                 <p className="text-2xl font-bold mt-0.5">{stableCount}</p>
                             </div>
-                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
+                            <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">
                                 <Heart className="h-4 w-4 text-emerald-100" />
                             </div>
                         </div>
@@ -143,7 +143,7 @@ function PatientsPageContent() {
                                 <p className="text-xs text-violet-100 font-medium">Habitaciones</p>
                                 <p className="text-2xl font-bold mt-0.5">{roomsUsed}</p>
                             </div>
-                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
+                            <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">
                                 <BedDouble className="h-4 w-4 text-violet-100" />
                             </div>
                         </div>
@@ -154,16 +154,16 @@ function PatientsPageContent() {
                     "border-0 text-white shadow-lg",
                     criticalCount > 0
                         ? "bg-gradient-to-br from-red-500 to-red-700 shadow-red-500/10"
-                        : "bg-gradient-to-br from-slate-500 to-slate-700 shadow-slate-500/10"
+                        : "bg-gradient-to-br from-zinc-600 to-zinc-800 shadow-zinc-500/10"
                 )}>
                     <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className={cn("text-xs font-medium", criticalCount > 0 ? "text-red-100" : "text-slate-300")}>Atención</p>
+                                <p className={cn("text-xs font-medium", criticalCount > 0 ? "text-red-100" : "text-muted-foreground")}>Atención</p>
                                 <p className="text-2xl font-bold mt-0.5">{criticalCount}</p>
                             </div>
-                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
-                                <AlertTriangle className={cn("h-4 w-4", criticalCount > 0 ? "text-red-100" : "text-slate-300")} />
+                            <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">
+                                <AlertTriangle className={cn("h-4 w-4", criticalCount > 0 ? "text-red-100" : "text-muted-foreground")} />
                             </div>
                         </div>
                     </CardContent>
@@ -171,15 +171,15 @@ function PatientsPageContent() {
             </div>
 
             {/* Table */}
-            <div className="border rounded-xl bg-white shadow-sm overflow-hidden">
+            <div className="border rounded-xl bg-card shadow-sm overflow-hidden">
                 <Table>
                     <TableHeader>
-                        <TableRow className="bg-slate-50/80">
-                            <TableHead className="font-semibold text-slate-600">Residente</TableHead>
-                            <TableHead className="font-semibold text-slate-600">Habitación</TableHead>
-                            <TableHead className="font-semibold text-slate-600">Edad</TableHead>
-                            <TableHead className="font-semibold text-slate-600">Estado</TableHead>
-                            <TableHead className="text-right font-semibold text-slate-600">Acciones</TableHead>
+                        <TableRow className="bg-card">
+                            <TableHead className="font-semibold text-muted-foreground">Residente</TableHead>
+                            <TableHead className="font-semibold text-muted-foreground">Habitación</TableHead>
+                            <TableHead className="font-semibold text-muted-foreground">Edad</TableHead>
+                            <TableHead className="font-semibold text-muted-foreground">Estado</TableHead>
+                            <TableHead className="text-right font-semibold text-muted-foreground">Acciones</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -196,11 +196,11 @@ function PatientsPageContent() {
                             <TableRow>
                                 <TableCell colSpan={5} className="text-center py-16 text-muted-foreground">
                                     <div className="flex flex-col items-center gap-3">
-                                        <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center">
-                                            <Users className="h-6 w-6 text-slate-400" />
+                                        <div className="h-12 w-12 rounded-full bg-card flex items-center justify-center">
+                                            <Users className="h-6 w-6 text-muted-foreground" />
                                         </div>
                                         <div>
-                                            <p className="font-medium text-slate-700 text-sm">{query ? "Sin resultados" : "Sin residentes"}</p>
+                                            <p className="font-medium text-secondary-foreground text-sm">{query ? "Sin resultados" : "Sin residentes"}</p>
                                             <p className="text-xs text-muted-foreground mt-0.5">{query ? "Intente otra búsqueda." : "Registre el primer residente para comenzar."}</p>
                                         </div>
                                     </div>
@@ -209,7 +209,7 @@ function PatientsPageContent() {
                         ) : patients.map((patient, i) => {
                             const gradient = avatarGradients[i % avatarGradients.length];
                             return (
-                                <SlideInRow key={patient.id} delay={Math.min(i * 0.04, 1)} className="hover:bg-slate-50/80 transition-colors group">
+                                <SlideInRow key={patient.id} delay={Math.min(i * 0.04, 1)} className="hover:bg-card transition-colors group">
                                     <TableCell className="font-medium">
                                         <div className="flex items-center gap-3">
                                             <div className={cn(
@@ -218,11 +218,11 @@ function PatientsPageContent() {
                                             )}>
                                                 {patient.name.charAt(0)}
                                             </div>
-                                            <span className="text-sm font-semibold text-slate-800">{patient.name}</span>
+                                            <span className="text-sm font-semibold text-foreground">{patient.name}</span>
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant="outline" className="text-[10px] font-mono bg-slate-50 text-slate-600 border-slate-200 px-2">
+                                        <Badge variant="outline" className="text-[10px] font-mono bg-card/[0.02] text-muted-foreground border-border px-2">
                                             {patient.room || "—"}
                                         </Badge>
                                     </TableCell>
@@ -234,12 +234,12 @@ function PatientsPageContent() {
                                             variant={patient.status === 'Estable' ? 'outline' : 'destructive'}
                                             className={cn(
                                                 "text-[10px] font-semibold px-2 py-0.5",
-                                                patient.status === 'Estable' && "bg-green-50 text-green-700 border-green-200 hover:bg-green-50"
+                                                patient.status === 'Estable' && "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/10"
                                             )}
                                         >
                                             <span className={cn(
                                                 "inline-block h-1.5 w-1.5 rounded-full mr-1.5",
-                                                patient.status === 'Estable' ? "bg-green-500" : "bg-red-500"
+                                                patient.status === 'Estable' ? "bg-emerald-500/100" : "bg-red-500/100"
                                             )} />
                                             {patient.status}
                                         </Badge>
@@ -247,12 +247,12 @@ function PatientsPageContent() {
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-1">
                                             <Link href={`/admin/patients/${patient.id}`}>
-                                                <Button variant="ghost" size="icon" title="Ver Detalles" className="h-8 w-8 hover:text-blue-600 hover:bg-blue-50">
+                                                <Button variant="ghost" size="icon" title="Ver Detalles" className="h-8 w-8 hover:text-blue-400 hover:bg-blue-500/10">
                                                     <FileText className="h-3.5 w-3.5" />
                                                 </Button>
                                             </Link>
                                             <Link href={`/admin/patients/${patient.id}?tab=logs`}>
-                                                <Button variant="ghost" size="icon" title="Historial Médico" className="h-8 w-8 hover:text-indigo-600 hover:bg-indigo-50">
+                                                <Button variant="ghost" size="icon" title="Historial Médico" className="h-8 w-8 hover:text-indigo-400 hover:bg-indigo-500/10">
                                                     <Activity className="h-3.5 w-3.5" />
                                                 </Button>
                                             </Link>

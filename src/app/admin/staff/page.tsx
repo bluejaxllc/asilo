@@ -31,9 +31,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const roleColors: Record<string, string> = {
-    ADMIN: "bg-purple-100 text-purple-700 border-purple-200",
-    STAFF: "bg-blue-100 text-blue-700 border-blue-200",
-    FAMILY: "bg-amber-100 text-amber-700 border-amber-200",
+    ADMIN: "bg-violet-500/15 text-violet-400 border-violet-500/20",
+    STAFF: "bg-blue-500/15 text-blue-400 border-blue-500/20",
+    FAMILY: "bg-amber-500/15 text-amber-400 border-amber-500/20",
 };
 
 export default function StaffPage() {
@@ -132,15 +132,15 @@ function StaffPageContent() {
 
             {/* Stat Cards */}
             <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
-                <Card className="border-0 bg-gradient-to-br from-slate-700 to-slate-900 text-white shadow-lg shadow-slate-500/10">
+                <Card className="border-0 bg-gradient-to-br from-zinc-700 to-zinc-900 text-white shadow-lg shadow-zinc-500/10">
                     <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-xs text-slate-300 font-medium">Total Personal</p>
+                                <p className="text-xs text-muted-foreground font-medium">Total Personal</p>
                                 <p className="text-2xl font-bold mt-0.5">{staffWithStatus.length}</p>
                             </div>
-                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
-                                <Users className="h-4 w-4 text-slate-300" />
+                            <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">
+                                <Users className="h-4 w-4 text-muted-foreground" />
                             </div>
                         </div>
                     </CardContent>
@@ -153,7 +153,7 @@ function StaffPageContent() {
                                 <p className="text-xs text-green-100 font-medium">En Turno</p>
                                 <p className="text-2xl font-bold mt-0.5">{activeStaffCount}</p>
                             </div>
-                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
+                            <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">
                                 <UserCheck className="h-4 w-4 text-green-100" />
                             </div>
                         </div>
@@ -167,7 +167,7 @@ function StaffPageContent() {
                                 <p className="text-xs text-amber-100 font-medium">Familiares</p>
                                 <p className="text-2xl font-bold mt-0.5">{familyCount}</p>
                             </div>
-                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
+                            <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">
                                 <ShieldCheck className="h-4 w-4 text-amber-100" />
                             </div>
                         </div>
@@ -181,7 +181,7 @@ function StaffPageContent() {
                                 <p className="text-xs text-blue-100 font-medium">Sin Actividad</p>
                                 <p className="text-2xl font-bold mt-0.5">{staffWithStatus.filter(s => s.status === "Inactivo").length}</p>
                             </div>
-                            <div className="h-9 w-9 bg-white/10 rounded-lg flex items-center justify-center">
+                            <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">
                                 <AlertCircle className="h-4 w-4 text-blue-100" />
                             </div>
                         </div>
@@ -190,20 +190,20 @@ function StaffPageContent() {
             </div>
 
             {/* Search */}
-            <div className="bg-white p-3 rounded-xl border shadow-sm">
+            <div className="bg-card p-3 rounded-xl border shadow-sm">
                 <SearchInput placeholder="Buscar personal por nombre o rol..." />
             </div>
 
             {/* Table */}
-            <div className="border rounded-xl bg-white shadow-sm overflow-hidden">
+            <div className="border rounded-xl bg-card shadow-sm overflow-hidden">
                 <Table>
                     <TableHeader>
-                        <TableRow className="bg-slate-50/80">
-                            <TableHead className="font-semibold text-slate-600">Personal</TableHead>
-                            <TableHead className="font-semibold text-slate-600">Rol</TableHead>
-                            <TableHead className="font-semibold text-slate-600">Estado</TableHead>
-                            <TableHead className="font-semibold text-slate-600">Última Actividad</TableHead>
-                            <TableHead className="text-right font-semibold text-slate-600">Acciones</TableHead>
+                        <TableRow className="bg-card">
+                            <TableHead className="font-semibold text-muted-foreground">Personal</TableHead>
+                            <TableHead className="font-semibold text-muted-foreground">Rol</TableHead>
+                            <TableHead className="font-semibold text-muted-foreground">Estado</TableHead>
+                            <TableHead className="font-semibold text-muted-foreground">Última Actividad</TableHead>
+                            <TableHead className="text-right font-semibold text-muted-foreground">Acciones</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -223,16 +223,16 @@ function StaffPageContent() {
                                 </TableCell>
                             </TableRow>
                         ) : staffWithStatus.map((staff, index) => (
-                            <SlideInRow key={staff.id} delay={Math.min(index * 0.04, 1)} className="hover:bg-slate-50/80 transition-colors group">
+                            <SlideInRow key={staff.id} delay={Math.min(index * 0.04, 1)} className="hover:bg-card transition-colors group">
                                 <TableCell className="font-medium">
                                     <div className="flex items-center gap-3">
-                                        <Avatar className="h-9 w-9 border-2 border-white shadow-sm">
-                                            <AvatarFallback className="bg-gradient-to-br from-slate-100 to-slate-200 text-slate-600 text-xs font-bold">
+                                        <Avatar className="h-9 w-9 border-2 border-border shadow-sm">
+                                            <AvatarFallback className="bg-gradient-to-br from-card to-muted text-muted-foreground text-xs font-bold">
                                                 {staff.name?.charAt(0) || "U"}
                                             </AvatarFallback>
                                         </Avatar>
                                         <div className="flex flex-col">
-                                            <span className="text-sm font-semibold text-slate-800">{staff.name || "Sin Nombre"}</span>
+                                            <span className="text-sm font-semibold text-foreground">{staff.name || "Sin Nombre"}</span>
                                             <span className="text-xs text-muted-foreground">{staff.email}</span>
                                         </div>
                                     </div>
@@ -249,7 +249,7 @@ function StaffPageContent() {
                                 </TableCell>
                                 <TableCell className="text-muted-foreground text-sm">{staff.lastActive}</TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="ghost" size="sm" onClick={() => handleViewHistory(staff)} className="gap-1.5 text-xs hover:text-blue-600 hover:bg-blue-50">
+                                    <Button variant="ghost" size="sm" onClick={() => handleViewHistory(staff)} className="gap-1.5 text-xs hover:text-blue-400 hover:bg-blue-500/10">
                                         <Clock className="h-3.5 w-3.5" /> Historial
                                     </Button>
                                 </TableCell>
@@ -278,7 +278,7 @@ function StaffPageContent() {
                         ) : (
                             <Table>
                                 <TableHeader>
-                                    <TableRow className="bg-slate-50">
+                                    <TableRow className="bg-card/[0.02]">
                                         <TableHead>Fecha</TableHead>
                                         <TableHead>Entrada</TableHead>
                                         <TableHead>Salida</TableHead>
@@ -299,11 +299,11 @@ function StaffPageContent() {
                                         }
 
                                         return (
-                                            <TableRow key={record.id} className="hover:bg-slate-50">
+                                            <TableRow key={record.id} className="hover:bg-accent/50">
                                                 <TableCell className="font-medium">{format(checkInDate, "dd/MM/yyyy", { locale: es })}</TableCell>
-                                                <TableCell className="text-green-600 font-mono">{format(checkInDate, "HH:mm", { locale: es })}</TableCell>
-                                                <TableCell className="text-red-600 font-mono">
-                                                    {checkOutDate ? format(checkOutDate, "HH:mm", { locale: es }) : <span className="text-green-600 animate-pulse">En turno</span>}
+                                                <TableCell className="text-emerald-400 font-mono">{format(checkInDate, "HH:mm", { locale: es })}</TableCell>
+                                                <TableCell className="text-red-400 font-mono">
+                                                    {checkOutDate ? format(checkOutDate, "HH:mm", { locale: es }) : <span className="text-emerald-400 animate-pulse">En turno</span>}
                                                 </TableCell>
                                                 <TableCell>
                                                     <Badge variant="outline" className="font-mono text-xs">

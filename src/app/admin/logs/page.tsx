@@ -20,20 +20,20 @@ import { useSearchParams } from "next/navigation";
 import { FadeIn, SlideInRow } from "@/components/ui/motion-wrapper";
 
 const LOG_TYPES = [
-    { key: "ALL", label: "Todos", icon: Filter, color: "text-slate-600", bg: "bg-slate-100", activeBg: "bg-slate-800 text-white" },
-    { key: "VITALS", label: "Vitales", icon: Activity, color: "text-blue-600", bg: "bg-blue-50", activeBg: "bg-blue-600 text-white" },
-    { key: "FOOD", label: "Alimentos", icon: Utensils, color: "text-orange-600", bg: "bg-orange-50", activeBg: "bg-orange-500 text-white" },
-    { key: "MEDS", label: "Meds", icon: Pill, color: "text-green-600", bg: "bg-green-50", activeBg: "bg-green-600 text-white" },
-    { key: "NOTE", label: "Notas", icon: FileText, color: "text-purple-600", bg: "bg-purple-50", activeBg: "bg-purple-600 text-white" },
-    { key: "INCIDENT", label: "Incidentes", icon: AlertTriangle, color: "text-red-600", bg: "bg-red-50", activeBg: "bg-red-600 text-white" },
+    { key: "ALL", label: "Todos", icon: Filter, color: "text-muted-foreground", bg: "bg-muted/60", activeBg: "bg-zinc-700 text-white" },
+    { key: "VITALS", label: "Vitales", icon: Activity, color: "text-blue-400", bg: "bg-blue-500/10", activeBg: "bg-blue-600 text-white" },
+    { key: "FOOD", label: "Alimentos", icon: Utensils, color: "text-orange-400", bg: "bg-orange-500/10", activeBg: "bg-orange-500/100 text-white" },
+    { key: "MEDS", label: "Meds", icon: Pill, color: "text-emerald-400", bg: "bg-emerald-500/10", activeBg: "bg-green-600 text-white" },
+    { key: "NOTE", label: "Notas", icon: FileText, color: "text-violet-400", bg: "bg-violet-500/10", activeBg: "bg-purple-600 text-white" },
+    { key: "INCIDENT", label: "Incidentes", icon: AlertTriangle, color: "text-red-400", bg: "bg-red-500/10", activeBg: "bg-red-600 text-white" },
 ];
 
 const typeConfig: Record<string, { label: string; badgeClass: string; dotColor: string }> = {
-    VITALS: { label: "VITALES", badgeClass: "bg-blue-100 text-blue-700 border-blue-200", dotColor: "bg-blue-500" },
-    FOOD: { label: "ALIMENTOS", badgeClass: "bg-orange-100 text-orange-700 border-orange-200", dotColor: "bg-orange-500" },
-    MEDS: { label: "MEDS", badgeClass: "bg-green-100 text-green-700 border-green-200", dotColor: "bg-green-500" },
-    NOTE: { label: "NOTA", badgeClass: "bg-purple-100 text-purple-700 border-purple-200", dotColor: "bg-purple-500" },
-    INCIDENT: { label: "INCIDENTE", badgeClass: "bg-red-100 text-red-700 border-red-200", dotColor: "bg-red-500" },
+    VITALS: { label: "VITALES", badgeClass: "bg-blue-500/15 text-blue-400 border-blue-500/20", dotColor: "bg-blue-500/100" },
+    FOOD: { label: "ALIMENTOS", badgeClass: "bg-orange-500/15 text-orange-400 border-orange-500/20", dotColor: "bg-orange-500/100" },
+    MEDS: { label: "MEDS", badgeClass: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20", dotColor: "bg-emerald-500/100" },
+    NOTE: { label: "NOTA", badgeClass: "bg-violet-500/15 text-violet-400 border-violet-500/20", dotColor: "bg-violet-500/100" },
+    INCIDENT: { label: "INCIDENTE", badgeClass: "bg-red-500/15 text-red-400 border-red-500/20", dotColor: "bg-red-500/100" },
 };
 
 export default function LogsPage() {
@@ -113,10 +113,10 @@ function LogsPageContent() {
             </div>
 
             {/* Table */}
-            <div className="border rounded-xl bg-white shadow-sm overflow-hidden">
+            <div className="border rounded-xl bg-card shadow-sm overflow-hidden">
                 <Table>
                     <TableHeader>
-                        <TableRow className="bg-slate-50/80">
+                        <TableRow className="bg-card">
                             <TableHead className="w-[100px]">Hora</TableHead>
                             <TableHead>Residente</TableHead>
                             <TableHead className="w-[120px]">Tipo</TableHead>
@@ -146,12 +146,12 @@ function LogsPageContent() {
                             const config = typeConfig[log.type] || typeConfig.NOTE;
 
                             return (
-                                <SlideInRow key={log.id} delay={Math.min(index * 0.03, 1)} className="hover:bg-slate-50/80 transition-colors group">
+                                <SlideInRow key={log.id} delay={Math.min(index * 0.03, 1)} className="hover:bg-card transition-colors group">
                                     <TableCell className="whitespace-nowrap">
                                         <div className="flex items-center gap-2">
                                             <div className={`h-2 w-2 rounded-full ${config.dotColor} flex-shrink-0`} />
                                             <div className="flex flex-col">
-                                                <span className="font-semibold text-slate-700 tabular-nums">
+                                                <span className="font-semibold text-secondary-foreground tabular-nums">
                                                     {format(logDate, "HH:mm", { locale: es })}
                                                 </span>
                                                 <span className="text-[10px] text-muted-foreground">
@@ -161,7 +161,7 @@ function LogsPageContent() {
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <span className="font-medium text-slate-800">{log.patient?.name || "General"}</span>
+                                        <span className="font-medium text-foreground">{log.patient?.name || "General"}</span>
                                     </TableCell>
                                     <TableCell>
                                         <Badge variant="outline" className={`text-[10px] px-2 py-0.5 font-semibold ${config.badgeClass}`}>
@@ -170,7 +170,7 @@ function LogsPageContent() {
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex flex-col max-w-md">
-                                            <span className="font-medium text-sm text-slate-700 truncate">{log.value || "—"}</span>
+                                            <span className="font-medium text-sm text-secondary-foreground truncate">{log.value || "—"}</span>
                                             {log.notes && (
                                                 <span className="text-xs text-muted-foreground mt-0.5 truncate">{log.notes}</span>
                                             )}
@@ -178,7 +178,7 @@ function LogsPageContent() {
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex items-center gap-2">
-                                            <div className="h-6 w-6 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-600 flex-shrink-0">
+                                            <div className="h-6 w-6 rounded-full bg-card flex items-center justify-center text-[10px] font-bold text-muted-foreground flex-shrink-0">
                                                 {log.author?.name?.charAt(0) || "?"}
                                             </div>
                                             <span className="text-sm text-muted-foreground truncate">{log.author?.name || "N/A"}</span>

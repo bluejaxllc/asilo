@@ -73,210 +73,166 @@ export default async function AdminDashboardPage() {
     });
 
     const logTypeColors: Record<string, string> = {
-        VITALS: "bg-blue-100 text-blue-700",
-        FOOD: "bg-green-100 text-green-700",
-        MEDS: "bg-purple-100 text-purple-700",
-        ACTIVITY: "bg-amber-100 text-amber-700",
-        NOTE: "bg-slate-100 text-slate-700",
+        VITALS: "bg-blue-500/15 text-blue-400 border-blue-500/20",
+        FOOD: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
+        MEDS: "bg-violet-500/15 text-violet-400 border-violet-500/20",
+        ACTIVITY: "bg-amber-500/15 text-amber-400 border-amber-500/20",
+        NOTE: "bg-zinc-500/15 text-muted-foreground border-zinc-500/20",
     };
 
     const priorityColors: Record<string, string> = {
-        HIGH: "bg-red-100 text-red-700",
-        MEDIUM: "bg-orange-100 text-orange-700",
-        LOW: "bg-green-100 text-green-700",
+        HIGH: "bg-red-500/15 text-red-400 border-red-500/20",
+        MEDIUM: "bg-amber-500/15 text-amber-400 border-amber-500/20",
+        LOW: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
     };
+
+    const statCards = [
+        {
+            label: "Residentes",
+            value: totalResidents,
+            sub: "Registrados en sistema",
+            href: "/admin/patients",
+            icon: Users,
+            accentBorder: "border-l-blue-500",
+            iconBg: "bg-blue-500/10",
+            iconColor: "text-blue-400",
+        },
+        {
+            label: "Personal Activo",
+            value: `${activeStaff}/${totalStaff}`,
+            sub: "En turno actual",
+            href: "/admin/staff",
+            icon: UserCheck,
+            accentBorder: "border-l-emerald-500",
+            iconBg: "bg-emerald-500/10",
+            iconColor: "text-emerald-400",
+        },
+        {
+            label: "Tareas Pendientes",
+            value: pendingTasks,
+            sub: "Por completar",
+            href: "/admin/tasks",
+            icon: AlertCircle,
+            accentBorder: "border-l-amber-500",
+            iconBg: "bg-amber-500/10",
+            iconColor: "text-amber-400",
+        },
+        {
+            label: "Alertas Inventario",
+            value: lowStockItems,
+            sub: lowStockItems > 0 ? "Medicamentos bajos" : "Todo en orden",
+            href: "/admin/inventory",
+            icon: Package,
+            accentBorder: lowStockItems > 0 ? "border-l-red-500" : "border-l-zinc-700",
+            iconBg: lowStockItems > 0 ? "bg-red-500/10" : "bg-zinc-500/10",
+            iconColor: lowStockItems > 0 ? "text-red-400" : "text-muted-foreground",
+        },
+    ];
 
     return (
         <FadeIn className="p-6 md:p-8 space-y-6">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
                 <div>
-                    <p className="text-sm text-muted-foreground capitalize">{formatDate()}</p>
-                    <h2 className="text-3xl font-bold tracking-tight">
-                        {getGreeting()}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Admin</span>
+                    <p className="text-sm text-muted-foreground capitalize font-mono">{formatDate()}</p>
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground">
+                        {getGreeting()}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Admin</span>
                     </h2>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <div className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
+                    <div className="flex h-2 w-2 rounded-full bg-emerald-500/100 animate-pulse" />
                     Sistema Operativo
                 </div>
             </div>
 
-            {/* Stat Cards */}
+            {/* Stat Cards — dark glass with accent left border */}
             <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-                <ScaleIn delay={0}>
-                    <Link href="/admin/patients">
-                        <Card className="group cursor-pointer border-0 bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all hover:-translate-y-1">
-                            <CardContent className="p-5">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm text-blue-100 font-medium">Residentes</p>
-                                        <p className="text-3xl font-bold mt-1">{totalResidents}</p>
-                                        <p className="text-xs text-blue-200 mt-1">Registrados en sistema</p>
+                {statCards.map((stat, i) => (
+                    <ScaleIn key={stat.label} delay={i * 0.08}>
+                        <Link href={stat.href}>
+                            <Card className={`group cursor-pointer bg-card border border-border/60 border-l-2 ${stat.accentBorder} hover:border-border hover:bg-accent transition-all duration-300 hover:-translate-y-0.5 shadow-lg shadow-black/20`}>
+                                <CardContent className="p-5">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-xs text-muted-foreground font-medium">{stat.label}</p>
+                                            <p className="text-2xl font-bold text-foreground mt-1 font-mono">{stat.value}</p>
+                                            <p className="text-[10px] text-muted-foreground mt-1">{stat.sub}</p>
+                                        </div>
+                                        <div className={`h-11 w-11 ${stat.iconBg} rounded-xl flex items-center justify-center border border-border group-hover:scale-110 transition-transform`}>
+                                            <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
+                                        </div>
                                     </div>
-                                    <div className="h-12 w-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
-                                        <Users className="h-6 w-6" />
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </Link>
-                </ScaleIn>
-
-                <ScaleIn delay={0.1}>
-                    <Link href="/admin/staff">
-                        <Card className="group cursor-pointer border-0 bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all hover:-translate-y-1">
-                            <CardContent className="p-5">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm text-emerald-100 font-medium">Personal Activo</p>
-                                        <p className="text-3xl font-bold mt-1">{activeStaff}<span className="text-lg font-normal text-emerald-200">/{totalStaff}</span></p>
-                                        <p className="text-xs text-emerald-200 mt-1">En turno actual</p>
-                                    </div>
-                                    <div className="h-12 w-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
-                                        <UserCheck className="h-6 w-6" />
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </Link>
-                </ScaleIn>
-
-                <ScaleIn delay={0.2}>
-                    <Link href="/admin/tasks">
-                        <Card className="group cursor-pointer border-0 bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-all hover:-translate-y-1">
-                            <CardContent className="p-5">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm text-amber-100 font-medium">Tareas Pendientes</p>
-                                        <p className="text-3xl font-bold mt-1">{pendingTasks}</p>
-                                        <p className="text-xs text-amber-200 mt-1">Por completar</p>
-                                    </div>
-                                    <div className="h-12 w-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
-                                        <AlertCircle className="h-6 w-6" />
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </Link>
-                </ScaleIn>
-
-                <ScaleIn delay={0.3}>
-                    <Link href="/admin/inventory">
-                        <Card className={`group cursor-pointer border-0 text-white shadow-lg transition-all hover:-translate-y-1 ${lowStockItems > 0 ? 'bg-gradient-to-br from-red-500 to-red-700 shadow-red-500/20 hover:shadow-red-500/40' : 'bg-gradient-to-br from-slate-500 to-slate-700 shadow-slate-500/20 hover:shadow-slate-500/40'}`}>
-                            <CardContent className="p-5">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className={`text-sm font-medium ${lowStockItems > 0 ? 'text-red-100' : 'text-slate-200'}`}>Alertas Inventario</p>
-                                        <p className="text-3xl font-bold mt-1">{lowStockItems}</p>
-                                        <p className={`text-xs mt-1 ${lowStockItems > 0 ? 'text-red-200' : 'text-slate-300'}`}>{lowStockItems > 0 ? 'Medicamentos bajos' : 'Todo en orden'}</p>
-                                    </div>
-                                    <div className="h-12 w-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
-                                        <Package className="h-6 w-6" />
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </Link>
-                </ScaleIn>
+                                </CardContent>
+                            </Card>
+                        </Link>
+                    </ScaleIn>
+                ))}
             </div>
 
             {/* Quick Stats Row */}
             <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
-                <SlideIn direction="left" delay={0.4}>
-                    <Card className="bg-white border-dashed">
-                        <CardContent className="p-4 flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-lg bg-orange-50 flex items-center justify-center">
-                                <Heart className="h-5 w-5 text-orange-500" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold text-slate-800">{familyAccounts}</p>
-                                <p className="text-xs text-muted-foreground">Cuentas Familiares</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </SlideIn>
-                <SlideIn direction="left" delay={0.5}>
-                    <Card className="bg-white border-dashed">
-                        <CardContent className="p-4 flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                                <Activity className="h-5 w-5 text-blue-500" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold text-slate-800">{recentLogs.length}</p>
-                                <p className="text-xs text-muted-foreground">Registros Recientes</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </SlideIn>
-                <SlideIn direction="left" delay={0.6}>
-                    <Card className="bg-white border-dashed">
-                        <CardContent className="p-4 flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-lg bg-green-50 flex items-center justify-center">
-                                <TrendingUp className="h-5 w-5 text-green-500" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold text-slate-800">{totalStaff}</p>
-                                <p className="text-xs text-muted-foreground">Total Personal</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </SlideIn>
-                <SlideIn direction="left" delay={0.7}>
-                    <Card className="bg-white border-dashed">
-                        <CardContent className="p-4 flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-lg bg-purple-50 flex items-center justify-center">
-                                <Clock className="h-5 w-5 text-purple-500" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold text-slate-800">24/7</p>
-                                <p className="text-xs text-muted-foreground">Monitoreo Activo</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </SlideIn>
+                {[
+                    { icon: Heart, label: "Cuentas Familiares", value: familyAccounts, color: "text-orange-400", bg: "bg-orange-500/10" },
+                    { icon: Activity, label: "Registros Recientes", value: recentLogs.length, color: "text-blue-400", bg: "bg-blue-500/10" },
+                    { icon: TrendingUp, label: "Total Personal", value: totalStaff, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+                    { icon: Clock, label: "Monitoreo Activo", value: "24/7", color: "text-violet-400", bg: "bg-violet-500/10" },
+                ].map((stat, i) => (
+                    <SlideIn key={stat.label} direction="left" delay={0.3 + i * 0.08}>
+                        <Card className="bg-card border border-border/60 border-dashed hover:border-border transition-colors">
+                            <CardContent className="p-4 flex items-center gap-3">
+                                <div className={`h-10 w-10 rounded-lg ${stat.bg} flex items-center justify-center border border-border`}>
+                                    <stat.icon className={`h-5 w-5 ${stat.color}`} />
+                                </div>
+                                <div>
+                                    <p className="text-xl font-bold text-foreground font-mono">{stat.value}</p>
+                                    <p className="text-[10px] text-muted-foreground">{stat.label}</p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </SlideIn>
+                ))}
             </div>
 
             {/* Activity & Tasks */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4 border shadow-sm">
+                <Card className="col-span-4 bg-card border border-border/60">
                     <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                             <div>
-                                <CardTitle className="text-lg">Actividad Reciente</CardTitle>
-                                <CardDescription>Últimos registros del equipo</CardDescription>
+                                <CardTitle className="text-base text-foreground">Actividad Reciente</CardTitle>
+                                <CardDescription className="text-muted-foreground text-xs">Últimos registros del equipo</CardDescription>
                             </div>
-                            <Link href="/admin/logs" className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 hover:underline">
+                            <Link href="/admin/logs" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors">
                                 Ver todo <ArrowRight className="h-3 w-3" />
                             </Link>
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-3">
+                        <div className="space-y-1">
                             {recentLogs.length === 0 ? (
                                 <div className="text-center py-8">
-                                    <Activity className="h-8 w-8 text-muted-foreground mx-auto mb-2 opacity-40" />
+                                    <Activity className="h-8 w-8 text-secondary-foreground mx-auto mb-2" />
                                     <p className="text-sm text-muted-foreground">Sin actividad reciente registrada.</p>
                                 </div>
                             ) : (
                                 recentLogs.map((log) => (
-                                    <div key={log.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors group">
+                                    <div key={log.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent/50 transition-colors group">
                                         <div className="flex-shrink-0 mt-0.5">
-                                            <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600">
+                                            <div className="h-8 w-8 rounded-full bg-card border border-border flex items-center justify-center text-xs font-bold text-muted-foreground">
                                                 {log.author?.name?.charAt(0) || "?"}
                                             </div>
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 mb-0.5">
-                                                <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${logTypeColors[log.type] || logTypeColors.NOTE}`}>
+                                                <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 border ${logTypeColors[log.type] || logTypeColors.NOTE}`}>
                                                     {log.type}
                                                 </Badge>
-                                                <span className="text-xs font-medium text-slate-700 truncate">{log.patient?.name || "General"}</span>
+                                                <span className="text-xs font-medium text-secondary-foreground truncate">{log.patient?.name || "General"}</span>
                                             </div>
                                             <p className="text-xs text-muted-foreground truncate">{log.notes || "Sin notas"}</p>
-                                            <p className="text-[10px] text-slate-400 mt-0.5">{log.author?.name}</p>
+                                            <p className="text-[10px] text-muted-foreground mt-0.5">{log.author?.name}</p>
                                         </div>
-                                        <span className="text-[10px] text-slate-400 flex-shrink-0 mt-1 tabular-nums">
+                                        <span className="text-[10px] text-muted-foreground flex-shrink-0 mt-1 tabular-nums font-mono">
                                             {log.createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </span>
                                     </div>
@@ -286,46 +242,46 @@ export default async function AdminDashboardPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="col-span-3 border shadow-sm">
+                <Card className="col-span-3 bg-card border border-border/60">
                     <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                             <div>
-                                <CardTitle className="text-lg">Tareas Pendientes</CardTitle>
-                                <CardDescription>{pendingTasks} sin completar</CardDescription>
+                                <CardTitle className="text-base text-foreground">Tareas Pendientes</CardTitle>
+                                <CardDescription className="text-muted-foreground text-xs">{pendingTasks} sin completar</CardDescription>
                             </div>
-                            <Link href="/admin/tasks" className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 hover:underline">
+                            <Link href="/admin/tasks" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors">
                                 Ver todo <ArrowRight className="h-3 w-3" />
                             </Link>
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                             {upcomingTasks.length === 0 ? (
                                 <div className="text-center py-8">
-                                    <AlertCircle className="h-8 w-8 text-muted-foreground mx-auto mb-2 opacity-40" />
+                                    <AlertCircle className="h-8 w-8 text-secondary-foreground mx-auto mb-2" />
                                     <p className="text-sm text-muted-foreground">No hay tareas pendientes.</p>
-                                    <p className="text-xs text-green-600 font-medium mt-1">¡Todo al día! 🎉</p>
+                                    <p className="text-xs text-emerald-500 font-medium mt-1">¡Todo al día! 🎉</p>
                                 </div>
                             ) : (
                                 upcomingTasks.map((task) => (
-                                    <div key={task.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
+                                    <div key={task.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent/50 transition-colors border border-transparent hover:border-border">
                                         <div className="flex-shrink-0">
-                                            <div className={`h-2 w-2 rounded-full ${task.priority === "HIGH" ? "bg-red-500" : task.priority === "MEDIUM" ? "bg-orange-400" : "bg-green-400"}`} />
+                                            <div className={`h-2 w-2 rounded-full ${task.priority === "HIGH" ? "bg-red-500/100" : task.priority === "MEDIUM" ? "bg-amber-400" : "bg-emerald-400"}`} />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-medium leading-none truncate">{task.title}</p>
+                                            <p className="text-sm font-medium leading-none truncate text-foreground">{task.title}</p>
                                             <div className="flex items-center gap-2 mt-1">
                                                 {task.patient && (
-                                                    <span className="text-[10px] text-slate-500">{task.patient.name}</span>
+                                                    <span className="text-[10px] text-muted-foreground">{task.patient.name}</span>
                                                 )}
                                                 {task.priority && (
-                                                    <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${priorityColors[task.priority] || ''}`}>
+                                                    <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 border ${priorityColors[task.priority] || ''}`}>
                                                         {task.priority}
                                                     </Badge>
                                                 )}
                                             </div>
                                         </div>
-                                        <span className="text-[10px] text-slate-400 flex-shrink-0 tabular-nums">
+                                        <span className="text-[10px] text-muted-foreground flex-shrink-0 tabular-nums font-mono">
                                             {task.dueDate ? task.dueDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
                                         </span>
                                     </div>

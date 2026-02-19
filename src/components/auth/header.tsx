@@ -28,7 +28,7 @@ export const Header = ({
                     .blue_jax
                 </h1>
             </div>
-            <p className="text-slate-400 text-sm">
+            <p className="text-muted-foreground text-sm">
                 {label}
             </p>
         </div>
