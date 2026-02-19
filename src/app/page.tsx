@@ -33,7 +33,7 @@ export default function Home() {
             <Link href="/auth/login">
               <Button variant="ghost" className="text-slate-600 hover:text-slate-900">Iniciar Sesión</Button>
             </Link>
-            <Link href="/admin">
+            <Link href="/auth/login?role=admin">
               <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md shadow-blue-500/20">
                 Ir al Panel
               </Button>
@@ -74,17 +74,17 @@ export default function Home() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/admin">
+              <Link href="/auth/login?role=admin">
                 <Button size="lg" className="h-14 px-8 text-lg w-full sm:w-auto shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 transition-all hover:-translate-y-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl">
-                  Ver Demo Admin <ArrowRight className="ml-2 h-5 w-5" />
+                  <ShieldCheck className="mr-2 h-5 w-5" /> Administración
                 </Button>
               </Link>
-              <Link href="/staff">
-                <Button size="lg" variant="outline" className="h-14 px-8 text-lg w-full sm:w-auto bg-white hover:bg-slate-50 border-slate-200 text-slate-700 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 rounded-xl">
-                  <ClipboardList className="mr-2 h-5 w-5" /> App de Personal
+              <Link href="/auth/login?role=staff">
+                <Button size="lg" variant="outline" className="h-14 px-8 text-lg w-full sm:w-auto bg-teal-50 hover:bg-teal-100 border-teal-200 text-teal-700 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 rounded-xl">
+                  <ClipboardList className="mr-2 h-5 w-5" /> Personal
                 </Button>
               </Link>
-              <Link href="/family">
+              <Link href="/auth/login?role=family">
                 <Button size="lg" variant="outline" className="h-14 px-8 text-lg w-full sm:w-auto bg-orange-50 hover:bg-orange-100 border-orange-200 text-orange-700 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 rounded-xl">
                   <Heart className="mr-2 h-5 w-5" /> Portal Familiar
                 </Button>
@@ -247,7 +247,7 @@ export default function Home() {
                 <p className="text-lg text-slate-400 leading-relaxed mb-8">
                   Control de acceso basado en roles, copias de seguridad automáticas y almacenamiento encriptado para proteger la información de sus residentes.
                 </p>
-                <Link href="/admin">
+                <Link href="/auth/login?role=admin">
                   <Button size="lg" className="bg-white text-slate-900 hover:bg-slate-100 rounded-xl h-12 px-6 font-semibold shadow-lg">
                     Explorar el Sistema <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -280,7 +280,7 @@ export default function Home() {
               Comience hoy con una demostración completa de nuestra plataforma. Sin compromiso, sin tarjeta de crédito.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/admin">
+              <Link href="/auth/login?role=admin">
                 <Button size="lg" className="h-14 px-10 text-lg bg-gradient-to-r from-blue-600 to-indigo-600 shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-1 transition-all rounded-xl">
                   Comenzar Demo Gratis <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
