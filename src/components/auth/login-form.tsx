@@ -50,9 +50,17 @@ export const LoginForm = () => {
         startTransition(() => {
             login(values)
                 .then((data) => {
-                    setError(data?.error);
-                    // setSuccess(data?.success);
+                    if (data?.error) {
+                        setError(data.error);
+                    } else if (data?.redirectUrl) {
+                        setSuccess(data.success);
+                        // Clean redirect — no flash
+                        window.location.href = data.redirectUrl;
+                    }
                 })
+                .catch(() => {
+                    setError("Algo salió mal!");
+                });
         });
     };
 

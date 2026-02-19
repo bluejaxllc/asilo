@@ -35,8 +35,8 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
         await signIn("credentials", {
             email,
             password,
-            redirectTo: redirectUrl,
-        })
+            redirect: false,
+        });
     } catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {
@@ -47,7 +47,9 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
             }
         }
 
-        // Re-throw everything else (including NEXT_REDIRECT on successful login)
         throw error;
     }
+
+    // If we get here, login succeeded — return the redirect URL to the client
+    return { success: "¡Iniciando sesión!", redirectUrl };
 };
