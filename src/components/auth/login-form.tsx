@@ -3,8 +3,9 @@
 import * as z from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useState, useTransition } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useState } from "react"
+import { useSearchParams } from "next/navigation"
+import { signIn } from "next-auth/react"
 
 import { LogIn, Loader2 } from "lucide-react"
 
@@ -21,20 +22,18 @@ import { CardWrapper } from "@/components/auth/card-wrapper"
 import { Button } from "@/components/ui/button"
 import { FormError } from "@/components/form-error"
 import { FormSuccess } from "@/components/form-success"
-import { login } from "@/actions/login"
 
 import { LoginSchema } from "@/schemas";
 
 export const LoginForm = () => {
     const searchParams = useSearchParams();
-    const router = useRouter();
     const urlError = searchParams.get("error") === "OAuthAccountNotLinked"
         ? "Email already in use with different provider!"
         : "";
 
     const [error, setError] = useState<string | undefined>("");
     const [success, setSuccess] = useState<string | undefined>("");
-    const [isPending, startTransition] = useTransition();
+    const [isPending, setIsPending] = useState(false);
 
     const form = useForm<z.infer<typeof LoginSchema>>({
         resolver: zodResolver(LoginSchema),
@@ -44,26 +43,44 @@ export const LoginForm = () => {
         },
     });
 
-    const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+    const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
         setError("");
         setSuccess("");
+        setIsPending(true);
 
-        startTransition(() => {
-            login(values)
-                .then((data) => {
-                    if (data?.error) {
-                        setError(data.error);
-                    } else if (data?.redirectUrl) {
-                        setSuccess("¡Iniciando sesión!");
-                        // Force Next.js to re-read server state (session cookie)
-                        // then navigate with full page load to avoid stale router cache
-                        window.location.replace(data.redirectUrl);
-                    }
-                })
-                .catch(() => {
-                    setError("Algo salió mal!");
-                });
-        });
+        try {
+            // Use client-side signIn from next-auth/react
+            // This properly sets the session cookie via browser fetch
+            const result = await signIn("credentials", {
+                email: values.email,
+                password: values.password,
+                redirect: false,
+            });
+
+            if (result?.error) {
+                setError("Credenciales inválidas!");
+                setIsPending(false);
+                return;
+            }
+
+            if (result?.ok) {
+                setSuccess("¡Iniciando sesión!");
+
+                // Fetch the session to determine role-based redirect
+                const sessionRes = await fetch("/api/auth/session");
+                const session = await sessionRes.json();
+
+                let redirectUrl = "/staff";
+                if (session?.user?.role === "ADMIN") redirectUrl = "/admin";
+                else if (session?.user?.role === "FAMILY") redirectUrl = "/family";
+
+                // Full page navigation with history replacement
+                window.location.replace(redirectUrl);
+            }
+        } catch {
+            setError("Algo salió mal!");
+            setIsPending(false);
+        }
     };
 
     return (
