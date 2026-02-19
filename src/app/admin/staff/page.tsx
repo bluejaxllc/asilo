@@ -99,7 +99,7 @@ function StaffPageContent() {
         setAttendanceHistory(history);
     };
 
-    const activeStaffCount = staffWithStatus.filter(s => s.status === "Disponible" || s.status === "Ocupado").length;
+    const activeStaffCount = staffWithStatus.filter(s => s.status === "Activo").length;
     const familyCount = staffWithStatus.filter(s => s.role === "FAMILY").length;
 
     return (
@@ -136,7 +136,7 @@ function StaffPageContent() {
                     <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-xs text-muted-foreground font-medium">Total Personal</p>
+                                <p className="text-xs text-zinc-300 font-medium">Total Personal</p>
                                 <p className="text-2xl font-bold mt-0.5">{staffWithStatus.length}</p>
                             </div>
                             <div className="h-9 w-9 bg-card/10 rounded-lg flex items-center justify-center">

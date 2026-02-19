@@ -184,11 +184,11 @@ function StaffPatientsContent() {
                                     {/* Quick Info */}
                                     <CardContent className="py-4 flex-grow">
                                         <div className="grid grid-cols-2 gap-3">
-                                            <div className="bg-blue-500/80 p-3 rounded-xl text-center border border-blue-500/50">
+                                            <div className="bg-blue-500/10 p-3 rounded-xl text-center border border-blue-500/20">
                                                 <span className="block text-[10px] font-bold text-blue-400 uppercase tracking-wider">Última Vital</span>
                                                 <span className="block text-lg font-bold text-blue-400 mt-0.5">{p.lastVitalTime}</span>
                                             </div>
-                                            <div className="bg-orange-500/80 p-3 rounded-xl text-center border border-orange-500/50">
+                                            <div className="bg-orange-500/10 p-3 rounded-xl text-center border border-orange-500/20">
                                                 <span className="block text-[10px] font-bold text-orange-400 uppercase tracking-wider">Dieta</span>
                                                 <span className="block text-sm font-bold text-orange-400 mt-0.5 truncate">{p.dietaryNeeds || "General"}</span>
                                             </div>

@@ -12,13 +12,13 @@ export async function GET(request: Request) {
 
         const staffUsers = await db.user.findMany({
             where: {
-                role: {
-                    in: ["STAFF", "DOCTOR", "NURSE", "KITCHEN"]
-                },
-                name: query ? {
-                    contains: query,
-                    mode: 'insensitive'
-                } : undefined
+                ...(query ? {
+                    OR: [
+                        { name: { contains: query, mode: 'insensitive' } },
+                        { role: { contains: query, mode: 'insensitive' } },
+                        { email: { contains: query, mode: 'insensitive' } },
+                    ]
+                } : {})
             },
             orderBy: { name: 'asc' }
         });

@@ -169,7 +169,7 @@ export default async function KitchenPage({ searchParams }: KitchenPageProps) {
                                             </div>
                                             <div className={cn(
                                                 "p-3 rounded-xl border",
-                                                hasSpecialDiet ? "bg-orange-500/80 border-orange-500/20" : "bg-emerald-500/80 border-emerald-500/20"
+                                                hasSpecialDiet ? "bg-orange-500/10 border-orange-500/20" : "bg-emerald-500/10 border-emerald-500/20"
                                             )}>
                                                 <span className={cn(
                                                     "text-base font-bold block",
