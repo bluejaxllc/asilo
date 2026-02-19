@@ -4,7 +4,7 @@ import * as z from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState, useTransition } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 
 import { LogIn, Loader2 } from "lucide-react"
 
@@ -27,6 +27,7 @@ import { LoginSchema } from "@/schemas";
 
 export const LoginForm = () => {
     const searchParams = useSearchParams();
+    const router = useRouter();
     const urlError = searchParams.get("error") === "OAuthAccountNotLinked"
         ? "Email already in use with different provider!"
         : "";
@@ -53,9 +54,10 @@ export const LoginForm = () => {
                     if (data?.error) {
                         setError(data.error);
                     } else if (data?.redirectUrl) {
-                        setSuccess(data.success);
-                        // Clean redirect — no flash
-                        window.location.href = data.redirectUrl;
+                        setSuccess("¡Iniciando sesión!");
+                        // Force Next.js to re-read server state (session cookie)
+                        // then navigate with full page load to avoid stale router cache
+                        window.location.replace(data.redirectUrl);
                     }
                 })
                 .catch(() => {
