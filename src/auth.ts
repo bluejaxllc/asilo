@@ -52,6 +52,34 @@ export const {
     adapter: PrismaAdapter(db),
     session: { strategy: "jwt" },
     secret: process.env.AUTH_SECRET,
+    cookies: {
+        sessionToken: {
+            name: `__Secure-authjs.session-token`,
+            options: {
+                httpOnly: true,
+                sameSite: "none",
+                path: "/",
+                secure: true,
+            },
+        },
+        callbackUrl: {
+            name: `__Secure-authjs.callback-url`,
+            options: {
+                sameSite: "none",
+                path: "/",
+                secure: true,
+            },
+        },
+        csrfToken: {
+            name: `__Secure-authjs.csrf-token`,
+            options: {
+                httpOnly: true,
+                sameSite: "none",
+                path: "/",
+                secure: true,
+            },
+        },
+    },
     providers: [
         Credentials({
             credentials: {
