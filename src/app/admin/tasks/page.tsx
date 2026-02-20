@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar, ClipboardList, Plus, Trash2, User, Clock, CheckCircle2, Loader2, ListTodo } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { getAllTasks, createTask, deleteTask, toggleTaskStatus } from "@/actions/tasks";
+import { getAllTasks, createTask, deleteTask, toggleTaskStatus, getStaffList } from "@/actions/tasks";
 import { getPatients } from "@/actions/patients";
 import {
     Select,
@@ -33,19 +33,25 @@ type StatusFilter = "ALL" | "PENDING" | "IN_PROGRESS" | "COMPLETED";
 export default function TasksPage() {
     const [tasks, setTasks] = useState<any[]>([]);
     const [patients, setPatients] = useState<any[]>([]);
+    const [staffList, setStaffList] = useState<any[]>([]);
     const [newTaskText, setNewTaskText] = useState("");
     const [selectedPatient, setSelectedPatient] = useState<string>("general");
+    const [selectedStaff, setSelectedStaff] = useState<string>("none");
+    const [selectedPriority, setSelectedPriority] = useState<string>("NORMAL");
+    const [dueDate, setDueDate] = useState<string>("");
     const [loading, setLoading] = useState(false);
     const [activeFilter, setActiveFilter] = useState<StatusFilter>("ALL");
 
     const loadData = async () => {
-        const [taskList, patientList] = await Promise.all([
+        const [taskList, patientList, staff] = await Promise.all([
             getAllTasks(),
-            getPatients()
+            getPatients(),
+            getStaffList()
         ]);
 
         setTasks(taskList);
         setPatients(patientList);
+        setStaffList(staff);
     };
 
     useEffect(() => {
@@ -106,7 +112,9 @@ export default function TasksPage() {
 
         setLoading(true);
         const patientId = selectedPatient === "general" ? undefined : selectedPatient;
-        const result = await createTask(newTaskText, "NORMAL", patientId);
+        const assignedToId = selectedStaff === "none" ? undefined : selectedStaff;
+        const due = dueDate || undefined;
+        const result = await createTask(newTaskText, selectedPriority, patientId, assignedToId, due);
         setLoading(false);
 
         if (result.error) {
@@ -115,6 +123,9 @@ export default function TasksPage() {
             toast.success(result.success);
             setNewTaskText("");
             setSelectedPatient("general");
+            setSelectedStaff("none");
+            setSelectedPriority("NORMAL");
+            setDueDate("");
             loadData();
         }
     };
@@ -252,32 +263,66 @@ export default function TasksPage() {
                         </CardHeader>
                         <CardContent className="pt-6">
                             <div className="space-y-6">
-                                {/* Add new task input */}
-                                <div className="flex flex-col md:flex-row gap-3 bg-card/[0.02] p-4 rounded-xl border border-dashed text-muted-foreground">
-                                    <Input
-                                        className="flex-1 bg-card border-border"
-                                        placeholder="Escriba una nueva tarea..."
-                                        value={newTaskText}
-                                        onChange={(e) => setNewTaskText(e.target.value)}
-                                        onKeyPress={(e) => {
-                                            if (e.key === 'Enter') handleAddTask();
-                                        }}
-                                    />
-                                    <Select value={selectedPatient} onValueChange={setSelectedPatient}>
-                                        <SelectTrigger className="w-[200px] bg-card border-border">
-                                            <SelectValue placeholder="Asignar a..." />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="general">General (Sin paciente)</SelectItem>
-                                            {patients.map(p => (
-                                                <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <Button onClick={handleAddTask} disabled={loading} className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
-                                        <Plus className="h-4 w-4 mr-2" />
-                                        {loading ? "Agregando..." : "Agregar Tarea"}
-                                    </Button>
+                                {/* Add new task form */}
+                                <div className="bg-card/[0.02] p-5 rounded-xl border border-dashed text-muted-foreground space-y-3">
+                                    <div className="flex flex-col md:flex-row gap-3">
+                                        <Input
+                                            className="flex-1 bg-card border-border"
+                                            placeholder="Escriba una nueva tarea..."
+                                            value={newTaskText}
+                                            onChange={(e) => setNewTaskText(e.target.value)}
+                                            onKeyPress={(e) => {
+                                                if (e.key === 'Enter') handleAddTask();
+                                            }}
+                                        />
+                                        <Button onClick={handleAddTask} disabled={loading} className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm shrink-0">
+                                            <Plus className="h-4 w-4 mr-2" />
+                                            {loading ? "Agregando..." : "Agregar Tarea"}
+                                        </Button>
+                                    </div>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                        <Select value={selectedStaff} onValueChange={setSelectedStaff}>
+                                            <SelectTrigger className="bg-card border-border">
+                                                <SelectValue placeholder="Asignar a personal..." />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="none">Sin asignar</SelectItem>
+                                                {staffList.map(s => (
+                                                    <SelectItem key={s.id} value={s.id}>
+                                                        {s.name} ({s.role})
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <Select value={selectedPatient} onValueChange={setSelectedPatient}>
+                                            <SelectTrigger className="bg-card border-border">
+                                                <SelectValue placeholder="Paciente..." />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="general">Sin paciente</SelectItem>
+                                                {patients.map(p => (
+                                                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <Select value={selectedPriority} onValueChange={setSelectedPriority}>
+                                            <SelectTrigger className="bg-card border-border">
+                                                <SelectValue placeholder="Prioridad" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="URGENT">🔴 Urgente</SelectItem>
+                                                <SelectItem value="HIGH">🟠 Alta</SelectItem>
+                                                <SelectItem value="NORMAL">🟡 Normal</SelectItem>
+                                                <SelectItem value="LOW">🟢 Baja</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <Input
+                                            type="datetime-local"
+                                            className="bg-card border-border"
+                                            value={dueDate}
+                                            onChange={(e) => setDueDate(e.target.value)}
+                                        />
+                                    </div>
                                 </div>
 
                                 {/* Task list */}

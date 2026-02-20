@@ -3,6 +3,16 @@
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 
+export const getStaffList = async () => {
+    return await db.user.findMany({
+        where: {
+            role: { notIn: ["ADMIN", "FAMILY"] }
+        },
+        select: { id: true, name: true, role: true },
+        orderBy: { name: 'asc' }
+    });
+};
+
 export const getMyTasks = async (email: string) => {
     try {
         const user = await db.user.findUnique({
@@ -43,13 +53,21 @@ export const getAllTasks = async () => {
     });
 };
 
-export const createTask = async (title: string, priority: string, patientId?: string) => {
+export const createTask = async (
+    title: string,
+    priority: string,
+    patientId?: string,
+    assignedToId?: string,
+    dueDate?: string
+) => {
     try {
         await db.task.create({
             data: {
                 title,
                 priority,
                 patientId: patientId || null,
+                assignedToId: assignedToId || null,
+                dueDate: dueDate ? new Date(dueDate) : null,
                 status: "PENDING"
             }
         });
