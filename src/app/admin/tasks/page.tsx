@@ -66,14 +66,21 @@ export default function TasksPage() {
             list = list.filter(t => t.status === activeFilter);
         }
 
-        // Sort: In-progress first, then Pending by time (earliest dueDate/createdAt first), Completed last
+        // Sort: In-progress first, then Pending, Completed last.
+        // Within same status: highest priority first, then earliest due date.
         list.sort((a, b) => {
             const statusOrder: Record<string, number> = { IN_PROGRESS: 0, PENDING: 1, COMPLETED: 2 };
             const oa = statusOrder[a.status] ?? 1;
             const ob = statusOrder[b.status] ?? 1;
             if (oa !== ob) return oa - ob;
 
-            // Within same status, sort by dueDate (if exists) then createdAt — earliest first
+            // Within same status, sort by priority (URGENT > HIGH > NORMAL > LOW)
+            const priorityOrder: Record<string, number> = { URGENT: 0, HIGH: 1, NORMAL: 2, LOW: 3 };
+            const pa = priorityOrder[a.priority] ?? 2;
+            const pb = priorityOrder[b.priority] ?? 2;
+            if (pa !== pb) return pa - pb;
+
+            // Then by dueDate (if exists) then createdAt — earliest first
             const dateA = a.dueDate ? new Date(a.dueDate).getTime() : new Date(a.createdAt).getTime();
             const dateB = b.dueDate ? new Date(b.dueDate).getTime() : new Date(b.createdAt).getTime();
             return dateA - dateB;
@@ -317,7 +324,13 @@ export default function TasksPage() {
                                                                     <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
                                                                 )}
                                                             </div>
-                                                            <div className="flex items-center gap-2 mt-1.5">
+                                                            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                                                                {task.assignedTo && (
+                                                                    <Badge variant="outline" className="text-xs font-normal text-violet-400 bg-violet-500/10 border-violet-500/20 flex items-center gap-1 pl-1 pr-2 py-0 h-5">
+                                                                        <User className="w-3 h-3" />
+                                                                        {task.assignedTo.name} ({task.assignedTo.role})
+                                                                    </Badge>
+                                                                )}
                                                                 {task.patient && (
                                                                     <Badge variant="outline" className="text-xs font-normal text-blue-400 bg-blue-500/10 border-blue-500/20 flex items-center gap-1 pl-1 pr-2 py-0 h-5">
                                                                         <User className="w-3 h-3" />

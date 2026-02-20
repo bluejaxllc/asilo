@@ -396,7 +396,7 @@ export default function Home() {
                   <Link href="/auth/login?role=admin">
                     <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                       <Button size="lg" className="h-12 px-6 bg-blue-600 hover:bg-blue-500/100 text-white rounded-lg font-semibold text-sm border border-blue-500/50 shadow-lg shadow-blue-600/20 transition-all hover:shadow-blue-500/40 w-full sm:w-auto">
-                        Solicitar Arquitectura del Sistema <ArrowRight className="ml-2 h-4 w-4" />
+                        Solicitar Certificación <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </motion.div>
                   </Link>

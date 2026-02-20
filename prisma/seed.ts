@@ -167,38 +167,143 @@ async function main() {
     console.log(`Family user created: ${familyUser.email} → linked to ${firstPatient.name}`)
 
 
-    // --- 4. TASKS ---
-    const taskTitles = [
-        'Toma de Glucosa', 'Aeso Matutino', 'Administrar Insulina', 'Caminata en Jardín',
-        'Cambio de Ropa de Cama', 'Revisión de Signos Vitales', 'Asistencia en Comedor',
-        'Terapia Ocupacional', 'Nebulización', 'Curación de Herida'
-    ]
+    // --- 4. TASKS (Role-Specific) ---
+    // Clear existing tasks to avoid duplicates on re-seed
+    await prisma.task.deleteMany({})
 
-    // Create random tasks for Staff (Carlos) and Nurse (Ana)
-    const targetStaff = [staff, allStaff.find(s => s.email === 'ana@asilo.com') || staff]
-
-    for (let i = 0; i < 20; i++) {
-        const randomStaff = targetStaff[Math.floor(Math.random() * targetStaff.length)]
-        const randomPatient = createdResidents[Math.floor(Math.random() * createdResidents.length)]
-        const randomTitle = taskTitles[Math.floor(Math.random() * taskTitles.length)]
-        const isCompleted = Math.random() > 0.7 // 30% completed
-        const isHighPriority = Math.random() > 0.8
-
-        const dueDate = new Date()
-        dueDate.setHours(8 + Math.floor(Math.random() * 10), 0, 0, 0) // Random time between 8am and 6pm
-
-        await prisma.task.create({
-            data: {
-                title: `${randomTitle} - ${randomPatient.name.split(' ')[0]}`,
-                description: `Realizar procedimiento estandar para ${randomPatient.name}.`,
-                priority: isHighPriority ? 'HIGH' : 'NORMAL',
-                status: isCompleted ? 'COMPLETED' : 'PENDING',
-                assignedToId: randomStaff.id,
-                dueDate
-            }
-        })
+    // Role-specific task definitions
+    const roleTaskMap: Record<string, { titles: string[]; descriptions: string[] }> = {
+        NURSE: {
+            titles: [
+                'Toma de glucosa',
+                'Administrar insulina',
+                'Revisión de signos vitales',
+                'Nebulización',
+                'Curación de herida',
+                'Cambio de vendajes',
+                'Aplicar inyección intramuscular',
+            ],
+            descriptions: [
+                'Medir niveles de glucosa en sangre y registrar en expediente.',
+                'Aplicar dosis prescrita de insulina según indicación médica.',
+                'Medir presión arterial, frecuencia cardíaca y temperatura.',
+                'Realizar sesión de nebulización con salbutamol según prescripción.',
+                'Limpiar y curar herida quirúrgica. Revisar signos de infección.',
+                'Cambiar vendajes y revisar evolución de la zona afectada.',
+                'Aplicar medicamento inyectable según orden médica.',
+            ],
+        },
+        STAFF: {
+            titles: [
+                'Aseo matutino',
+                'Caminata en jardín',
+                'Cambio de ropa de cama',
+                'Asistencia en comedor',
+                'Terapia ocupacional',
+                'Acompañar a cita médica',
+                'Actividad recreativa',
+            ],
+            descriptions: [
+                'Asistir al residente con su higiene personal matutina.',
+                'Acompañar al residente en caminata por el jardín (15-20 min).',
+                'Cambiar sábanas, fundas y cobijas de la cama del residente.',
+                'Acompañar y asistir al residente durante el horario de comida.',
+                'Facilitar actividad de terapia ocupacional (manualidades, lectura).',
+                'Acompañar al residente a su cita médica programada.',
+                'Organizar juego de mesa o actividad grupal con residentes.',
+            ],
+        },
+        KITCHEN: {
+            titles: [
+                'Preparar desayuno',
+                'Preparar comida',
+                'Preparar cena',
+                'Revisar inventario de alimentos',
+                'Preparar dietas especiales',
+                'Desinfectar cocina',
+                'Preparar colaciones',
+            ],
+            descriptions: [
+                'Preparar desayuno para todos los residentes según menú del día.',
+                'Cocinar comida principal respetando dietas individuales.',
+                'Preparar cena ligera para todos los residentes.',
+                'Verificar stock de perecederos y reportar faltantes al admin.',
+                'Preparar platos especiales: dieta baja en sodio, diabética, renal, suave.',
+                'Limpieza profunda y desinfección de todas las superficies de cocina.',
+                'Preparar refrigerios de media mañana y media tarde.',
+            ],
+        },
+        CLEANING: {
+            titles: [
+                'Limpieza de habitaciones',
+                'Desinfección de baños',
+                'Lavado de ropa de cama',
+                'Limpieza de áreas comunes',
+                'Recolección de basura',
+                'Sanitización de comedor',
+            ],
+            descriptions: [
+                'Barrer, trapear y desinfectar habitaciones asignadas.',
+                'Limpiar y desinfectar baños de residentes con productos antibacteriales.',
+                'Recoger, lavar y secar ropa de cama de las habitaciones.',
+                'Limpiar sala de TV, pasillos y recepción.',
+                'Recolectar y clasificar basura de todas las áreas del asilo.',
+                'Limpiar mesas, sillas y piso del comedor después de cada comida.',
+            ],
+        },
+        DOCTOR: {
+            titles: [
+                'Ronda médica matutina',
+                'Revisión de expedientes',
+                'Consulta individual',
+                'Actualizar tratamiento',
+                'Valoración de ingreso',
+                'Revisión de laboratorios',
+            ],
+            descriptions: [
+                'Realizar visita a cada residente para evaluar estado general.',
+                'Revisar y actualizar expedientes médicos de residentes.',
+                'Consulta detallada con el residente: evaluación y ajuste de tratamiento.',
+                'Modificar dosis o medicamentos según evolución del paciente.',
+                'Realizar valoración médica completa a nuevo residente.',
+                'Interpretar resultados de laboratorio y actualizar diagnósticos.',
+            ],
+        },
     }
-    console.log('Tasks populated.')
+
+    const statuses = ['PENDING', 'PENDING', 'PENDING', 'IN_PROGRESS', 'COMPLETED']
+    const priorities = ['NORMAL', 'NORMAL', 'NORMAL', 'HIGH', 'URGENT']
+
+    for (const staffMember of allStaff) {
+        const roleTasks = roleTaskMap[staffMember.role]
+        if (!roleTasks) continue // Skip ADMIN and FAMILY — they don't have operational tasks
+
+        const taskCount = Math.min(roleTasks.titles.length, 5 + Math.floor(Math.random() * 3)) // 5-7 tasks
+
+        for (let i = 0; i < taskCount; i++) {
+            const randomPatient = createdResidents[Math.floor(Math.random() * createdResidents.length)]
+            const status = statuses[Math.floor(Math.random() * statuses.length)]
+            const priority = priorities[Math.floor(Math.random() * priorities.length)]
+
+            // Spread due dates across today and next 3 days
+            const dueDate = new Date()
+            dueDate.setDate(dueDate.getDate() + Math.floor(Math.random() * 4))
+            dueDate.setHours(7 + Math.floor(Math.random() * 12), Math.floor(Math.random() * 4) * 15, 0, 0)
+
+            await prisma.task.create({
+                data: {
+                    title: `${roleTasks.titles[i]} - ${randomPatient.name.split(' ')[0]}`,
+                    description: roleTasks.descriptions[i],
+                    priority,
+                    status,
+                    assignedToId: staffMember.id,
+                    patientId: randomPatient.id,
+                    dueDate,
+                },
+            })
+        }
+    }
+    console.log('Role-specific tasks populated.')
 
 
     // --- 5. LOGS (BITÁCORA HISTORY) ---

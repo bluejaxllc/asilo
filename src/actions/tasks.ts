@@ -13,8 +13,7 @@ export const getMyTasks = async (email: string) => {
 
         return await db.task.findMany({
             where: {
-                // Show all for now, or filter by user if strict assignment needed
-                // OR: assignedToId: user.id
+                assignedToId: user.id
             },
             include: {
                 patient: true
@@ -33,7 +32,10 @@ export const getAllTasks = async () => {
     // Patient data will be joined on the client side.
     return await db.task.findMany({
         include: {
-            patient: true
+            patient: true,
+            assignedTo: {
+                select: { name: true, role: true }
+            }
         },
         orderBy: {
             createdAt: 'desc'

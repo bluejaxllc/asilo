@@ -14,8 +14,43 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: ".blue_jax | Estancia para el Adulto Mayor",
-  description: "Sistema de gestión integral para el cuidado del adulto mayor.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://asilo.bluejax.ai"),
+  title: {
+    default: ".blue_jax | Estancia para el Adulto Mayor",
+    template: "%s | .blue_jax",
+  },
+  description:
+    "El sistema operativo para residencias de retiro. Centralice identidades, automatice el cumplimiento normativo y controle su operación.",
+  keywords: [
+    "asilo",
+    "residencia adulto mayor",
+    "gestión geriátrica",
+    "cuidado del adulto mayor",
+    "estancia para ancianos",
+    "software residencias",
+    "BlueJax",
+  ],
+  authors: [{ name: "BlueJax", url: "https://bluejax.ai" }],
+  creator: "BlueJax",
+  openGraph: {
+    title: ".blue_jax | Estancia para el Adulto Mayor",
+    description:
+      "El sistema operativo para residencias de retiro. Centralice identidades, automatice el cumplimiento normativo y controle su operación.",
+    type: "website",
+    locale: "es_MX",
+    siteName: ".blue_jax",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: ".blue_jax | Estancia para el Adulto Mayor",
+    description:
+      "El sistema operativo para residencias de retiro. Centralice identidades, automatice el cumplimiento normativo y controle su operación.",
+    creator: "@bluejax",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -24,7 +59,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
