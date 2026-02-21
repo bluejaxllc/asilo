@@ -16,11 +16,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://asilo.bluejax.ai"),
   title: {
-    default: ".blue_jax | Estancia para el Adulto Mayor",
-    template: "%s | .blue_jax",
+    default: "Asilo | Estancia para el Adulto Mayor",
+    template: "%s | Asilo",
   },
   description:
-    "El sistema operativo para residencias de retiro. Centralice identidades, automatice el cumplimiento normativo y controle su operación.",
+    "El sistema operativo para residencias de retiro. Centralice identidades, automatice el cumplimiento normativo y controle su operación. Por BlueJax.",
   keywords: [
     "asilo",
     "residencia adulto mayor",
@@ -33,18 +33,18 @@ export const metadata: Metadata = {
   authors: [{ name: "BlueJax", url: "https://bluejax.ai" }],
   creator: "BlueJax",
   openGraph: {
-    title: ".blue_jax | Estancia para el Adulto Mayor",
+    title: "Asilo | El Sistema Operativo para Residencias de Retiro",
     description:
-      "El sistema operativo para residencias de retiro. Centralice identidades, automatice el cumplimiento normativo y controle su operación.",
+      "Centralice identidades, automatice el cumplimiento normativo y controle su operación médica desde una única infraestructura. Por BlueJax.",
     type: "website",
     locale: "es_MX",
-    siteName: ".blue_jax",
+    siteName: "Asilo",
   },
   twitter: {
     card: "summary_large_image",
-    title: ".blue_jax | Estancia para el Adulto Mayor",
+    title: "Asilo | El Sistema Operativo para Residencias de Retiro",
     description:
-      "El sistema operativo para residencias de retiro. Centralice identidades, automatice el cumplimiento normativo y controle su operación.",
+      "Centralice identidades, automatice el cumplimiento normativo y controle su operación médica. Por BlueJax.",
     creator: "@bluejax",
   },
   robots: {
