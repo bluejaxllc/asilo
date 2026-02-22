@@ -47,6 +47,13 @@ export const metadata: Metadata = {
       "Centralice identidades, automatice el cumplimiento normativo y controle su operación médica. Por BlueJax.",
     creator: "@bluejax",
   },
+  icons: {
+    icon: [
+      { url: "/icon.png", type: "image/png" },
+      { url: "/favicon.ico", type: "image/x-icon" },
+    ],
+    apple: [{ url: "/apple-icon.png", type: "image/png" }],
+  },
   robots: {
     index: true,
     follow: true,
