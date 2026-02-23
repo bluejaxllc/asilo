@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
+import { requireRole } from "@/lib/role-guard";
 
 export const addMedication = async (data: {
     name: string;
@@ -11,6 +12,9 @@ export const addMedication = async (data: {
     unit: string;
     expiryDate?: string;
 }) => {
+    const check = await requireRole("ADMIN");
+    if ("error" in check) return { error: check.error };
+
     try {
         await db.medication.create({
             data: {
@@ -67,16 +71,16 @@ export const getAllMedications = async (query?: string) => {
 };
 
 export const logMedicationAdministration = async (patientId: string, medicationName: string, dosage: string) => {
+    const check = await requireRole("ADMIN", "DOCTOR", "NURSE", "STAFF");
+    if ("error" in check) return { error: check.error };
+    const session = check.session;
+
     try {
-        const session = await auth();
-        if (!session?.user?.id) {
-            return { error: "No autorizado — inicie sesión" };
-        }
 
         await db.dailyLog.create({
             data: {
                 patientId,
-                authorId: session.user.id,
+                authorId: session.user.id!,
                 type: "MEDS",
                 value: `Administró ${medicationName} (${dosage})`,
                 notes: `Dosis de ${dosage}`

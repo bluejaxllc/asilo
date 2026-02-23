@@ -4,8 +4,12 @@ import * as z from "zod";
 import { db } from "@/lib/db";
 import { PatientSchema } from "@/schemas";
 import { revalidatePath } from "next/cache";
+import { requireRole } from "@/lib/role-guard";
 
 export const createPatient = async (values: z.infer<typeof PatientSchema>) => {
+    const check = await requireRole("ADMIN");
+    if ("error" in check) return { error: check.error };
+
     const validatedFields = PatientSchema.safeParse(values);
 
     if (!validatedFields.success) {
@@ -104,6 +108,9 @@ export const updatePatient = async (
         dietaryNeeds?: string;
     }
 ) => {
+    const check = await requireRole("ADMIN", "DOCTOR", "NURSE");
+    if ("error" in check) return { error: check.error };
+
     try {
         await db.patient.update({
             where: { id },
@@ -141,9 +148,13 @@ export const getPatients = async (query?: string) => {
             orderBy: { name: 'asc' },
             include: {
                 logs: {
-                    where: { type: 'VITALS' },
                     orderBy: { createdAt: 'desc' },
-                    take: 1
+                    take: 5
+                },
+                medications: {
+                    include: {
+                        medication: true
+                    }
                 }
             }
         });

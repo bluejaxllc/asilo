@@ -3,13 +3,12 @@
 import { db } from "@/lib/db";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
+import { requireRole } from "@/lib/role-guard";
 
 export const addClinicalNote = async (patientId: string, content: string) => {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-        return { error: "No autorizado" };
-    }
+    const check = await requireRole("ADMIN", "DOCTOR", "NURSE");
+    if ("error" in check) return { error: check.error };
+    const session = check.session;
 
     if (!content || !content.trim()) {
         return { error: "El contenido de la nota no puede estar vacío" };
@@ -21,7 +20,7 @@ export const addClinicalNote = async (patientId: string, content: string) => {
                 type: "NOTE",
                 value: content, // Storing note content in 'value' as planned
                 patientId,
-                authorId: session.user.id
+                authorId: session.user.id!
             }
         });
 

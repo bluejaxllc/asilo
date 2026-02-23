@@ -29,6 +29,7 @@ const ROLE_CONFIG: Record<string, { label: string; icon: any; gradient: string }
 const ALL_NAV_ITEMS = [
     { href: "/staff", label: "Mis Tareas", icon: ClipboardList, color: "blue", roles: ["STAFF", "NURSE", "DOCTOR", "KITCHEN"] },
     { href: "/staff/patients", label: "Residentes", icon: Users, color: "blue", roles: ["STAFF", "NURSE", "DOCTOR"] },
+    { href: "/staff/vitals", label: "Vitales", icon: Activity, color: "pink", roles: ["NURSE", "DOCTOR"] },
     { href: "/staff/kitchen", label: "Cocina", icon: Utensils, color: "orange", roles: ["KITCHEN", "STAFF", "NURSE"] },
 ];
 
@@ -70,9 +71,13 @@ function StaffNavbar() {
                                 ? active
                                     ? "text-orange-400 bg-orange-500/10 border-orange-400/50"
                                     : "text-muted-foreground hover:text-orange-400 hover:bg-orange-500/5 border-transparent"
-                                : active
-                                    ? "text-blue-400 bg-blue-500/10 border-blue-400/50"
-                                    : "text-muted-foreground hover:text-blue-400 hover:bg-blue-500/5 border-transparent";
+                                : item.color === "pink"
+                                    ? active
+                                        ? "text-pink-400 bg-pink-500/10 border-pink-400/50"
+                                        : "text-muted-foreground hover:text-pink-400 hover:bg-pink-500/5 border-transparent"
+                                    : active
+                                        ? "text-blue-400 bg-blue-500/10 border-blue-400/50"
+                                        : "text-muted-foreground hover:text-blue-400 hover:bg-blue-500/5 border-transparent";
 
                             return (
                                 <Link key={item.href} href={item.href}>
@@ -93,9 +98,9 @@ function StaffNavbar() {
                                     {session.user.name}
                                 </span>
                                 <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${role === "DOCTOR" ? "bg-emerald-500/15 text-emerald-400" :
-                                        role === "NURSE" ? "bg-pink-500/15 text-pink-400" :
-                                            role === "KITCHEN" ? "bg-orange-500/15 text-orange-400" :
-                                                "bg-blue-500/15 text-blue-400"
+                                    role === "NURSE" ? "bg-pink-500/15 text-pink-400" :
+                                        role === "KITCHEN" ? "bg-orange-500/15 text-orange-400" :
+                                            "bg-blue-500/15 text-blue-400"
                                     }`}>
                                     {config.label}
                                 </span>

@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { SearchInput } from "@/components/ui/search-input";
 import { Utensils, AlertTriangle, Users, Salad, Sun, Sunset, Moon } from "lucide-react";
 import { FadeIn, SlideIn, ScaleIn, HoverScale } from "@/components/ui/motion-wrapper";
+import { MealLogButton } from "@/components/kitchen/meal-log-button";
 
 export const dynamic = 'force-dynamic';
 
@@ -156,9 +157,12 @@ export default async function KitchenPage({ searchParams }: KitchenPageProps) {
                                                 <CardTitle className="text-xl font-bold text-foreground">{p.name}</CardTitle>
                                                 <p className="text-sm font-mono text-muted-foreground mt-0.5">Hab. {p.room}</p>
                                             </div>
-                                            <Badge variant="outline" className="bg-card/[0.02] text-muted-foreground border-border text-xs">
-                                                {p.status}
-                                            </Badge>
+                                            <div className="flex items-center gap-2">
+                                                <MealLogButton patientId={p.id} patientName={p.name} />
+                                                <Badge variant="outline" className="bg-card/[0.02] text-muted-foreground border-border text-xs">
+                                                    {p.status}
+                                                </Badge>
+                                            </div>
                                         </div>
                                     </CardHeader>
                                     <CardContent className="space-y-3 pt-0">
