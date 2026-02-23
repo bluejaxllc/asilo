@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
     const baseUrl =
-        process.env.NEXT_PUBLIC_APP_URL || "https://app.bluejax.ai";
+        process.env.NEXT_PUBLIC_APP_URL || "https://retiro.bluejax.ai";
 
     return {
         rules: [

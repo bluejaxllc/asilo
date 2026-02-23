@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://app.bluejax.ai"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://retiro.bluejax.ai"),
   title: {
     default: "Retiro | Estancia para el Adulto Mayor",
     template: "%s | Retiro",

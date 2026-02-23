@@ -23,6 +23,10 @@ import {
   CheckCircle2,
   CircleDot,
   ChevronRight,
+  Stethoscope,
+  ClipboardList,
+  Heart,
+  UtensilsCrossed,
 } from "lucide-react"
 
 /* ════════════════════════════════════════
@@ -823,6 +827,72 @@ export default function Home() {
                 </div>
               </RevealSection>
             </div>
+          </div>
+        </section>
+
+        {/* ═══════════ ROLE SELECTOR ═══════════ */}
+        <section className="py-24 border-b border-border relative overflow-hidden bg-background">
+          <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.02, 0.05, 0.02] }}
+            transition={{ duration: 12, repeat: Infinity }}
+            className="absolute bottom-0 left-1/3 w-[500px] h-[500px] bg-indigo-600 rounded-full blur-[200px] -z-10" />
+
+          <div className="max-w-7xl mx-auto px-6">
+            <RevealSection className="text-center mb-14">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-background border border-border text-muted-foreground text-xs font-mono uppercase tracking-widest mb-4">
+                <KeyRound className="h-3 w-3 text-blue-500" /> acceso por rol
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Ingrese según su{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">perfil</span>
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Cada rol tiene su propio portal con acceso personalizado. Seleccione su tipo de acceso para continuar.
+              </p>
+            </RevealSection>
+
+            <StaggerContainer className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {[
+                { role: "admin", icon: ShieldCheck, title: "Administrador", desc: "Control total del sistema", gradient: "from-blue-600 to-indigo-600", border: "border-blue-500/20 hover:border-blue-500/50", iconBg: "bg-blue-500/15", iconColor: "text-blue-400", shadow: "hover:shadow-blue-500/20" },
+                { role: "doctor", icon: Stethoscope, title: "Médico", desc: "Expedientes y diagnósticos", gradient: "from-emerald-600 to-green-600", border: "border-emerald-500/20 hover:border-emerald-500/50", iconBg: "bg-emerald-500/15", iconColor: "text-emerald-400", shadow: "hover:shadow-emerald-500/20" },
+                { role: "nurse", icon: Users, title: "Enfermería", desc: "Medicamentos y signos vitales", gradient: "from-pink-600 to-rose-600", border: "border-pink-500/20 hover:border-pink-500/50", iconBg: "bg-pink-500/15", iconColor: "text-pink-400", shadow: "hover:shadow-pink-500/20" },
+                { role: "staff", icon: ClipboardList, title: "Personal", desc: "Tareas y asistencia diaria", gradient: "from-teal-600 to-cyan-600", border: "border-teal-500/20 hover:border-teal-500/50", iconBg: "bg-teal-500/15", iconColor: "text-teal-400", shadow: "hover:shadow-teal-500/20" },
+                { role: "kitchen", icon: UtensilsCrossed, title: "Cocina", desc: "Menús y dietas especiales", gradient: "from-yellow-600 to-orange-500", border: "border-yellow-500/20 hover:border-yellow-500/50", iconBg: "bg-yellow-500/15", iconColor: "text-yellow-400", shadow: "hover:shadow-yellow-500/20" },
+                { role: "family", icon: Heart, title: "Familiar", desc: "Seguimiento de su ser querido", gradient: "from-orange-500 to-amber-500", border: "border-orange-500/20 hover:border-orange-500/50", iconBg: "bg-orange-500/15", iconColor: "text-orange-400", shadow: "hover:shadow-orange-500/20" },
+              ].map((r) => (
+                <StaggerItem key={r.role}>
+                  <Link href={`/auth/login?role=${r.role}`}>
+                    <motion.div
+                      whileHover={{ scale: 1.04, y: -6 }}
+                      whileTap={{ scale: 0.97 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      className={`relative bg-card border ${r.border} rounded-xl p-5 cursor-pointer group glow-border hover:shadow-xl ${r.shadow} transition-all duration-300`}
+                    >
+                      {/* Gradient accent line */}
+                      <div className={`absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r ${r.gradient} opacity-0 group-hover:opacity-100 transition-opacity rounded-t-xl`} />
+
+                      <div className="flex items-start gap-4">
+                        <div className={`h-12 w-12 rounded-xl ${r.iconBg} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}>
+                          <r.icon className={`h-6 w-6 ${r.iconColor}`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-bold text-white mb-0.5 group-hover:text-white transition-colors">{r.title}</div>
+                          <div className="text-xs text-muted-foreground">{r.desc}</div>
+                        </div>
+                        <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
+                      </div>
+                    </motion.div>
+                  </Link>
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
+
+            <RevealSection delay={0.4} className="text-center mt-8">
+              <Link href="/auth/login">
+                <Button variant="ghost" className="text-muted-foreground hover:text-white text-sm">
+                  O inicie sesión con su correo directamente →
+                </Button>
+              </Link>
+            </RevealSection>
           </div>
         </section>
 
