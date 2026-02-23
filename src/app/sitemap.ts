@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
     const baseUrl =
-        process.env.NEXT_PUBLIC_APP_URL || "https://asilo.bluejax.ai";
+        process.env.NEXT_PUBLIC_APP_URL || "https://app.bluejax.ai";
 
     return [
         {

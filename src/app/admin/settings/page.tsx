@@ -123,7 +123,7 @@ export default function SettingsPage() {
                                         <Building2 className="h-5 w-5 text-blue-400" />
                                     </div>
                                     <div>
-                                        <CardTitle className="text-lg">Información del Asilo</CardTitle>
+                                        <CardTitle className="text-lg">Información del Retiro</CardTitle>
                                         <CardDescription>
                                             Datos visibles en reportes y encabezados del sistema.
                                         </CardDescription>
