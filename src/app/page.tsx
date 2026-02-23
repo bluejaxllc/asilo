@@ -383,7 +383,7 @@ function HeroButtons() {
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col bg-sidebar text-white overflow-x-hidden" style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
+    <div className="dark flex min-h-screen flex-col bg-sidebar text-white overflow-x-hidden" style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
 
       <style jsx global>{`
         @keyframes grid-fade { 0%, 100% { opacity: 0.03; } 50% { opacity: 0.08; } }
