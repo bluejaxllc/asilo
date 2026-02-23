@@ -33,11 +33,11 @@ export async function GET(request: Request) {
             if (attendance) {
                 if (!attendance.checkOut) {
                     status = "Activo";
-                    statusColor = "bg-green-500/15 text-emerald-300";
+                    statusColor = "bg-green-500/15 text-emerald-700 dark:text-emerald-300";
                     lastActive = "Entrada: " + formatDistanceToNow(attendance.checkIn, { addSuffix: true, locale: es });
                 } else {
                     status = "Turno Finalizado";
-                    statusColor = "bg-blue-500/15 text-blue-300";
+                    statusColor = "bg-blue-500/15 text-blue-700 dark:text-blue-300";
                     lastActive = "Salida: " + formatDistanceToNow(attendance.checkOut, { addSuffix: true, locale: es });
                 }
             }

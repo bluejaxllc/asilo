@@ -31,9 +31,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const roleColors: Record<string, string> = {
-    ADMIN: "bg-violet-500/15 text-violet-400 border-violet-500/20",
-    STAFF: "bg-blue-500/15 text-blue-400 border-blue-500/20",
-    FAMILY: "bg-amber-500/15 text-amber-400 border-amber-500/20",
+    ADMIN: "bg-violet-500/15 text-violet-600 dark:text-violet-400 border-violet-500/20",
+    STAFF: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/20",
+    FAMILY: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/20",
 };
 
 export default function StaffPage() {
@@ -249,7 +249,7 @@ function StaffPageContent() {
                                 </TableCell>
                                 <TableCell className="text-muted-foreground text-sm">{staff.lastActive}</TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="ghost" size="sm" onClick={() => handleViewHistory(staff)} className="gap-1.5 text-xs hover:text-blue-400 hover:bg-blue-500/10">
+                                    <Button variant="ghost" size="sm" onClick={() => handleViewHistory(staff)} className="gap-1.5 text-xs hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-500/10">
                                         <Clock className="h-3.5 w-3.5" /> Historial
                                     </Button>
                                 </TableCell>

@@ -46,9 +46,9 @@ import {
 import { toast } from "sonner";
 
 const TYPE_CONFIG: Record<string, { label: string; icon: any; color: string; bg: string; activeBg: string; dot: string }> = {
-    INFO: { label: "Información", icon: Info, color: "text-blue-400", bg: "bg-blue-500/10", activeBg: "bg-blue-600 text-white", dot: "bg-blue-500/100" },
-    WARNING: { label: "Advertencia", icon: AlertTriangle, color: "text-amber-400", bg: "bg-amber-500/10", activeBg: "bg-amber-500/100 text-white", dot: "bg-amber-500/100" },
-    CRITICAL: { label: "Crítico", icon: AlertCircle, color: "text-red-400", bg: "bg-red-500/10", activeBg: "bg-red-600 text-white", dot: "bg-red-500/100" },
+    INFO: { label: "Información", icon: Info, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-500/10", activeBg: "bg-blue-600 text-white", dot: "bg-blue-500/100" },
+    WARNING: { label: "Advertencia", icon: AlertTriangle, color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-500/10", activeBg: "bg-amber-500/100 text-white", dot: "bg-amber-500/100" },
+    CRITICAL: { label: "Crítico", icon: AlertCircle, color: "text-red-600 dark:text-red-400", bg: "bg-red-500/10", activeBg: "bg-red-600 text-white", dot: "bg-red-500/100" },
 };
 
 export default function NotificationsPage() {
@@ -185,7 +185,7 @@ export default function NotificationsPage() {
                                     </Select>
                                 </div>
                                 <div className="space-y-2 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                                    <p className="text-xs font-medium text-blue-400 flex items-center gap-1">
+                                    <p className="text-xs font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1">
                                         <UserCircle className="h-3 w-3" /> Destinatario
                                     </p>
                                     <Select value={newRecipientRole} onValueChange={setNewRecipientRole}>
@@ -358,7 +358,7 @@ export default function NotificationsPage() {
                                                         })}
                                                     </p>
                                                     {(n.recipientRole || n.recipientName) && (
-                                                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-blue-500/20 bg-blue-500/10 text-blue-400 gap-1">
+                                                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-400 gap-1">
                                                             <UserCircle className="h-2.5 w-2.5" />
                                                             {n.recipientName || n.recipientRole}
                                                         </Badge>

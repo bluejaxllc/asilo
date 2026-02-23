@@ -124,7 +124,7 @@ export const StaffForm = ({ onSuccess }: StaffFormProps) => {
 
             {formData.role === "FAMILY" && (
                 <div className="space-y-2 p-3 bg-orange-500/10 rounded-lg border border-orange-500/20">
-                    <p className="text-xs font-medium text-orange-400 flex items-center gap-1">
+                    <p className="text-xs font-medium text-orange-600 dark:text-orange-400 flex items-center gap-1">
                         <Heart className="h-3 w-3" /> Vincular con Residente
                     </p>
                     <Select
