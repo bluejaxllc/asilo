@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { motion, useInView, useMotionValue, useTransform, animate } from "framer-motion"
+import { motion, useInView, useMotionValue, useTransform, animate, AnimatePresence } from "framer-motion"
 import { useRef, useEffect, useState } from "react"
 import {
   ShieldCheck,
@@ -23,6 +23,8 @@ import {
   CheckCircle2,
   CircleDot,
   ChevronRight,
+  ChevronDown,
+  ExternalLink,
   Stethoscope,
   ClipboardList,
   Heart,
@@ -304,6 +306,78 @@ function TerminalResultLine({ text, delay = 0 }: { text: string; delay?: number 
 }
 
 /* ════════════════════════════════════════
+   HERO BUTTONS WITH FAN-OUT
+   ════════════════════════════════════════ */
+
+const ROLE_BUTTONS = [
+  { role: "admin", label: "Administrador", icon: ShieldCheck, color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20 hover:border-blue-500/40" },
+  { role: "doctor", label: "Médico", icon: Stethoscope, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20 hover:border-emerald-500/40" },
+  { role: "nurse", label: "Enfermería", icon: Heart, color: "text-pink-400", bg: "bg-pink-500/10", border: "border-pink-500/20 hover:border-pink-500/40" },
+  { role: "staff", label: "Personal", icon: ClipboardList, color: "text-teal-400", bg: "bg-teal-500/10", border: "border-teal-500/20 hover:border-teal-500/40" },
+  { role: "kitchen", label: "Cocina", icon: UtensilsCrossed, color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/20 hover:border-yellow-500/40" },
+  { role: "family", label: "Familiar", icon: Users, color: "text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/20 hover:border-orange-500/40" },
+]
+
+function HeroButtons() {
+  const [expanded, setExpanded] = useState(false)
+  return (
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.7 }}
+      className="space-y-3">
+      <div className="flex flex-col sm:flex-row gap-3">
+        <a href="https://www.bluejax.ai/retiro" target="_blank" rel="noopener noreferrer">
+          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+            <Button size="lg" className="h-12 px-6 bg-blue-600 hover:bg-blue-500/100 text-white rounded-lg font-semibold text-sm border border-blue-500/50 shadow-lg shadow-blue-600/20 transition-all hover:shadow-blue-500/40 w-full sm:w-auto">
+              Solicitar Certificación <ExternalLink className="ml-2 h-4 w-4" />
+            </Button>
+          </motion.div>
+        </a>
+        <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+          <Button size="lg" variant="ghost" onClick={() => setExpanded(!expanded)}
+            className="h-12 px-6 rounded-lg text-sm text-muted-foreground border border-border/60 bg-transparent hover:border-zinc-500 hover:text-white hover:bg-card/5 w-full sm:w-auto">
+            Acceso Personal Activo
+            <motion.span animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.3 }} className="ml-2">
+              <ChevronDown className="h-4 w-4" />
+            </motion.span>
+          </Button>
+        </motion.div>
+      </div>
+
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ opacity: 0, height: 0, y: -10 }}
+            animate={{ opacity: 1, height: "auto", y: 0 }}
+            exit={{ opacity: 0, height: 0, y: -10 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+              {ROLE_BUTTONS.map((r, i) => (
+                <motion.div key={r.role}
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ delay: i * 0.06, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <Link href={`/auth/login?role=${r.role}`}>
+                    <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg border ${r.border} bg-card/60 backdrop-blur-sm cursor-pointer transition-all duration-200 hover:bg-card group`}>
+                      <div className={`h-8 w-8 rounded-md ${r.bg} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                        <r.icon className={`h-4 w-4 ${r.color}`} />
+                      </div>
+                      <span className="text-xs font-semibold text-white">{r.label}</span>
+                      <ArrowRight className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity ml-auto" />
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  )
+}
+
+/* ════════════════════════════════════════
    MAIN PAGE
    ════════════════════════════════════════ */
 
@@ -395,21 +469,7 @@ export default function Home() {
                   Centralice identidades, automatice el cumplimiento normativo y controle su operación médica desde una única infraestructura.
                 </motion.p>
 
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.7 }}
-                  className="flex flex-col sm:flex-row gap-3">
-                  <Link href="/auth/login?role=admin">
-                    <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                      <Button size="lg" className="h-12 px-6 bg-blue-600 hover:bg-blue-500/100 text-white rounded-lg font-semibold text-sm border border-blue-500/50 shadow-lg shadow-blue-600/20 transition-all hover:shadow-blue-500/40 w-full sm:w-auto">
-                        Solicitar Certificación <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </motion.div>
-                  </Link>
-                  <Link href="/auth/login">
-                    <Button size="lg" variant="ghost" className="h-12 px-6 rounded-lg text-sm text-muted-foreground border border-border/60 bg-transparent hover:border-zinc-500 hover:text-white hover:bg-card/5 w-full sm:w-auto">
-                      Acceso Personal Activo
-                    </Button>
-                  </Link>
-                </motion.div>
+                <HeroButtons />
               </div>
 
               {/* ───── Dashboard with BOOT SEQUENCE ───── */}
@@ -831,7 +891,7 @@ export default function Home() {
         </section>
 
         {/* ═══════════ ROLE SELECTOR ═══════════ */}
-        <section className="py-24 border-b border-border relative overflow-hidden bg-background">
+        <section id="role-selector" className="py-24 border-b border-border relative overflow-hidden bg-background">
           <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.02, 0.05, 0.02] }}
             transition={{ duration: 12, repeat: Infinity }}
             className="absolute bottom-0 left-1/3 w-[500px] h-[500px] bg-indigo-600 rounded-full blur-[200px] -z-10" />
@@ -917,16 +977,16 @@ export default function Home() {
             <motion.div className="flex flex-col sm:flex-row gap-4 justify-center"
               initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }} transition={{ delay: 0.3, duration: 0.6 }}>
-              <Link href="/auth/login?role=admin">
+              <a href="https://www.bluejax.ai/retiro" target="_blank" rel="noopener noreferrer">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button size="lg" className="h-13 px-8 text-sm font-semibold bg-blue-600 hover:bg-blue-500/100 text-white rounded-lg border border-blue-500/50 shadow-lg shadow-blue-600/25 transition-all hover:shadow-blue-500/40">
-                    Iniciar Fase de Descubrimiento <ArrowRight className="ml-2 h-4 w-4" />
+                    Solicitar Certificación <ExternalLink className="ml-2 h-4 w-4" />
                   </Button>
                 </motion.div>
-              </Link>
-              <Link href="/auth/login">
+              </a>
+              <Link href="/#role-selector">
                 <Button size="lg" variant="ghost" className="h-13 px-8 text-sm rounded-lg text-muted-foreground border border-border/60 bg-transparent hover:border-zinc-500 hover:text-white hover:bg-card/5">
-                  Acceso Personal Activo
+                  Acceso Personal Activo ↑
                 </Button>
               </Link>
             </motion.div>
