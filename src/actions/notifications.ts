@@ -55,9 +55,17 @@ export async function deleteNotification(id: string) {
 export async function createNotification(
     title: string,
     message: string,
-    type: string = "INFO"
+    type: string = "INFO",
+    recipientRole?: string,
+    recipientName?: string
 ) {
     return db.notification.create({
-        data: { title, message, type },
+        data: {
+            title,
+            message,
+            type,
+            ...(recipientRole && recipientRole !== "ALL" ? { recipientRole } : {}),
+            ...(recipientName ? { recipientName } : {}),
+        },
     });
 }

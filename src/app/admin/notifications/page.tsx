@@ -15,6 +15,7 @@ import {
     Loader2,
     BellOff,
     Plus,
+    UserCircle,
 } from "lucide-react";
 import {
     Dialog,
@@ -59,6 +60,8 @@ export default function NotificationsPage() {
     const [newTitle, setNewTitle] = useState("");
     const [newMessage, setNewMessage] = useState("");
     const [newType, setNewType] = useState("INFO");
+    const [newRecipientRole, setNewRecipientRole] = useState("ALL");
+    const [newRecipientName, setNewRecipientName] = useState("");
 
     const fetchData = async () => {
         setLoading(true);
@@ -98,12 +101,20 @@ export default function NotificationsPage() {
             toast.error("Complete todos los campos");
             return;
         }
-        await createNotification(newTitle, newMessage, newType);
+        await createNotification(
+            newTitle,
+            newMessage,
+            newType,
+            newRecipientRole !== "ALL" ? newRecipientRole : undefined,
+            newRecipientName.trim() || undefined
+        );
         toast.success("Notificación creada");
         setCreateOpen(false);
         setNewTitle("");
         setNewMessage("");
         setNewType("INFO");
+        setNewRecipientRole("ALL");
+        setNewRecipientName("");
         fetchData();
     };
 
@@ -172,6 +183,31 @@ export default function NotificationsPage() {
                                             <SelectItem value="CRITICAL">🚨 Crítico</SelectItem>
                                         </SelectContent>
                                     </Select>
+                                </div>
+                                <div className="space-y-2 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                                    <p className="text-xs font-medium text-blue-400 flex items-center gap-1">
+                                        <UserCircle className="h-3 w-3" /> Destinatario
+                                    </p>
+                                    <Select value={newRecipientRole} onValueChange={setNewRecipientRole}>
+                                        <SelectTrigger className="bg-card">
+                                            <SelectValue placeholder="¿A quién va dirigida?" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="ALL">Todos</SelectItem>
+                                            <SelectItem value="ADMIN">Administrador</SelectItem>
+                                            <SelectItem value="DOCTOR">Doctor/a</SelectItem>
+                                            <SelectItem value="STAFF">Cuidador/a</SelectItem>
+                                            <SelectItem value="NURSE">Enfermero/a</SelectItem>
+                                            <SelectItem value="KITCHEN">Cocina</SelectItem>
+                                            <SelectItem value="FAMILY">Familiar</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <Input
+                                        placeholder="Nombre específico (opcional)"
+                                        value={newRecipientName}
+                                        onChange={(e) => setNewRecipientName(e.target.value)}
+                                        className="bg-card"
+                                    />
                                 </div>
                                 <div className="flex justify-end gap-2 pt-2">
                                     <Button variant="outline" onClick={() => setCreateOpen(false)}>Cancelar</Button>
@@ -312,14 +348,22 @@ export default function NotificationsPage() {
                                                     )}
                                                 </div>
                                                 <p className="text-xs text-muted-foreground line-clamp-2">{n.message}</p>
-                                                <p className="text-[10px] text-muted-foreground mt-1.5">
-                                                    {new Date(n.createdAt).toLocaleString("es-MX", {
-                                                        day: "numeric",
-                                                        month: "short",
-                                                        hour: "2-digit",
-                                                        minute: "2-digit",
-                                                    })}
-                                                </p>
+                                                <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                                                    <p className="text-[10px] text-muted-foreground">
+                                                        {new Date(n.createdAt).toLocaleString("es-MX", {
+                                                            day: "numeric",
+                                                            month: "short",
+                                                            hour: "2-digit",
+                                                            minute: "2-digit",
+                                                        })}
+                                                    </p>
+                                                    {(n.recipientRole || n.recipientName) && (
+                                                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-blue-500/20 bg-blue-500/10 text-blue-400 gap-1">
+                                                            <UserCircle className="h-2.5 w-2.5" />
+                                                            {n.recipientName || n.recipientRole}
+                                                        </Badge>
+                                                    )}
+                                                </div>
                                             </div>
                                             <div className="flex items-center gap-1 flex-shrink-0">
                                                 {!n.read && (

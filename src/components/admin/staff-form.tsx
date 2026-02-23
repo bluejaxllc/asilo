@@ -6,20 +6,30 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner";
 import { getPatients } from "@/actions/patients";
-import { Heart } from "lucide-react";
+import { Heart, RefreshCw, Eye, EyeOff } from "lucide-react";
 
 interface StaffFormProps {
     onSuccess?: () => void;
 }
 
+function generatePassword(length = 8): string {
+    const chars = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+}
+
 export const StaffForm = ({ onSuccess }: StaffFormProps) => {
     const [loading, setLoading] = useState(false);
     const [patients, setPatients] = useState<any[]>([]);
+    const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         role: "",
-        password: "123456", // Default password
+        password: "",
         patientId: ""
     });
 
@@ -35,6 +45,11 @@ export const StaffForm = ({ onSuccess }: StaffFormProps) => {
 
         if (!formData.name || !formData.email || !formData.role) {
             toast.error("Por favor complete todos los campos");
+            return;
+        }
+
+        if (!formData.password || formData.password.length < 6) {
+            toast.error("La contraseña debe tener al menos 6 caracteres");
             return;
         }
 
@@ -60,7 +75,7 @@ export const StaffForm = ({ onSuccess }: StaffFormProps) => {
                     ? "Familiar registrado exitosamente"
                     : "Personal registrado exitosamente"
                 );
-                setFormData({ name: "", email: "", role: "", password: "123456", patientId: "" });
+                setFormData({ name: "", email: "", role: "", password: "", patientId: "" });
                 onSuccess?.();
             } else {
                 toast.error(data.error || "Error al registrar");
@@ -94,6 +109,7 @@ export const StaffForm = ({ onSuccess }: StaffFormProps) => {
                     <SelectValue placeholder="Seleccionar Rol" />
                 </SelectTrigger>
                 <SelectContent>
+                    <SelectItem value="ADMIN">Administrador</SelectItem>
                     <SelectItem value="DOCTOR">Doctor/a</SelectItem>
                     <SelectItem value="STAFF">Cuidador/a</SelectItem>
                     <SelectItem value="NURSE">Enfermero/a</SelectItem>
@@ -129,9 +145,46 @@ export const StaffForm = ({ onSuccess }: StaffFormProps) => {
                 </div>
             )}
 
-            <p className="text-sm text-muted-foreground">
-                Contraseña por defecto: <code className="bg-muted/60 px-2 py-1 rounded">123456</code>
-            </p>
+            <div className="space-y-1.5">
+                <label className="text-sm font-medium">Contraseña</label>
+                <div className="flex gap-2">
+                    <div className="relative flex-1">
+                        <Input
+                            placeholder="Mínimo 6 caracteres"
+                            type={showPassword ? "text" : "password"}
+                            value={formData.password}
+                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            className="pr-10"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                    </div>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => {
+                            const pwd = generatePassword();
+                            setFormData({ ...formData, password: pwd });
+                            setShowPassword(true);
+                            toast.info(`Contraseña generada: ${pwd}`, { duration: 8000 });
+                        }}
+                        title="Generar contraseña aleatoria"
+                        className="flex-shrink-0"
+                    >
+                        <RefreshCw className="h-4 w-4" />
+                    </Button>
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                    Escriba una contraseña o presione el botón para generar una aleatoria.
+                </p>
+            </div>
+
             <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Registrando..." : formData.role === "FAMILY" ? "Registrar Familiar" : "Registrar Personal"}
             </Button>

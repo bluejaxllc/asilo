@@ -137,6 +137,9 @@ model Notification {
   type      String   // INFO, WARNING, CRITICAL
   read      Boolean  @default(false)
   
+  recipientRole String?  // Target role: ADMIN, STAFF, DOCTOR, NURSE, KITCHEN, FAMILY, or null for ALL
+  recipientName String?  // Optional specific person name
+  
   createdAt DateTime @default(now())
 }
 
