@@ -35,6 +35,7 @@ import { getMessages } from "@/actions/family-messages";
 import { redirect } from "next/navigation";
 import { AssignMedicationDialog } from "@/components/patients/assign-medication-dialog";
 import { AdministerMedButton } from "@/components/patients/administer-med-button";
+import { EditPatientDialog } from "@/components/patients/edit-patient-dialog";
 import { cn } from "@/lib/utils";
 
 const logTypeConfig: Record<string, { label: string; icon: any; color: string; bg: string }> = {
@@ -109,9 +110,20 @@ export default async function PatientDetailsPage({ params }: { params: Promise<{
                         </div>
                     </div>
 
-                    <Button variant="secondary" className="bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-sm">
-                        <AlertTriangle className="mr-2 h-4 w-4" /> Reportar Incidente
-                    </Button>
+                    <div className="flex gap-2">
+                        <EditPatientDialog patient={{
+                            id: patient.id,
+                            name: patient.name,
+                            room: patient.room,
+                            status: patient.status,
+                            age: patient.age,
+                            medicalHistory: patient.medicalHistory,
+                            dietaryNeeds: patient.dietaryNeeds,
+                        }} />
+                        <Button variant="secondary" className="bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-sm">
+                            <AlertTriangle className="mr-2 h-4 w-4" /> Reportar Incidente
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Quick Stats */}

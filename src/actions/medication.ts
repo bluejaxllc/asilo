@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
 
 export const addMedication = async (data: {
     name: string;
@@ -67,10 +68,15 @@ export const getAllMedications = async (query?: string) => {
 
 export const logMedicationAdministration = async (patientId: string, medicationName: string, dosage: string) => {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return { error: "No autorizado — inicie sesión" };
+        }
+
         await db.dailyLog.create({
             data: {
                 patientId,
-                authorId: "staff-id-placeholder", // Ideally this comes from session
+                authorId: session.user.id,
                 type: "MEDS",
                 value: `Administró ${medicationName} (${dosage})`,
                 notes: `Dosis de ${dosage}`

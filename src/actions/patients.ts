@@ -93,6 +93,40 @@ export const getPatientById = async (id: string) => {
     }
 };
 
+export const updatePatient = async (
+    id: string,
+    data: {
+        name?: string;
+        room?: string;
+        status?: string;
+        age?: number;
+        medicalHistory?: string;
+        dietaryNeeds?: string;
+    }
+) => {
+    try {
+        await db.patient.update({
+            where: { id },
+            data: {
+                ...(data.name !== undefined && { name: data.name }),
+                ...(data.room !== undefined && { room: data.room }),
+                ...(data.status !== undefined && { status: data.status }),
+                ...(data.age !== undefined && { age: data.age }),
+                ...(data.medicalHistory !== undefined && { medicalHistory: data.medicalHistory }),
+                ...(data.dietaryNeeds !== undefined && { dietaryNeeds: data.dietaryNeeds }),
+            }
+        });
+
+        revalidatePath(`/admin/patients/${id}`);
+        revalidatePath("/admin/patients");
+        revalidatePath("/staff/patients");
+        return { success: "Residente actualizado exitosamente" };
+    } catch (error) {
+        console.error("Error updating patient:", error);
+        return { error: "Error al actualizar residente" };
+    }
+};
+
 export const getPatients = async (query?: string) => {
     try {
         const whereClause = query ? {
