@@ -324,7 +324,7 @@ function HeroButtons() {
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.7 }}
       className="space-y-3">
       <div className="flex flex-col sm:flex-row gap-3">
-        <a href="https://www.bluejax.ai/contact" target="_blank" rel="noopener noreferrer">
+        <a href="https://bluejax.ai/a2p" target="_blank" rel="noopener noreferrer">
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
             <Button size="lg" className="h-12 px-6 bg-blue-600 hover:bg-blue-500/100 text-white rounded-lg font-semibold text-sm border border-blue-500/50 shadow-lg shadow-blue-600/20 transition-all hover:shadow-blue-500/40 w-full sm:w-auto">
               Solicitar Certificación <ExternalLink className="ml-2 h-4 w-4" />
@@ -977,7 +977,7 @@ export default function Home() {
             <motion.div className="flex flex-col sm:flex-row gap-4 justify-center"
               initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }} transition={{ delay: 0.3, duration: 0.6 }}>
-              <a href="https://www.bluejax.ai/contact" target="_blank" rel="noopener noreferrer">
+              <a href="https://bluejax.ai/a2p" target="_blank" rel="noopener noreferrer">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button size="lg" className="h-13 px-8 text-sm font-semibold bg-blue-600 hover:bg-blue-500/100 text-white rounded-lg border border-blue-500/50 shadow-lg shadow-blue-600/25 transition-all hover:shadow-blue-500/40">
                     Solicitar Certificación <ExternalLink className="ml-2 h-4 w-4" />
