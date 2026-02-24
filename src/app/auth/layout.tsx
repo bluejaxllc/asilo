@@ -50,14 +50,14 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
     const orbs = backgroundOrbs[role] || defaultOrbs;
 
     return (
-        <div className="dark min-h-screen flex items-center justify-center relative overflow-hidden bg-background">
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background">
             {/* Animated gradient orbs — color changes per role */}
             <div className={`absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full ${orbs.orb1} blur-[120px] animate-pulse`} style={{ animationDuration: "8s" }} />
             <div className={`absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full ${orbs.orb2} blur-[120px] animate-pulse`} style={{ animationDuration: "10s" }} />
             <div className={`absolute top-[30%] right-[20%] w-[30%] h-[30%] rounded-full ${orbs.orb3} blur-[100px] animate-pulse`} style={{ animationDuration: "12s" }} />
 
             {/* Subtle grid pattern */}
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
+            <div className="absolute inset-0 bg-[linear-gradient(hsl(var(--border)/0.3)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--border)/0.3)_1px,transparent_1px)] bg-[size:64px_64px]" />
 
             <div className="relative z-10 w-full px-4">
                 {children}
@@ -75,7 +75,7 @@ const AuthLayout = ({
         <SessionProvider>
             <Suspense fallback={
                 <div className="min-h-screen flex items-center justify-center bg-background">
-                    <div className="text-white/50 animate-pulse">Cargando...</div>
+                    <div className="text-muted-foreground animate-pulse">Cargando...</div>
                 </div>
             }>
                 <AuthLayoutInner>{children}</AuthLayoutInner>

@@ -310,12 +310,12 @@ function TerminalResultLine({ text, delay = 0 }: { text: string; delay?: number 
    ════════════════════════════════════════ */
 
 const ROLE_BUTTONS = [
-  { role: "admin", label: "Administrador", icon: ShieldCheck, color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20 hover:border-blue-500/40" },
-  { role: "doctor", label: "Médico", icon: Stethoscope, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20 hover:border-emerald-500/40" },
-  { role: "nurse", label: "Enfermería", icon: Heart, color: "text-pink-400", bg: "bg-pink-500/10", border: "border-pink-500/20 hover:border-pink-500/40" },
-  { role: "staff", label: "Personal", icon: ClipboardList, color: "text-teal-400", bg: "bg-teal-500/10", border: "border-teal-500/20 hover:border-teal-500/40" },
-  { role: "kitchen", label: "Cocina", icon: UtensilsCrossed, color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/20 hover:border-yellow-500/40" },
-  { role: "family", label: "Familiar", icon: Users, color: "text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/20 hover:border-orange-500/40" },
+  { role: "admin", label: "Administrador", icon: ShieldCheck, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20 hover:border-blue-500/40" },
+  { role: "doctor", label: "Médico", icon: Stethoscope, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20 hover:border-emerald-500/40" },
+  { role: "nurse", label: "Enfermería", icon: Heart, color: "text-pink-600 dark:text-pink-400", bg: "bg-pink-500/10", border: "border-pink-500/20 hover:border-pink-500/40" },
+  { role: "staff", label: "Personal", icon: ClipboardList, color: "text-teal-600 dark:text-teal-400", bg: "bg-teal-500/10", border: "border-teal-500/20 hover:border-teal-500/40" },
+  { role: "kitchen", label: "Cocina", icon: UtensilsCrossed, color: "text-yellow-600 dark:text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/20 hover:border-yellow-500/40" },
+  { role: "family", label: "Familiar", icon: Users, color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/20 hover:border-orange-500/40" },
 ]
 
 function HeroButtons() {
@@ -333,7 +333,7 @@ function HeroButtons() {
         </a>
         <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
           <Button size="lg" variant="ghost" onClick={() => setExpanded(!expanded)}
-            className="h-12 px-6 rounded-lg text-sm text-muted-foreground border border-border/60 bg-transparent hover:border-zinc-500 hover:text-white hover:bg-card/5 w-full sm:w-auto">
+            className="h-12 px-6 rounded-lg text-sm text-muted-foreground border border-border/60 bg-transparent hover:border-zinc-500 hover:text-foreground hover:bg-card/5 w-full sm:w-auto">
             Acceso Personal Activo
             <motion.span animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.3 }} className="ml-2">
               <ChevronDown className="h-4 w-4" />
@@ -363,7 +363,7 @@ function HeroButtons() {
                       <div className={`h-8 w-8 rounded-md ${r.bg} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
                         <r.icon className={`h-4 w-4 ${r.color}`} />
                       </div>
-                      <span className="text-xs font-semibold text-white">{r.label}</span>
+                      <span className="text-xs font-semibold text-foreground">{r.label}</span>
                       <ArrowRight className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity ml-auto" />
                     </div>
                   </Link>
@@ -383,7 +383,7 @@ function HeroButtons() {
 
 export default function Home() {
   return (
-    <div className="dark flex min-h-screen flex-col bg-sidebar text-white overflow-x-hidden" style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
+    <div className="flex min-h-screen flex-col bg-background text-foreground overflow-x-hidden" style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
 
       <style jsx global>{`
         @keyframes grid-fade { 0%, 100% { opacity: 0.03; } 50% { opacity: 0.08; } }
@@ -416,11 +416,11 @@ export default function Home() {
               className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center group-hover:bg-blue-500/100 transition-colors animate-pulse-glow">
               <ShieldCheck className="h-4 w-4 text-white" />
             </motion.div>
-            <span className="font-bold text-lg text-white" style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>.blue_jax</span>
+            <span className="font-bold text-lg text-foreground" style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>.blue_jax</span>
           </Link>
           <div className="flex gap-3 items-center">
             <Link href="/auth/login">
-              <Button variant="ghost" className="text-muted-foreground hover:text-white hover:bg-card/5 text-sm">Iniciar Sesión</Button>
+              <Button variant="ghost" className="text-muted-foreground hover:text-foreground hover:bg-card/5 text-sm">Iniciar Sesión</Button>
             </Link>
             <Link href="/auth/login?role=admin">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -514,7 +514,7 @@ export default function Home() {
                           className="bg-background/50 border border-border/50 rounded-lg p-2.5 hover:border-border transition-colors"
                         >
                           <div className="text-[9px] font-mono text-muted-foreground uppercase tracking-wider">{stat.label}</div>
-                          <div className={`text-xl font-mono font-bold mt-0.5 ${stat.status === 'warn' ? 'text-amber-400' : 'text-white'}`}>
+                          <div className={`text-xl font-mono font-bold mt-0.5 ${stat.status === 'warn' ? 'text-amber-600 dark:text-amber-400' : 'text-foreground'}`}>
                             <CountUp target={stat.target} delay={stat.delay} />
                           </div>
                         </motion.div>
@@ -562,7 +562,7 @@ export default function Home() {
                     <stat.icon className="h-4 w-4 text-blue-500" />
                   </motion.div>
                   <div>
-                    <div className="text-xl font-bold font-mono text-white">{stat.value}</div>
+                    <div className="text-xl font-bold font-mono text-foreground">{stat.value}</div>
                     <div className="text-xs text-muted-foreground">{stat.label}</div>
                   </div>
                 </div>
@@ -606,7 +606,7 @@ export default function Home() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="text-[9px] font-mono text-red-400 uppercase tracking-wider mb-1">01 — EVENTO DETECTADO</div>
-                          <div className="text-sm font-semibold text-white">Signo Vital Crítico Registrado</div>
+                          <div className="text-sm font-semibold text-foreground">Signo Vital Crítico Registrado</div>
                           <div className="text-xs font-mono text-muted-foreground mt-1">BP: 180/110 mmHg — Residente #204, Hab 204</div>
                         </div>
                       </div>
@@ -636,7 +636,7 @@ export default function Home() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="text-[9px] font-mono text-blue-400 uppercase tracking-wider mb-1">02 — EVALUACIÓN DE REGLAS</div>
-                          <div className="text-sm font-semibold text-white">Motor de Reglas Ejecutado</div>
+                          <div className="text-sm font-semibold text-foreground">Motor de Reglas Ejecutado</div>
                           <div className="text-xs font-mono text-muted-foreground mt-1">
                             <span className="text-blue-400/70">if</span> (BP {">"} 160/100) → <span className="text-emerald-400/70">DISPATCH_ALL</span>
                           </div>
@@ -681,7 +681,7 @@ export default function Home() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className={`text-[9px] font-mono ${c.text} uppercase tracking-wider mb-0.5`}>{action.step} — {action.label}</div>
-                                <div className="text-xs font-semibold text-white">{action.title}</div>
+                                <div className="text-xs font-semibold text-foreground">{action.title}</div>
                                 <div className="text-[10px] font-mono text-muted-foreground mt-0.5">{action.detail}</div>
                               </div>
                             </div>
@@ -792,7 +792,7 @@ export default function Home() {
                       <div className={`h-10 w-10 rounded-lg ${c.bg} ${c.border} border flex items-center justify-center mb-4`}>
                         <mod.icon className={`h-5 w-5 ${c.text}`} />
                       </div>
-                      <h3 className="font-bold text-white mb-1.5">{mod.title}</h3>
+                      <h3 className="font-bold text-foreground mb-1.5">{mod.title}</h3>
                       <p className="text-sm text-muted-foreground leading-relaxed">{mod.desc}</p>
                     </motion.div>
                   </StaggerItem>
@@ -834,7 +834,7 @@ export default function Home() {
                         <motion.div whileHover={{ scale: 1.2, rotate: 10 }}>
                           <CheckCircle2 className="h-4 w-4 text-blue-500 flex-shrink-0 group-hover:text-blue-400 transition-colors" />
                         </motion.div>
-                        <span className="text-sm text-secondary-foreground group-hover:text-white transition-colors">{item}</span>
+                        <span className="text-sm text-secondary-foreground group-hover:text-foreground transition-colors">{item}</span>
                       </div>
                     </StaggerItem>
                   ))}
@@ -935,7 +935,7 @@ export default function Home() {
                           <r.icon className={`h-6 w-6 ${r.iconColor}`} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-bold text-white mb-0.5 group-hover:text-white transition-colors">{r.title}</div>
+                          <div className="text-sm font-bold text-foreground mb-0.5 group-hover:text-foreground transition-colors">{r.title}</div>
                           <div className="text-xs text-muted-foreground">{r.desc}</div>
                         </div>
                         <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
@@ -948,7 +948,7 @@ export default function Home() {
 
             <RevealSection delay={0.4} className="text-center mt-8">
               <Link href="/auth/login">
-                <Button variant="ghost" className="text-muted-foreground hover:text-white text-sm">
+                <Button variant="ghost" className="text-muted-foreground hover:text-foreground text-sm">
                   O inicie sesión con su correo directamente →
                 </Button>
               </Link>
@@ -985,7 +985,7 @@ export default function Home() {
                 </motion.div>
               </a>
               <Link href="/#role-selector">
-                <Button size="lg" variant="ghost" className="h-13 px-8 text-sm rounded-lg text-muted-foreground border border-border/60 bg-transparent hover:border-zinc-500 hover:text-white hover:bg-card/5">
+                <Button size="lg" variant="ghost" className="h-13 px-8 text-sm rounded-lg text-muted-foreground border border-border/60 bg-transparent hover:border-zinc-500 hover:text-foreground hover:bg-card/5">
                   Acceso Personal Activo ↑
                 </Button>
               </Link>
@@ -1001,7 +1001,7 @@ export default function Home() {
             <div className="h-7 w-7 rounded-md bg-blue-600 flex items-center justify-center">
               <ShieldCheck className="h-3.5 w-3.5 text-white" />
             </div>
-            <span className="font-bold text-sm text-white" style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>.blue_jax</span>
+            <span className="font-bold text-sm text-foreground" style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>.blue_jax</span>
           </div>
           <p className="text-xs text-muted-foreground font-mono">&copy; 2026 .blue_jax — Infraestructura para Residencias de Retiro</p>
         </div>

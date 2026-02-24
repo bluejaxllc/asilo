@@ -197,7 +197,7 @@ export const LoginForm = () => {
     return (
         <div className="w-[440px] max-w-full mx-auto">
             {/* Card */}
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-black/30 border border-border bg-card/[0.03] backdrop-blur-xl">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-black/10 dark:shadow-black/30 border border-border bg-card backdrop-blur-xl">
                 {/* Gradient top accent */}
                 <div className={`h-1.5 bg-gradient-to-r ${theme.accentBar}`} />
 
@@ -206,7 +206,7 @@ export const LoginForm = () => {
                     <div className={`h-16 w-16 mx-auto rounded-2xl bg-gradient-to-br ${theme.iconBg} flex items-center justify-center shadow-lg mb-5`}>
                         <Icon className="h-8 w-8 text-white" />
                     </div>
-                    <h1 className="text-2xl font-bold text-white mb-2">{theme.title}</h1>
+                    <h1 className="text-2xl font-bold text-foreground mb-2">{theme.title}</h1>
                     <p className="text-sm text-muted-foreground leading-relaxed">{theme.subtitle}</p>
                 </div>
 
@@ -230,7 +230,7 @@ export const LoginForm = () => {
                                                     disabled={isPending}
                                                     placeholder="ejemplo@correo.com"
                                                     type="email"
-                                                    className={`h-12 bg-card/5 border-border text-white placeholder:text-muted-foreground ${theme.inputFocus} rounded-xl transition-colors`}
+                                                    className={`h-12 bg-card/5 border-border text-foreground placeholder:text-muted-foreground ${theme.inputFocus} rounded-xl transition-colors`}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -249,7 +249,7 @@ export const LoginForm = () => {
                                                     disabled={isPending}
                                                     placeholder="••••••••"
                                                     type="password"
-                                                    className={`h-12 bg-card/5 border-border text-white placeholder:text-muted-foreground ${theme.inputFocus} rounded-xl transition-colors`}
+                                                    className={`h-12 bg-card/5 border-border text-foreground placeholder:text-muted-foreground ${theme.inputFocus} rounded-xl transition-colors`}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -283,7 +283,7 @@ export const LoginForm = () => {
                     <div className="border-t border-border pt-5 text-center">
                         <a
                             href="/"
-                            className="text-sm text-muted-foreground hover:text-white transition-colors"
+                            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                         >
                             {theme.backLabel}
                         </a>
