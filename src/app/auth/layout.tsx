@@ -50,7 +50,7 @@ function AuthLayoutInner({ children }: { children: React.ReactNode }) {
     const orbs = backgroundOrbs[role] || defaultOrbs;
 
     return (
-        <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background">
+        <div className="dark min-h-screen flex items-center justify-center relative overflow-hidden bg-background">
             {/* Animated gradient orbs — color changes per role */}
             <div className={`absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full ${orbs.orb1} blur-[120px] animate-pulse`} style={{ animationDuration: "8s" }} />
             <div className={`absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full ${orbs.orb2} blur-[120px] animate-pulse`} style={{ animationDuration: "10s" }} />
