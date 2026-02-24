@@ -154,10 +154,8 @@ export const Sidebar = () => {
 
             {/* Upgrade Banner */}
             <div className="px-3 pb-3">
-                <a
-                    href="https://retiro.bluejax.ai/upgrade"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                <Link
+                    href="/upgrade"
                     className="block p-3 rounded-lg bg-gradient-to-r from-blue-600/10 to-indigo-600/10 border border-blue-500/20 hover:border-blue-500/40 transition-all group"
                 >
                     <div className="flex items-center gap-2 mb-1">
@@ -167,7 +165,7 @@ export const Sidebar = () => {
                     <p className="text-[10px] text-muted-foreground leading-relaxed">
                         IA, automatización y analíticas avanzadas
                     </p>
-                </a>
+                </Link>
             </div>
 
             {/* Footer */}

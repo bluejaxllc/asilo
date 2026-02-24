@@ -5,6 +5,7 @@
  */
 export const publicRoutes = [
     "/",
+    "/upgrade",
     "/api/antigravity/run",
     "/api/debug-auth",
 ];

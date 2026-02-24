@@ -130,8 +130,7 @@ export function PremiumCard({
                 {/* Lock Overlay & CTA */}
                 <div className="flex items-center gap-3">
                     <Link
-                        href="https://retiro.bluejax.ai/upgrade"
-                        target="_blank"
+                        href="/upgrade"
                         className={cn(
                             "flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200",
                             "bg-gradient-to-r from-blue-600 to-indigo-600 text-white",
