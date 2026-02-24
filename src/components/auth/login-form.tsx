@@ -165,10 +165,14 @@ export const LoginForm = () => {
         setIsPending(true);
 
         try {
+            // Explicitly use current origin so NextAuth doesn't fall back to VERCEL_URL
+            const origin = window.location.origin;
+
             const result = await signIn("credentials", {
                 email: values.email,
                 password: values.password,
                 redirect: false,
+                callbackUrl: origin,
             });
 
             if (result?.error) {
@@ -179,14 +183,14 @@ export const LoginForm = () => {
 
             if (result?.ok) {
                 setSuccess("¡Iniciando sesión!");
-                const sessionRes = await fetch("/api/auth/session");
+                const sessionRes = await fetch(`${origin}/api/auth/session`);
                 const session = await sessionRes.json();
 
-                let redirectUrl = "/staff";
-                if (session?.user?.role === "ADMIN") redirectUrl = "/admin";
-                else if (session?.user?.role === "FAMILY") redirectUrl = "/family";
+                let redirectPath = "/staff";
+                if (session?.user?.role === "ADMIN") redirectPath = "/admin";
+                else if (session?.user?.role === "FAMILY") redirectPath = "/family";
 
-                window.location.replace(redirectUrl);
+                window.location.replace(`${origin}${redirectPath}`);
             }
         } catch {
             setError("Algo salió mal!");
