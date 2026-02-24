@@ -20,12 +20,13 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { UserPlus, Clock, Users, ShieldCheck, UserCheck, AlertCircle } from "lucide-react";
+import { UserPlus, Clock, Users, ShieldCheck, UserCheck, AlertCircle, CalendarClock, BarChart3, Award } from "lucide-react";
 import { StaffForm } from "@/components/admin/staff-form";
 import { getStaffAttendanceHistory } from "@/actions/staff";
 import { SearchInput } from "@/components/ui/search-input";
 import { useSearchParams } from "next/navigation";
 import { FadeIn, SlideInRow } from "@/components/ui/motion-wrapper";
+import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -319,6 +320,28 @@ function StaffPageContent() {
                     </div>
                 </DialogContent>
             </Dialog>
+
+            {/* BlueJax Pro Features */}
+            <PremiumSection>
+                <PremiumCard
+                    title="Optimizador de Turnos con IA"
+                    description="Sugiere horarios óptimos basados en carga de trabajo, habilidades y patrones históricos del equipo."
+                    icon={CalendarClock}
+                    accent="blue"
+                />
+                <PremiumCard
+                    title="Dashboard de Rendimiento"
+                    description="Tareas completadas, tiempo promedio de respuesta y tasa de asistencia por empleado."
+                    icon={BarChart3}
+                    accent="emerald"
+                />
+                <PremiumCard
+                    title="Rastreador de Certificaciones"
+                    description="Control de vencimiento de licencias y certificaciones con recordatorios automáticos."
+                    icon={Award}
+                    accent="amber"
+                />
+            </PremiumSection>
         </FadeIn>
     );
 }

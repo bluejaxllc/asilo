@@ -2,8 +2,9 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, UserCheck, AlertCircle, Package, Activity, Clock, Heart, ArrowRight, TrendingUp } from "lucide-react";
+import { Users, UserCheck, AlertCircle, Package, Activity, Clock, Heart, ArrowRight, TrendingUp, Brain, Zap, BarChart3, Star } from "lucide-react";
 import { FadeIn, ScaleIn, SlideIn } from "@/components/ui/motion-wrapper";
+import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
 
 export const dynamic = 'force-dynamic';
 
@@ -291,6 +292,42 @@ export default async function AdminDashboardPage() {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* BlueJax Pro Features */}
+            <SlideIn direction="up" delay={0.5}>
+                <PremiumSection>
+                    <PremiumCard
+                        title="Resumen de Riesgos con IA"
+                        description="Informe diario generado por IA que analiza tendencias de signos vitales, detecta residentes en riesgo y sugiere intervenciones preventivas."
+                        icon={Brain}
+                        accent="violet"
+                    />
+                    <PremiumCard
+                        title="Alertas Predictivas"
+                        description="Detección temprana de anomalías: 'Residente #204 presión arterial ↑12% esta semana — revisión recomendada'."
+                        icon={Zap}
+                        accent="amber"
+                    />
+                    <PremiumCard
+                        title="Métricas de Eficiencia"
+                        description="Score automatizado de rendimiento por turno, tiempo de respuesta promedio y comparativo histórico del equipo."
+                        icon={BarChart3}
+                        accent="cyan"
+                    />
+                    <PremiumCard
+                        title="Reputación Online"
+                        description="Auto-responda a Google Reviews con IA y envíe solicitudes de reseñas a familias satisfechas para mejorar su presencia online."
+                        icon={Star}
+                        accent="amber"
+                    />
+                    <PremiumCard
+                        title="Embudo de Captación"
+                        description="Landing pages y formularios optimizados para atraer nuevas familias. Seguimiento automático desde la consulta."
+                        icon={TrendingUp}
+                        accent="rose"
+                    />
+                </PremiumSection>
+            </SlideIn>
         </FadeIn>
     );
 }

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar, ClipboardList, Plus, Trash2, User, Clock, CheckCircle2, Loader2, ListTodo } from "lucide-react";
+import { Calendar, ClipboardList, Plus, Trash2, User, Clock, CheckCircle2, Loader2, ListTodo, Cpu, Repeat2, Mic } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { getAllTasks, createTask, deleteTask, toggleTaskStatus, getStaffList } from "@/actions/tasks";
@@ -27,6 +27,7 @@ import { StaffCalendar } from "@/components/admin/staff-calendar";
 import { FadeIn, SlideIn } from "@/components/ui/motion-wrapper";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
 
 type StatusFilter = "ALL" | "PENDING" | "IN_PROGRESS" | "COMPLETED";
 
@@ -452,6 +453,28 @@ export default function TasksPage() {
                     </Card>
                 </TabsContent>
             </Tabs>
+
+            {/* BlueJax Pro Features */}
+            <PremiumSection>
+                <PremiumCard
+                    title="Asignación Inteligente"
+                    description="IA auto-asigna tareas según carga de trabajo, habilidades y disponibilidad del personal."
+                    icon={Cpu}
+                    accent="violet"
+                />
+                <PremiumCard
+                    title="Motor de Tareas Recurrentes"
+                    description="Cree plantillas que generan automáticamente tareas diarias, semanales o mensuales."
+                    icon={Repeat2}
+                    accent="blue"
+                />
+                <PremiumCard
+                    title="Voz a Tarea"
+                    description="Dicte tareas por micrófono y la IA las convierte en tareas estructuradas automáticamente."
+                    icon={Mic}
+                    accent="cyan"
+                />
+            </PremiumSection>
         </FadeIn>
     );
 }

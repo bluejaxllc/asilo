@@ -15,6 +15,8 @@ import {
     BarChart3,
     Bot,
     MessageCircle,
+    Sparkles,
+    Megaphone,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -67,18 +69,28 @@ const routes = [
         icon: BarChart3,
         href: "/admin/reports",
         color: "text-cyan-400",
+        pro: true,
     },
     {
         label: "Mensajes",
         icon: MessageCircle,
         href: "/admin/messages",
         color: "text-indigo-400",
+        pro: true,
     },
     {
         label: "Agentes",
         icon: Bot,
         href: "/admin/agents",
         color: "text-fuchsia-400",
+        pro: true,
+    },
+    {
+        label: "Marketing",
+        icon: Megaphone,
+        href: "/admin/marketing",
+        color: "text-rose-400",
+        pro: true,
     },
     {
         label: "Configuración",
@@ -129,12 +141,33 @@ export const Sidebar = () => {
                                 isActive ? route.color : "text-muted-foreground group-hover:text-muted-foreground"
                             )} />
                             {route.label}
-                            {isActive && (
+                            {(route as any).pro && (
+                                <Sparkles className="h-3 w-3 text-blue-400 ml-auto flex-shrink-0 opacity-60" />
+                            )}
+                            {isActive && !(route as any).pro && (
                                 <div className="ml-auto h-1.5 w-1.5 rounded-full bg-blue-500/100 animate-pulse" />
                             )}
                         </Link>
                     );
                 })}
+            </div>
+
+            {/* Upgrade Banner */}
+            <div className="px-3 pb-3">
+                <a
+                    href="https://retiro.bluejax.ai/upgrade"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block p-3 rounded-lg bg-gradient-to-r from-blue-600/10 to-indigo-600/10 border border-blue-500/20 hover:border-blue-500/40 transition-all group"
+                >
+                    <div className="flex items-center gap-2 mb-1">
+                        <Sparkles className="h-3.5 w-3.5 text-blue-400" />
+                        <span className="text-xs font-bold text-foreground">BlueJax Pro</span>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed">
+                        IA, automatización y analíticas avanzadas
+                    </p>
+                </a>
             </div>
 
             {/* Footer */}

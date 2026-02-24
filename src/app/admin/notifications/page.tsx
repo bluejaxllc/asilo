@@ -16,6 +16,10 @@ import {
     BellOff,
     Plus,
     UserCircle,
+    Brain,
+    Route,
+    CalendarClock,
+    Mail,
 } from "lucide-react";
 import {
     Dialog,
@@ -34,6 +38,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { FadeIn, SlideIn } from "@/components/ui/motion-wrapper";
+import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
 import { SearchInput } from "@/components/ui/search-input";
 import {
     getNotifications,
@@ -395,6 +400,34 @@ export default function NotificationsPage() {
                     })
                 )}
             </div>
+
+            {/* BlueJax Pro Features */}
+            <PremiumSection>
+                <PremiumCard
+                    title="Enrutamiento Inteligente"
+                    description="IA dirige notificaciones al personal correcto según turno, rol y proximidad al residente."
+                    icon={Route}
+                    accent="blue"
+                />
+                <PremiumCard
+                    title="Triage con IA"
+                    description="Clasifica automáticamente la urgencia de cada alerta para priorizar atención."
+                    icon={Brain}
+                    accent="violet"
+                />
+                <PremiumCard
+                    title="Reportes Programados"
+                    description="Reciba resúmenes diarios o semanales de notificaciones directamente en su correo."
+                    icon={CalendarClock}
+                    accent="amber"
+                />
+                <PremiumCard
+                    title="Campañas SMS/Email"
+                    description="Envíe newsletters, recordatorios de eventos y comunicados masivos a todos los contactos de familias automáticamente."
+                    icon={Mail}
+                    accent="cyan"
+                />
+            </PremiumSection>
         </FadeIn>
     );
 }

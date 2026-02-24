@@ -28,6 +28,9 @@ import {
     BedDouble,
     UserCheck,
     BarChart3,
+    Brain,
+    FileCheck,
+    FileDown,
 } from "lucide-react";
 import {
     BarChart,
@@ -44,6 +47,7 @@ import {
 import { FadeIn, SlideIn, SlideInRow } from "@/components/ui/motion-wrapper";
 import { getReportStats, getActivityTrends, getStaffPerformance, getOccupancyData } from "@/actions/reports";
 import { cn } from "@/lib/utils";
+import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
 
 export default function ReportsPage() {
     const [stats, setStats] = useState<any>(null);
@@ -339,6 +343,28 @@ export default function ReportsPage() {
                     </Card>
                 </SlideIn>
             </div>
+
+            {/* BlueJax Pro Features */}
+            <PremiumSection>
+                <PremiumCard
+                    title="Resumen Ejecutivo con IA"
+                    description="Genera un resumen ejecutivo semanal en lenguaje natural con hallazgos clave y recomendaciones."
+                    icon={Brain}
+                    accent="violet"
+                />
+                <PremiumCard
+                    title="Reportes de Cumplimiento"
+                    description="Verifica automáticamente si se cumplen los estándares regulatorios de atención."
+                    icon={FileCheck}
+                    accent="emerald"
+                />
+                <PremiumCard
+                    title="Exportar a PDF Profesional"
+                    description="Descargue reportes con branding profesional listos para enviar a familias o reguladores."
+                    icon={FileDown}
+                    accent="blue"
+                />
+            </PremiumSection>
         </FadeIn>
     );
 }

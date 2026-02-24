@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { FadeIn, SlideIn } from "@/components/ui/motion-wrapper";
+import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
 import { cn } from "@/lib/utils";
 import {
     MessageCircle,
@@ -26,6 +27,10 @@ import {
     Clock,
     AlertCircle,
     BedDouble,
+    Brain,
+    SmilePlus,
+    Megaphone,
+    MessageSquareMore,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -342,6 +347,34 @@ export default function AdminMessagesPage() {
                     </Card>
                 </FadeIn>
             )}
+
+            {/* BlueJax Pro Features */}
+            <PremiumSection>
+                <PremiumCard
+                    title="Respuestas Sugeridas por IA"
+                    description="IA genera borradores de respuesta basados en el contexto del residente y la consulta del familiar."
+                    icon={Brain}
+                    accent="violet"
+                />
+                <PremiumCard
+                    title="Análisis de Sentimiento"
+                    description="Detecta automáticamente el tono emocional de los mensajes (urgente, preocupado, positivo)."
+                    icon={SmilePlus}
+                    accent="amber"
+                />
+                <PremiumCard
+                    title="Mensajes Broadcast"
+                    description="Envíe comunicados a todos los familiares a la vez sobre eventos, políticas o actualizaciones."
+                    icon={Megaphone}
+                    accent="blue"
+                />
+                <PremiumCard
+                    title="WhatsApp Business"
+                    description="Envíe y reciba mensajes de WhatsApp directamente desde el panel. Plantillas, mensajes masivos y respuestas automáticas."
+                    icon={MessageSquareMore}
+                    accent="emerald"
+                />
+            </PremiumSection>
         </div>
     );
 }

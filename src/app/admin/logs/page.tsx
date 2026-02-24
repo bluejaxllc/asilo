@@ -10,7 +10,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Activity, Utensils, Pill, FileText, AlertTriangle, Filter, Download } from "lucide-react";
+import { Activity, Utensils, Pill, FileText, AlertTriangle, Filter, Download, Brain, Search, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getAllLogs } from "@/actions/logs";
 import { format } from "date-fns";
@@ -18,6 +18,7 @@ import { es } from "date-fns/locale";
 import { SearchInput } from "@/components/ui/search-input";
 import { useSearchParams } from "next/navigation";
 import { FadeIn, SlideInRow } from "@/components/ui/motion-wrapper";
+import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
 
 const LOG_TYPES = [
     { key: "ALL", label: "Todos", icon: Filter, color: "text-muted-foreground", bg: "bg-muted/60", activeBg: "bg-zinc-700 text-white" },
@@ -197,6 +198,28 @@ function LogsPageContent() {
                     Mostrando {filteredLogs.length} de {logs.length} registros
                 </div>
             )}
+
+            {/* BlueJax Pro Features */}
+            <PremiumSection>
+                <PremiumCard
+                    title="Análisis de Bitácora con IA"
+                    description="Detección de patrones en registros: '3 incidentes de higiene en Hab 204 esta semana'."
+                    icon={Brain}
+                    accent="violet"
+                />
+                <PremiumCard
+                    title="Detección de Anomalías"
+                    description="Identifica entradas inusuales o brechas en la documentación automáticamente."
+                    icon={Search}
+                    accent="rose"
+                />
+                <PremiumCard
+                    title="Registro por Voz"
+                    description="Dicte entradas de bitácora, la IA transcribe y categoriza automáticamente."
+                    icon={Mic}
+                    accent="cyan"
+                />
+            </PremiumSection>
         </FadeIn>
     );
 }

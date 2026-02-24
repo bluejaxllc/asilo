@@ -20,9 +20,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { MedicationForm } from "@/components/inventory/medication-form";
-import { Plus, AlertTriangle, Pill, BarChart3, Loader2 } from "lucide-react";
+import { Plus, AlertTriangle, Pill, BarChart3, Loader2, RefreshCcw, Calendar, TrendingUp } from "lucide-react";
 import { ClientStockChart } from "@/components/inventory/client-stock-chart";
 import { FadeIn, SlideInRow } from "@/components/ui/motion-wrapper";
+import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { getAllMedications, updateMedicationStock } from "@/actions/medication";
 import { Input } from "@/components/ui/input";
@@ -279,6 +280,28 @@ function InventoryPageContent() {
                     </div>
                 </DialogContent>
             </Dialog>
+
+            {/* BlueJax Pro Features */}
+            <PremiumSection>
+                <PremiumCard
+                    title="Predicción de Reorden Automático"
+                    description="IA predice cuándo se agotará cada medicamento basado en patrones de consumo."
+                    icon={RefreshCcw}
+                    accent="blue"
+                />
+                <PremiumCard
+                    title="Monitor de Caducidad"
+                    description="Línea de tiempo visual con alertas automáticas a 30, 15 y 7 días de vencimiento."
+                    icon={Calendar}
+                    accent="rose"
+                />
+                <PremiumCard
+                    title="Analítica de Consumo"
+                    description="Gráficas de uso por medicamento: tendencias semanales, mensuales y comparativos."
+                    icon={TrendingUp}
+                    accent="emerald"
+                />
+            </PremiumSection>
         </FadeIn>
     );
 }

@@ -19,9 +19,10 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { PatientForm } from "@/components/patients/patient-form";
-import { UserPlus, FileText, Activity, Users, Heart, BedDouble, AlertTriangle } from "lucide-react";
+import { UserPlus, FileText, Activity, Users, Heart, BedDouble, AlertTriangle, Brain, TrendingUp, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { FadeIn, HoverScale, SlideInRow } from "@/components/ui/motion-wrapper";
+import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -269,6 +270,28 @@ function PatientsPageContent() {
                     </TableBody>
                 </Table>
             </div>
+
+            {/* BlueJax Pro Features */}
+            <PremiumSection>
+                <PremiumCard
+                    title="Notas Clínicas con IA"
+                    description="Resúmenes clínicos auto-generados a partir de los registros diarios de cada residente."
+                    icon={Brain}
+                    accent="violet"
+                />
+                <PremiumCard
+                    title="Gráficas de Signos Vitales"
+                    description="Visualice tendencias de presión, glucosa y peso por residente con gráficas interactivas."
+                    icon={TrendingUp}
+                    accent="blue"
+                />
+                <PremiumCard
+                    title="Evaluación de Riesgo de Caídas"
+                    description="Score de riesgo calculado por IA basado en edad, medicamentos y movilidad."
+                    icon={ShieldAlert}
+                    accent="amber"
+                />
+            </PremiumSection>
         </FadeIn>
     );
 }

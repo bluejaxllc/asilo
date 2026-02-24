@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FadeIn, SlideIn, ScaleIn } from "@/components/ui/motion-wrapper";
+import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
 import { cn } from "@/lib/utils";
 import {
     Bot,
@@ -27,6 +28,9 @@ import {
     Zap,
     ChevronDown,
     ChevronUp,
+    Wrench,
+    Webhook,
+    History,
 } from "lucide-react";
 
 interface AgentInfo {
@@ -317,6 +321,28 @@ export default function AgentsPage() {
                     <span>Los agentes pueden ser ejecutados manualmente o configurados para ejecución automática vía cron.</span>
                 </div>
             </FadeIn>
+
+            {/* BlueJax Pro Features */}
+            <PremiumSection>
+                <PremiumCard
+                    title="Constructor de Agentes Custom"
+                    description="Cree agentes personalizados con reglas, triggers y acciones específicas para su operación."
+                    icon={Wrench}
+                    accent="violet"
+                />
+                <PremiumCard
+                    title="Integraciones Webhook"
+                    description="Conecte agentes con sistemas externos: WhatsApp, Slack, ERPs y más."
+                    icon={Webhook}
+                    accent="blue"
+                />
+                <PremiumCard
+                    title="Historial de Ejecuciones"
+                    description="Timeline completo de ejecuciones con logs detallados, duración y resultados."
+                    icon={History}
+                    accent="emerald"
+                />
+            </PremiumSection>
         </div>
     );
 }

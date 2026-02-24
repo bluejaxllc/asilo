@@ -12,12 +12,13 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, Loader2, Building2, Bell, Database, Shield, Info } from "lucide-react";
+import { Save, Loader2, Building2, Bell, Database, Shield, Info, Palette, UserCog, ClipboardCheck, Users } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { getSettings, updateSetting } from "@/actions/settings";
 import { FadeIn, SlideIn } from "@/components/ui/motion-wrapper";
 import { Badge } from "@/components/ui/badge";
+import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
 
 export default function SettingsPage() {
     const [loading, setLoading] = useState(true);
@@ -268,6 +269,34 @@ export default function SettingsPage() {
                     </SlideIn>
                 </TabsContent>
             </Tabs>
+
+            {/* BlueJax Pro Features */}
+            <PremiumSection>
+                <PremiumCard
+                    title="White Label / Marca Propia"
+                    description="Personalice logo, colores, nombre y dominio para presentar el sistema como propio."
+                    icon={Palette}
+                    accent="violet"
+                />
+                <PremiumCard
+                    title="Control de Acceso Granular"
+                    description="Defina permisos detallados por rol: qué módulos pueden ver, editar o eliminar."
+                    icon={UserCog}
+                    accent="blue"
+                />
+                <PremiumCard
+                    title="Bitácora de Auditoría"
+                    description="Registro completo de quién hizo qué, cuándo y dónde en el sistema."
+                    icon={ClipboardCheck}
+                    accent="amber"
+                />
+                <PremiumCard
+                    title="CRM de Familias"
+                    description="Pipeline visual para consultas de nuevos residentes: Consulta → Visita → Admisión. Lead scoring automático."
+                    icon={Users}
+                    accent="rose"
+                />
+            </PremiumSection>
         </FadeIn>
     );
 }
