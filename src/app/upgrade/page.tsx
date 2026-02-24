@@ -109,7 +109,7 @@ const tiers = [
             "Bitácora de auditoría completa",
         ],
         cta: "Activar Pro",
-        ctaHref: "https://www.bluejax.ai/retiro",
+        ctaHref: "https://www.bluejax.ai/contact",
     },
     {
         name: "Enterprise",
@@ -128,7 +128,7 @@ const tiers = [
             "Soporte prioritario 24/7",
         ],
         cta: "Contactar Ventas",
-        ctaHref: "https://www.bluejax.ai/retiro",
+        ctaHref: "https://www.bluejax.ai/contact",
     },
 ];
 
@@ -431,7 +431,7 @@ export default function UpgradePage() {
                                 Agende una demostración personalizada y descubra cómo BlueJax Pro puede optimizar cada aspecto de su operación.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                                <a href="https://www.bluejax.ai/retiro" target="_blank" rel="noopener noreferrer">
+                                <a href="https://www.bluejax.ai/contact" target="_blank" rel="noopener noreferrer">
                                     <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                                         <Button size="lg" className="h-12 px-8 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold text-sm border border-blue-500/50 shadow-lg shadow-blue-600/20 w-full sm:w-auto">
                                             Solicitar Demo <ArrowRight className="ml-2 h-4 w-4" />
