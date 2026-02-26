@@ -1,6 +1,7 @@
 
 import { Agent, AgentContext, AgentResult } from '../core/types';
 import { db } from '@/lib/db';
+import { generateBlueJaxResponse } from '@/lib/bluejax-ai';
 
 export class EfficiencyAuditAgent implements Agent {
     id = 'efficiency-audit';
@@ -33,15 +34,24 @@ export class EfficiencyAuditAgent implements Agent {
         // Get urgent tasks still pending
         const urgentPending = tasks.filter(t => t.status !== 'COMPLETED' && t.priority === 'URGENT').length;
 
-        let status = 'OPTIMAL';
-        let message = `Score de Eficiencia: ${score}%. ${completed} tareas completadas de ${tasks.length}.`;
+        const prompt = `Actúa como BlueJax, Auditor de Eficiencia. Analiza las siguientes métricas de tareas de personal en el asilo (últimas 24h):
+- Total: ${tasks.length}
+- Completadas: ${completed}
+- Pendientes: ${pending}
+- Urgentes pendientes: ${urgentPending}
+- Score de eficiencia: ${score}%
 
-        if (score < 50) {
-            status = 'CRITICAL';
-            message += ` Riesgo operativo detectado: Bajo nivel de completado.`;
-        } else if (score < 80 || urgentPending > 0) {
-            status = 'WARNING';
-            message += ` Atención: ${urgentPending} tareas urgentes siguen pendientes.`;
+Genera un breve reporte ejecutivo (máximo 3 oraciones). 
+Si hay tareas urgentes pendientes o el score es bajo (<70%), incluye una advertencia clara.
+Si el score es bueno (>85%), da un mensaje positivo resaltando el buen rendimiento.`;
+
+        let message = `Score de Eficiencia: ${score}%. ${completed} tareas completadas de ${tasks.length}.`;
+        const aiStatus = (score < 50) ? 'CRITICAL' : (score < 80 || urgentPending > 0) ? 'WARNING' : 'OPTIMAL';
+
+        try {
+            message = await generateBlueJaxResponse(prompt);
+        } catch (err) {
+            console.error("AI Error generating efficiency audit", err);
         }
 
         // Create system notification
@@ -49,7 +59,7 @@ export class EfficiencyAuditAgent implements Agent {
             data: {
                 title: `📊 Reporte de Eficiencia: ${score}%`,
                 message: message,
-                type: status,
+                type: aiStatus,
                 recipientRole: 'ADMIN'
             }
         });

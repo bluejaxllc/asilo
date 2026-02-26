@@ -2,6 +2,7 @@
 import { Agent, AgentContext, AgentResult } from '../core/types';
 import { db } from '@/lib/db';
 import { sendWhatsAppAlert } from '@/actions/whatsapp';
+import { generateBlueJaxResponse } from '@/lib/bluejax-ai';
 
 export class PatientRiskAuditAgent implements Agent {
     id = 'patient-risk-audit';
@@ -31,48 +32,50 @@ export class PatientRiskAuditAgent implements Agent {
             };
         }
 
-        const risksDetected = [];
-
+        const patientData: Record<string, { name: string, room: string | null, logs: any[] }> = {};
         for (const log of recentLogs) {
             if (!log.patient) continue;
-
-            // 1. Vital Signs Audit (Example: High Blood Pressure)
-            if (log.type === 'VITALS' && log.value) {
-                // Assuming format like "140/90" or "150/100"
-                const matches = log.value.match(/(\d+)\/(\d+)/);
-                if (matches) {
-                    const systolic = parseInt(matches[1]);
-                    const diastolic = parseInt(matches[2]);
-
-                    if (systolic >= 160 || diastolic >= 100) {
-                        risksDetected.push({
-                            patientId: log.patient.id,
-                            patientName: log.patient.name,
-                            type: 'CRITICAL',
-                            trigger: 'BP_HIGH',
-                            description: `Presión arterial crítica detectada: ${log.value} (Hab: ${log.patient.room || 'N/A'})`
-                        });
-                    } else if (systolic >= 140 || diastolic >= 90) {
-                        risksDetected.push({
-                            patientId: log.patient.id,
-                            patientName: log.patient.name,
-                            type: 'WARNING',
-                            trigger: 'BP_ELEVATED',
-                            description: `Presión arterial elevada: ${log.value} — Se recomienda monitoreo frecuente.`
-                        });
-                    }
-                }
+            const pid = log.patient.id;
+            if (!patientData[pid]) {
+                patientData[pid] = { name: log.patient.name, room: log.patient.room, logs: [] };
             }
+            patientData[pid].logs.push(log);
+        }
 
-            // 2. Incident Audit
-            if (log.type === 'INCIDENT') {
-                risksDetected.push({
-                    patientId: log.patient.id,
-                    patientName: log.patient.name,
-                    type: 'WARNING',
-                    trigger: 'INCIDENT_DETECTED',
-                    description: `Incidente reportado: ${log.notes?.substring(0, 100)}...`
-                });
+        const risksDetected = [];
+
+        for (const [patientId, data] of Object.entries(patientData)) {
+            const prompt = `Analiza los siguientes registros clínicos de las últimas 24h para el residente ${data.name}.
+Determina si existe algún riesgo clínico basado en signos vitales o incidentes.
+Si todo está estable, responde exactamente "SEGURO".
+Si hay riesgo moderado, responde "ADVERTENCIA: [Explicación concisa]".
+Si hay riesgo severo, responde "CRÍTICO: [Explicación concisa]".
+Solo responde con una de estas tres opciones.
+Datos JSON: ${JSON.stringify(data.logs)}`;
+
+            try {
+                const aiAnalysis = await generateBlueJaxResponse(prompt);
+                const response = aiAnalysis.trim().toUpperCase();
+
+                if (response.startsWith('CRÍTICO')) {
+                    risksDetected.push({
+                        patientId,
+                        patientName: data.name,
+                        type: 'CRITICAL',
+                        trigger: 'AI_CRITICAL_RISK',
+                        description: aiAnalysis.replace(/CRÍTICO:|CRÍTICO/i, '').trim() || 'Riesgo Crítico detectado por IA'
+                    });
+                } else if (response.startsWith('ADVERTENCIA')) {
+                    risksDetected.push({
+                        patientId,
+                        patientName: data.name,
+                        type: 'WARNING',
+                        trigger: 'AI_WARNING_RISK',
+                        description: aiAnalysis.replace(/ADVERTENCIA:|ADVERTENCIA/i, '').trim() || 'Riesgo Moderado detectado por IA'
+                    });
+                }
+            } catch (err) {
+                console.error("AI Error analyzing risks for patient", patientId, err);
             }
         }
 

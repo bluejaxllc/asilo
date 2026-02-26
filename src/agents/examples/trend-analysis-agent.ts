@@ -1,6 +1,7 @@
 
 import { Agent, AgentContext, AgentResult } from '../core/types';
 import { db } from '@/lib/db';
+import { generateBlueJaxResponse } from '@/lib/bluejax-ai';
 
 export class TrendAnalysisAgent implements Agent {
     id = 'trend-analysis';
@@ -35,26 +36,30 @@ export class TrendAnalysisAgent implements Agent {
         let findingsCount = 0;
 
         for (const [id, trend] of Object.entries(patientTrends)) {
-            // Simple logic: Is systolic pressure trending up consistently?
-            // value format "120/80"
-            const pressures = trend.data
-                .map(l => parseInt((l.value || "").split('/')[0]))
-                .filter(p => !isNaN(p));
+            if (trend.data.length >= 3) {
+                const prompt = `Analiza los siguientes signos vitales de los últimos 7 días para el residente ${trend.name}. 
+Busca tendencias peligrosas (ej. presión arterial subiendo consistentemente, pérdida de peso, fiebre recurrente).
+Si NO hay tendencias preocupantes, responde exactamente con la palabra "NINGUNA".
+Si hay una tendencia preocupante, responde con un mensaje de alerta corto y conciso (máximo 2 oraciones) explicando la anomalía.
+Datos JSON: ${JSON.stringify(trend.data)}`;
 
-            if (pressures.length >= 3) {
-                const isTrendingUp = pressures[pressures.length - 1] > pressures[0] + 15;
+                try {
+                    const aiAnalysis = await generateBlueJaxResponse(prompt);
 
-                if (isTrendingUp) {
-                    findingsCount++;
-                    await db.notification.create({
-                        data: {
-                            title: `📈 Alerta Predictiva: ${trend.name}`,
-                            message: `Se detectó una tendencia alcista en la presión arterial (+${pressures[pressures.length - 1] - pressures[0]} mmHg) en los últimos ${trend.data.length} registros. Se recomienda revisión preventiva.`,
-                            type: 'WARNING',
-                            recipientRole: 'ADMIN',
-                            patientId: id
-                        }
-                    });
+                    if (aiAnalysis && !aiAnalysis.toUpperCase().includes("NINGUNA") && aiAnalysis.trim() !== "") {
+                        findingsCount++;
+                        await db.notification.create({
+                            data: {
+                                title: `📈 Alerta Predictiva IA: ${trend.name}`,
+                                message: aiAnalysis.trim(),
+                                type: 'WARNING',
+                                recipientRole: 'ADMIN',
+                                patientId: id
+                            }
+                        });
+                    }
+                } catch (err) {
+                    console.error("AI Error analyzing trends for patient", id, err);
                 }
             }
         }

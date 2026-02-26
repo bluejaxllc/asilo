@@ -1,5 +1,6 @@
 import { Agent, AgentContext, AgentResult } from '../core/types';
 import { db } from '@/lib/db';
+import { generateBlueJaxResponse } from '@/lib/bluejax-ai';
 
 export class ClinicalNotesAgent implements Agent {
     id = 'clinical-notes-synthesis';
@@ -42,15 +43,16 @@ export class ClinicalNotesAgent implements Agent {
 
         for (const [patientId, data] of Object.entries(patientData)) {
             if (data.records.length > 2) {
-                // Determine general synthesis based on record types
-                const vitalsCount = data.records.filter(r => r.type === 'VITALS').length;
-                const incidentCount = data.records.filter(r => r.type === 'INCIDENT').length;
+                const prompt = `Por favor analiza los siguientes registros clínicos recientes (últimas 48h) del residente ${data.name}. 
+Genera una nota clínica profesional, clara y concisa (máximo 4 oraciones) resumiendo su estado y resaltando cualquier anomalía.
+Registros en formato JSON: ${JSON.stringify(data.records)}`;
 
-                let synthesis = `Resumen Clínico IA (48h): El residente presentó ${vitalsCount} tomas de signos vitales. `;
-                if (incidentCount > 0) {
-                    synthesis += `Se requiere atención por ${incidentCount} reporte(s) de incidentes recientes. Monitoreo constante recomendado.`;
-                } else {
-                    synthesis += `Los parámetros se mantienen estables acorde a su historial. No hay incidentes reportados.`;
+                let synthesis = "";
+                try {
+                    synthesis = await generateBlueJaxResponse(prompt);
+                } catch (err) {
+                    console.error("AI Error for patient", patientId, err);
+                    synthesis = `Error al generar síntesis IA para ${data.name}. Consulte los registros manualmente.`;
                 }
 
                 if (admin) {
