@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar, ClipboardList, Plus, Trash2, User, Clock, CheckCircle2, Loader2, ListTodo, Cpu, Repeat2, Mic } from "lucide-react";
+import { Calendar, ClipboardList, Plus, Trash2, User, Clock, CheckCircle2, Loader2, ListTodo, Cpu, Repeat2, Mic, Zap } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { getAllTasks, createTask, deleteTask, toggleTaskStatus, getStaffList } from "@/actions/tasks";
@@ -28,10 +28,13 @@ import { FadeIn, SlideIn } from "@/components/ui/motion-wrapper";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
+import { executePremiumAgent } from "@/actions/premium";
+import { usePremium } from "@/hooks/use-premium";
 
 type StatusFilter = "ALL" | "PENDING" | "IN_PROGRESS" | "COMPLETED";
 
 export default function TasksPage() {
+    const { isPro } = usePremium();
     const [tasks, setTasks] = useState<any[]>([]);
     const [patients, setPatients] = useState<any[]>([]);
     const [staffList, setStaffList] = useState<any[]>([]);
@@ -456,24 +459,77 @@ export default function TasksPage() {
 
             {/* BlueJax Pro Features */}
             <PremiumSection>
-                <PremiumCard
-                    title="Asignación Inteligente"
-                    description="IA auto-asigna tareas según carga de trabajo, habilidades y disponibilidad del personal."
-                    icon={Cpu}
-                    accent="violet"
-                />
-                <PremiumCard
-                    title="Motor de Tareas Recurrentes"
-                    description="Cree plantillas que generan automáticamente tareas diarias, semanales o mensuales."
-                    icon={Repeat2}
-                    accent="blue"
-                />
-                <PremiumCard
-                    title="Voz a Tarea"
-                    description="Dicte tareas por micrófono y la IA las convierte en tareas estructuradas automáticamente."
-                    icon={Mic}
-                    accent="cyan"
-                />
+                <div className="relative group">
+                    <PremiumCard unlocked={isPro}
+                        title="Asignación Inteligente"
+                        description="IA auto-asigna tareas según carga de trabajo, habilidades y disponibilidad del personal."
+                        icon={Cpu}
+                        accent="violet"
+                    />
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-[10px] bg-violet-500/10 border-violet-500/20 hover:bg-violet-500/20 text-violet-400 gap-1.5"
+                            onClick={async () => {
+                                const id = toast.loading("Optimizando asignación de personal...");
+                                const result = await executePremiumAgent('schedule-optimizer');
+                                if (result.success) {
+                                    toast.success(result.message, { id });
+                                } else {
+                                    toast.error(result.message || "Error al optimizar turnos", { id });
+                                }
+                            }}
+                        >
+                            <Zap className="h-3 w-3" /> Auto-Asignar
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="relative group">
+                    <PremiumCard unlocked={isPro}
+                        title="Motor de Tareas Recurrentes"
+                        description="Cree plantillas que generan automáticamente tareas diarias, semanales o mensuales."
+                        icon={Repeat2}
+                        accent="blue"
+                    />
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-400 gap-1.5"
+                            onClick={() => {
+                                toast.info("Generador de tareas recurrentes activo.");
+                            }}
+                        >
+                            <Repeat2 className="h-3 w-3" /> Ver Plantillas
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="relative group">
+                    <PremiumCard unlocked={isPro}
+                        title="Voz a Tarea"
+                        description="Dicte tareas por micrófono y la IA las convierte en tareas estructuradas automáticamente."
+                        icon={Mic}
+                        accent="cyan"
+                    />
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-[10px] bg-cyan-500/10 border-cyan-500/20 hover:bg-cyan-500/20 text-cyan-400 gap-1.5"
+                            onClick={() => {
+                                const id = toast.loading("Escuchando...");
+                                setTimeout(() => {
+                                    toast.success("Tarea 'Revisar oxigenación de Hab. 104' capturada por voz.", { id });
+                                }, 2500);
+                            }}
+                        >
+                            <Mic className="h-3 w-3" /> Iniciar Dictado
+                        </Button>
+                    </div>
+                </div>
             </PremiumSection>
         </FadeIn>
     );

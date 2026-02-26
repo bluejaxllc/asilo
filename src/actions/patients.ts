@@ -88,6 +88,10 @@ export const getPatientById = async (id: string) => {
                     include: {
                         medication: true
                     }
+                },
+                notifications: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 5
                 }
             }
         });

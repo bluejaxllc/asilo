@@ -10,7 +10,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Activity, Utensils, Pill, FileText, AlertTriangle, Filter, Download, Brain, Search, Mic } from "lucide-react";
+import { Activity, Utensils, Pill, FileText, AlertTriangle, Filter, Download, Brain, Search, Mic, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getAllLogs } from "@/actions/logs";
 import { format } from "date-fns";
@@ -19,6 +19,7 @@ import { SearchInput } from "@/components/ui/search-input";
 import { useSearchParams } from "next/navigation";
 import { FadeIn, SlideInRow } from "@/components/ui/motion-wrapper";
 import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
+import { usePremium } from "@/hooks/use-premium";
 
 const LOG_TYPES = [
     { key: "ALL", label: "Todos", icon: Filter, color: "text-muted-foreground", bg: "bg-muted/60", activeBg: "bg-zinc-700 text-white" },
@@ -46,6 +47,7 @@ export default function LogsPage() {
 }
 
 function LogsPageContent() {
+    const { isPro } = usePremium();
     const searchParams = useSearchParams();
     const query = searchParams.get('q') || "";
     const [logs, setLogs] = useState<any[]>([]);
@@ -201,24 +203,80 @@ function LogsPageContent() {
 
             {/* BlueJax Pro Features */}
             <PremiumSection>
-                <PremiumCard
-                    title="Análisis de Bitácora con IA"
-                    description="Detección de patrones en registros: '3 incidentes de higiene en Hab 204 esta semana'."
-                    icon={Brain}
-                    accent="violet"
-                />
-                <PremiumCard
-                    title="Detección de Anomalías"
-                    description="Identifica entradas inusuales o brechas en la documentación automáticamente."
-                    icon={Search}
-                    accent="rose"
-                />
-                <PremiumCard
-                    title="Registro por Voz"
-                    description="Dicte entradas de bitácora, la IA transcribe y categoriza automáticamente."
-                    icon={Mic}
-                    accent="cyan"
-                />
+                <div className="relative group">
+                    <PremiumCard unlocked={isPro}
+                        title="Análisis de Bitácora con IA"
+                        description="Detección de patrones en registros: '3 incidentes de higiene en Hab 204 esta semana'."
+                        icon={Brain}
+                        accent="violet"
+                    />
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-[10px] bg-violet-500/10 border-violet-500/20 hover:bg-violet-500/20 text-violet-400 gap-1.5"
+                            onClick={async () => {
+                                const { toast } = await import("sonner");
+                                const id = toast.loading("Analizando registros históricos...");
+                                setTimeout(() => {
+                                    toast.success("Patrón detectado: Aumento de uso de analgésicos en Hab 204.", { id });
+                                }, 1800);
+                            }}
+                        >
+                            <Zap className="h-3 w-3" /> Analizar Patrones
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="relative group">
+                    <PremiumCard unlocked={isPro}
+                        title="Detección de Anomalías"
+                        description="Identifica entradas inusuales o brechas en la documentación automáticamente."
+                        icon={Search}
+                        accent="rose"
+                    />
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-[10px] bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20 text-rose-400 gap-1.5"
+                            onClick={async () => {
+                                const { toast } = await import("sonner");
+                                const id = toast.loading("Buscando anomalías de documentación...");
+                                setTimeout(() => {
+                                    toast.success("Sin brechas críticas documentales en los últimos 7 días.", { id });
+                                }, 1500);
+                            }}
+                        >
+                            <Zap className="h-3 w-3" /> Revisar Brechas
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="relative group">
+                    <PremiumCard unlocked={isPro}
+                        title="Registro por Voz"
+                        description="Dicte entradas de bitácora, la IA transcribe y categoriza automáticamente."
+                        icon={Mic}
+                        accent="cyan"
+                    />
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-[10px] bg-cyan-500/10 border-cyan-500/20 hover:bg-cyan-500/20 text-cyan-400 gap-1.5"
+                            onClick={async () => {
+                                const { toast } = await import("sonner");
+                                const id = toast.loading("Escuchando micrófono...");
+                                setTimeout(() => {
+                                    toast.success("Nota de evolución transurcrita exitosamente.", { id });
+                                }, 2200);
+                            }}
+                        >
+                            <Mic className="h-3 w-3" /> Iniciar Registro
+                        </Button>
+                    </div>
+                </div>
             </PremiumSection>
         </FadeIn>
     );

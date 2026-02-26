@@ -49,6 +49,7 @@ import {
     getUnreadCount,
 } from "@/actions/notifications";
 import { toast } from "sonner";
+import { usePremium } from "@/hooks/use-premium";
 
 const TYPE_CONFIG: Record<string, { label: string; icon: any; color: string; bg: string; activeBg: string; dot: string }> = {
     INFO: { label: "Información", icon: Info, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-500/10", activeBg: "bg-blue-600 text-white", dot: "bg-blue-500/100" },
@@ -57,6 +58,7 @@ const TYPE_CONFIG: Record<string, { label: string; icon: any; color: string; bg:
 };
 
 export default function NotificationsPage() {
+    const { isPro } = usePremium();
     const [notifications, setNotifications] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeFilter, setActiveFilter] = useState("ALL");
@@ -403,25 +405,25 @@ export default function NotificationsPage() {
 
             {/* BlueJax Pro Features */}
             <PremiumSection>
-                <PremiumCard
+                <PremiumCard unlocked={isPro}
                     title="Enrutamiento Inteligente"
                     description="IA dirige notificaciones al personal correcto según turno, rol y proximidad al residente."
                     icon={Route}
                     accent="blue"
                 />
-                <PremiumCard
+                <PremiumCard unlocked={isPro}
                     title="Triage con IA"
                     description="Clasifica automáticamente la urgencia de cada alerta para priorizar atención."
                     icon={Brain}
                     accent="violet"
                 />
-                <PremiumCard
+                <PremiumCard unlocked={isPro}
                     title="Reportes Programados"
                     description="Reciba resúmenes diarios o semanales de notificaciones directamente en su correo."
                     icon={CalendarClock}
                     accent="amber"
                 />
-                <PremiumCard
+                <PremiumCard unlocked={isPro}
                     title="Campañas SMS/Email"
                     description="Envíe newsletters, recordatorios de eventos y comunicados masivos a todos los contactos de familias automáticamente."
                     icon={Mail}

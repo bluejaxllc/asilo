@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Users, UserCheck, AlertCircle, Package, Activity, Clock, Heart, ArrowRight, TrendingUp, Brain, Zap, BarChart3, Star } from "lucide-react";
 import { FadeIn, ScaleIn, SlideIn } from "@/components/ui/motion-wrapper";
 import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
+import { usePremium } from "@/hooks/use-premium";
 
 interface DashboardData {
     totalResidents: number;
@@ -48,6 +50,7 @@ const priorityColors: Record<string, string> = {
 };
 
 export function AdminDashboardClient({ data }: { data: DashboardData }) {
+    const { isPro } = usePremium();
     const {
         totalResidents, activeStaff, totalStaff, pendingTasks,
         lowStockItems, familyAccounts, recentLogs, upcomingTasks,
@@ -117,22 +120,54 @@ export function AdminDashboardClient({ data }: { data: DashboardData }) {
             <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
                 {statCards.map((stat, i) => (
                     <ScaleIn key={stat.label} delay={i * 0.08}>
-                        <Link href={stat.href}>
-                            <Card className={`group cursor-pointer bg-card border border-border/60 border-l-2 ${stat.accentBorder} hover:border-border hover:bg-accent transition-all duration-300 hover:-translate-y-0.5 shadow-lg shadow-black/20`}>
-                                <CardContent className="p-5">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-xs text-muted-foreground font-medium">{stat.label}</p>
-                                            <p className="text-2xl font-bold text-foreground mt-1 font-mono">{stat.value}</p>
-                                            <p className="text-[10px] text-muted-foreground mt-1">{stat.sub}</p>
+                        <div className="relative group">
+                            <Link href={stat.href}>
+                                <Card className={`group cursor-pointer bg-card border border-border/60 border-l-2 ${stat.accentBorder} hover:border-border hover:bg-accent transition-all duration-300 hover:-translate-y-0.5 shadow-lg shadow-black/20`}>
+                                    <CardContent className="p-5">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-xs text-muted-foreground font-medium">{stat.label}</p>
+                                                <p className="text-2xl font-bold text-foreground mt-1 font-mono">{stat.value}</p>
+                                                <p className="text-[10px] text-muted-foreground mt-1">{stat.sub}</p>
+                                            </div>
+                                            <div className={`h-11 w-11 ${stat.iconBg} rounded-xl flex items-center justify-center border border-border group-hover:scale-110 transition-transform`}>
+                                                <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
+                                            </div>
                                         </div>
-                                        <div className={`h-11 w-11 ${stat.iconBg} rounded-xl flex items-center justify-center border border-border group-hover:scale-110 transition-transform`}>
-                                            <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </Link>
+                                    </CardContent>
+                                </Card>
+                            </Link>
+
+                            {/* Inventory IQ Quick Action */}
+                            {stat.label === "Alertas Inventario" && (
+                                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className="h-7 w-7 p-0 rounded-full hover:bg-red-500/20 text-red-400"
+                                        onClick={async (e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            const { toast } = await import("sonner");
+                                            const { runInventoryAudit } = await import("@/actions/reports");
+                                            const id = toast.loading("IA auditando inventario...");
+                                            try {
+                                                const result = await runInventoryAudit();
+                                                if (result.success) {
+                                                    toast.success(result.message, { id });
+                                                } else {
+                                                    toast.error(result.message, { id });
+                                                }
+                                            } catch (e) {
+                                                toast.error("Error al ejecutar auditoría", { id });
+                                            }
+                                        }}
+                                    >
+                                        <Zap className="h-3.5 w-3.5" />
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
                     </ScaleIn>
                 ))}
             </div>
@@ -263,38 +298,168 @@ export function AdminDashboardClient({ data }: { data: DashboardData }) {
             {/* BlueJax Pro Features */}
             <SlideIn direction="up" delay={0.5}>
                 <PremiumSection>
-                    <PremiumCard
-                        title="Resumen de Riesgos con IA"
-                        description="Informe diario generado por IA que analiza tendencias de signos vitales, detecta residentes en riesgo y sugiere intervenciones preventivas."
-                        icon={Brain}
-                        accent="violet"
-                    />
-                    <PremiumCard
-                        title="Alertas Predictivas"
-                        description="Detección temprana de anomalías: 'Residente #204 presión arterial ↑12% esta semana — revisión recomendada'."
-                        icon={Zap}
-                        accent="amber"
-                    />
-                    <PremiumCard
-                        title="Métricas de Eficiencia"
-                        description="Score automatizado de rendimiento por turno, tiempo de respuesta promedio y comparativo histórico del equipo."
-                        icon={BarChart3}
-                        accent="cyan"
-                    />
-                    <PremiumCard
-                        title="Reputación Online"
-                        description="Auto-responda a Google Reviews con IA y envíe solicitudes de reseñas a familias satisfechas para mejorar su presencia online."
-                        icon={Star}
-                        accent="amber"
-                    />
-                    <PremiumCard
-                        title="Embudo de Captación"
-                        description="Landing pages y formularios optimizados para atraer nuevas familias. Seguimiento automático desde la consulta."
-                        icon={TrendingUp}
-                        accent="rose"
-                    />
+                    <div className="relative group">
+                        <PremiumCard unlocked={isPro}
+                            title="Resumen de Riesgos con IA"
+                            description="Informe diario generado por IA que analiza tendencias de signos vitales, detecta residentes en riesgo y sugiere intervenciones preventivas."
+                            icon={Brain}
+                            accent="violet"
+                        />
+                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 text-[10px] bg-violet-500/10 border-violet-500/20 hover:bg-violet-500/20 text-violet-400 gap-1.5"
+                                onClick={async () => {
+                                    const { toast } = await import("sonner");
+                                    const { runRiskAudit } = await import("@/actions/reports");
+                                    const id = toast.loading("IA analizando biometría y reportes...");
+                                    try {
+                                        const result = await runRiskAudit();
+                                        if (result.success) {
+                                            toast.success(result.message, { id });
+                                        } else {
+                                            toast.error(result.message, { id });
+                                        }
+                                    } catch (e) {
+                                        toast.error("Error al ejecutar auditoría", { id });
+                                    }
+                                }}
+                            >
+                                <Zap className="h-3 w-3" /> Ejecutar Auditoría
+                            </Button>
+                        </div>
+                    </div>
+                    <div className="relative group">
+                        <PremiumCard unlocked={isPro}
+                            title="Alertas Predictivas"
+                            description="Detección temprana de anomalías: 'Residente #204 presión arterial ↑12% esta semana — revisión recomendada'."
+                            icon={Zap}
+                            accent="amber"
+                        />
+                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-400 gap-1.5"
+                                onClick={async () => {
+                                    const { toast } = await import("sonner");
+                                    const { runTrendAudit } = await import("@/actions/reports");
+                                    const id = toast.loading("IA analizando tendencias históricas...");
+                                    try {
+                                        const result = await runTrendAudit();
+                                        if (result.success) {
+                                            toast.success(result.message, { id });
+                                        } else {
+                                            toast.error(result.message, { id });
+                                        }
+                                    } catch (e) {
+                                        toast.error("Error al ejecutar auditoría", { id });
+                                    }
+                                }}
+                            >
+                                <Zap className="h-3 w-3" /> Analizar Tendencias
+                            </Button>
+                        </div>
+                    </div>
+                    <div className="relative group">
+                        <PremiumCard unlocked={isPro}
+                            title="Métricas de Eficiencia"
+                            description="Score automatizado de rendimiento por turno, tiempo de respuesta promedio y comparativo histórico del equipo."
+                            icon={BarChart3}
+                            accent="cyan"
+                        />
+                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 text-[10px] bg-cyan-500/10 border-cyan-500/20 hover:bg-cyan-500/20 text-cyan-400 gap-1.5"
+                                onClick={async () => {
+                                    const { toast } = await import("sonner");
+                                    const { runEfficiencyAudit } = await import("@/actions/reports");
+                                    const id = toast.loading("IA analizando eficiencia operativa...");
+                                    try {
+                                        const result = await runEfficiencyAudit();
+                                        if (result.success) {
+                                            toast.success(result.message, { id });
+                                        } else {
+                                            toast.error(result.message, { id });
+                                        }
+                                    } catch (e) {
+                                        toast.error("Error al ejecutar auditoría", { id });
+                                    }
+                                }}
+                            >
+                                <Zap className="h-3 w-3" /> Calcular Métricas
+                            </Button>
+                        </div>
+                    </div>
+                    <div className="relative group">
+                        <PremiumCard unlocked={isPro}
+                            title="Reputación Online"
+                            description="Auto-responda a Google Reviews con IA y envíe solicitudes de reseñas a familias satisfechas para mejorar su presencia online."
+                            icon={Star}
+                            accent="amber"
+                        />
+                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-400 gap-1.5"
+                                onClick={async () => {
+                                    const { toast } = await import("sonner");
+                                    const { runReputationAudit } = await import("@/actions/reports");
+                                    const id = toast.loading("IA auditando reseñas...");
+                                    try {
+                                        const result = await runReputationAudit();
+                                        if (result.success) {
+                                            toast.success(result.message, { id });
+                                        } else {
+                                            toast.error(result.message, { id });
+                                        }
+                                    } catch (e) {
+                                        toast.error("Error al ejecutar auditoría", { id });
+                                    }
+                                }}
+                            >
+                                <Zap className="h-3 w-3" /> Auditar Reseñas
+                            </Button>
+                        </div>
+                    </div>
+                    <div className="relative group">
+                        <PremiumCard unlocked={isPro}
+                            title="Embudo de Captación"
+                            description="Landing pages y formularios optimizados para atraer nuevas familias. Seguimiento automático desde la consulta."
+                            icon={TrendingUp}
+                            accent="rose"
+                        />
+                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 text-[10px] bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20 text-rose-400 gap-1.5"
+                                onClick={async () => {
+                                    const { toast } = await import("sonner");
+                                    const { runMarketingAudit } = await import("@/actions/reports");
+                                    const id = toast.loading("IA analizando embudo...");
+                                    try {
+                                        const result = await runMarketingAudit();
+                                        if (result.success) {
+                                            toast.success(result.message, { id });
+                                        } else {
+                                            toast.error(result.message, { id });
+                                        }
+                                    } catch (e) {
+                                        toast.error("Error al ejecutar auditoría", { id });
+                                    }
+                                }}
+                            >
+                                <Zap className="h-3 w-3" /> Ver Conversión
+                            </Button>
+                        </div>
+                    </div>
                 </PremiumSection>
             </SlideIn>
-        </FadeIn>
+        </FadeIn >
     );
 }

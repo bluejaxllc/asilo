@@ -1,6 +1,7 @@
 
 import { Agent, AgentContext, AgentResult } from '../core/types';
 import { db } from '@/lib/db';
+import { sendWhatsAppAlert } from '@/actions/whatsapp';
 
 export class LowStockAgent implements Agent {
     id = 'low-stock-monitor';
@@ -32,6 +33,14 @@ export class LowStockAgent implements Agent {
                     type: isOutOfStock ? 'CRITICAL' : 'WARNING',
                 }
             });
+
+            // Trigger WhatsApp alert for critical stock (0)
+            if (isOutOfStock) {
+                await sendWhatsAppAlert(
+                    "+521234567890", // Simulated admin number
+                    `📦 STOCK AGOTADO: El artículo "${item.name}" se ha agotado por completo. Se requiere resurtir inmediatamente.`
+                );
+            }
         }
 
         const itemNames = lowStockItems.map(i => `${i.name} (${i.stock}/${i.minStock})`).join(', ');

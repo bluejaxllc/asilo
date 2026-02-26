@@ -23,12 +23,14 @@ import {
     CalendarDays,
     User,
     Stethoscope,
-    MessageCircle
+    MessageCircle,
+    Brain
 } from "lucide-react";
 import Link from "next/link";
 import { VitalsChart } from "@/components/patients/vitals-chart";
 import { ClinicalNotes } from "@/components/patients/clinical-notes";
 import { PatientMessages } from "@/components/patients/patient-messages";
+import { IAInsights } from "@/components/patients/ia-insights";
 import { FadeIn } from "@/components/ui/motion-wrapper";
 import { getPatientById } from "@/actions/patients";
 import { getMessages } from "@/actions/family-messages";
@@ -212,6 +214,18 @@ export default async function PatientDetailsPage({ params }: { params: Promise<{
                                     </CardHeader>
                                     <CardContent className="h-[320px] w-full">
                                         <VitalsChart logs={patient.logs} />
+                                    </CardContent>
+                                </Card>
+
+                                <Card className="border shadow-sm">
+                                    <CardHeader className="pb-3">
+                                        <CardTitle className="text-base flex items-center gap-2">
+                                            <Brain className="h-4 w-4 text-violet-400" />
+                                            IA Clinical Insights
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <IAInsights insights={patient.notifications as any} />
                                     </CardContent>
                                 </Card>
 

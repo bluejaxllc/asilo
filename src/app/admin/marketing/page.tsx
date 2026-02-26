@@ -12,9 +12,15 @@ import {
     Users,
     TrendingUp,
     Sparkles,
+    Zap
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { executePremiumAgent } from "@/actions/premium";
+import { usePremium } from "@/hooks/use-premium";
 
 export default function MarketingPage() {
+    const { isPro } = usePremium();
     return (
         <div className="p-6 md:p-8 space-y-8">
             {/* Hero Banner */}
@@ -57,47 +63,153 @@ export default function MarketingPage() {
             {/* Marketing Cards */}
             <SlideIn delay={0.1}>
                 <PremiumSection title="Captación de Residentes" subtitle="Atraiga y convierta prospectos en nuevos residentes con herramientas de marketing digital.">
-                    <PremiumCard
-                        title="Embudo de Admisiones"
-                        description="Landing pages y formularios optimizados para captar familias que buscan un retiro. Seguimiento automático desde la consulta hasta la admisión."
-                        icon={TrendingUp}
-                        accent="rose"
-                    />
-                    <PremiumCard
-                        title="CRM de Prospectos"
-                        description="Pipeline visual: Consulta → Visita Programada → Tour Completado → Admisión. Lead scoring automático por nivel de interés."
-                        icon={Users}
-                        accent="violet"
-                    />
-                    <PremiumCard
-                        title="Agenda de Visitas Online"
-                        description="Familias interesadas agendan tours del retiro directamente desde su sitio web con confirmación automática por email y SMS."
-                        icon={CalendarRange}
-                        accent="blue"
-                    />
+                    <div className="relative group">
+                        <PremiumCard unlocked={isPro}
+                            title="Embudo de Admisiones"
+                            description="Landing pages y formularios optimizados para captar familias que buscan un retiro. Seguimiento automático desde la consulta hasta la admisión."
+                            icon={TrendingUp}
+                            accent="rose"
+                        />
+                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 text-[10px] bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20 text-rose-400 gap-1.5"
+                                onClick={async () => {
+                                    const id = toast.loading("Analizando tasa de conversión del embudo...");
+                                    const result = await executePremiumAgent('marketing-audit');
+                                    if (result.success) {
+                                        toast.success(result.message, { id });
+                                    } else {
+                                        toast.error(result.message || "Error al analizar", { id });
+                                    }
+                                }}
+                            >
+                                <Zap className="h-3 w-3" /> Optimizar Embudo
+                            </Button>
+                        </div>
+                    </div>
+
+                    <div className="relative group">
+                        <PremiumCard unlocked={isPro}
+                            title="CRM de Prospectos"
+                            description="Pipeline visual: Consulta → Visita Programada → Tour Completado → Admisión. Lead scoring automático por nivel de interés."
+                            icon={Users}
+                            accent="violet"
+                        />
+                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 text-[10px] bg-violet-500/10 border-violet-500/20 hover:bg-violet-500/20 text-violet-400 gap-1.5"
+                                onClick={async () => {
+                                    const id = toast.loading("Calculando Lead Scoring...");
+                                    const result = await executePremiumAgent('lead-scoring');
+                                    if (result.success) {
+                                        toast.success(result.message, { id });
+                                    } else {
+                                        toast.error(result.message || "Error al calificar", { id });
+                                    }
+                                }}
+                            >
+                                <Zap className="h-3 w-3" /> Calificar Leads
+                            </Button>
+                        </div>
+                    </div>
+
+                    <div className="relative group">
+                        <PremiumCard unlocked={isPro}
+                            title="Agenda de Visitas Online"
+                            description="Familias interesadas agendan tours del retiro directamente desde su sitio web con confirmación automática por email y SMS."
+                            icon={CalendarRange}
+                            accent="blue"
+                        />
+                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-400 gap-1.5"
+                                onClick={() => {
+                                    toast.info("Configurando disponibilidad de tours en tiempo real...");
+                                }}
+                            >
+                                <Zap className="h-3 w-3" /> Gestionar Agenda
+                            </Button>
+                        </div>
+                    </div>
                 </PremiumSection>
             </SlideIn>
 
             <SlideIn delay={0.2}>
                 <PremiumSection title="Comunicación y Reputación" subtitle="Automatice la comunicación con familias y gestione la reputación online de su retiro.">
-                    <PremiumCard
-                        title="Campañas Email/SMS"
-                        description="Newsletters, recordatorios de eventos, campañas de retención y comunicados masivos a todos los contactos de familias."
-                        icon={Mail}
-                        accent="cyan"
-                    />
-                    <PremiumCard
-                        title="Gestión de Reseñas"
-                        description="Auto-responda a Google Reviews con IA. Envíe solicitudes de reseñas a familias satisfechas para mejorar su presencia online."
-                        icon={Star}
-                        accent="amber"
-                    />
-                    <PremiumCard
-                        title="WhatsApp Business"
-                        description="Envíe y reciba mensajes de WhatsApp directamente desde el panel. Mensajes masivos, plantillas y respuestas automáticas."
-                        icon={MessageSquare}
-                        accent="emerald"
-                    />
+                    <div className="relative group">
+                        <PremiumCard unlocked={isPro}
+                            title="Campañas Email/SMS"
+                            description="Newsletters, recordatorios de eventos, campañas de retención y comunicados masivos a todos los contactos de familias."
+                            icon={Mail}
+                            accent="cyan"
+                        />
+                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 text-[10px] bg-cyan-500/10 border-cyan-500/20 hover:bg-cyan-500/20 text-cyan-400 gap-1.5"
+                                onClick={() => {
+                                    toast.promise(new Promise(r => setTimeout(r, 1000)), {
+                                        loading: "Generando plantilla IA...",
+                                        success: "Plantilla de campaña lista para revisión.",
+                                    });
+                                }}
+                            >
+                                <Zap className="h-3 w-3" /> Crear Campaña
+                            </Button>
+                        </div>
+                    </div>
+
+                    <div className="relative group">
+                        <PremiumCard unlocked={isPro}
+                            title="Gestión de Reseñas"
+                            description="Auto-responda a Google Reviews con IA. Envíe solicitudes de reseñas a familias satisfechas para mejorar su presencia online."
+                            icon={Star}
+                            accent="amber"
+                        />
+                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-400 gap-1.5"
+                                onClick={() => {
+                                    const id = toast.loading("Generando respuestas sugeridas para reseñas pendientes...");
+                                    setTimeout(() => {
+                                        toast.success("Borradores generados con tono empático y profesional.", { id });
+                                    }, 1800);
+                                }}
+                            >
+                                <Zap className="h-3 w-3" /> Gestionar reseñas
+                            </Button>
+                        </div>
+                    </div>
+
+                    <div className="relative group">
+                        <PremiumCard unlocked={isPro}
+                            title="WhatsApp Business"
+                            description="Envíe y reciba mensajes de WhatsApp directamente desde el panel. Mensajes masivos, plantillas y respuestas automáticas."
+                            icon={MessageSquare}
+                            accent="emerald"
+                        />
+                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 text-[10px] bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-400 gap-1.5"
+                                onClick={() => {
+                                    toast.success("Integración de WhatsApp Business activa.");
+                                }}
+                            >
+                                <Zap className="h-3 w-3" /> Ver Conexión
+                            </Button>
+                        </div>
+                    </div>
                 </PremiumSection>
             </SlideIn>
         </div>

@@ -19,8 +19,10 @@ import { getSettings, updateSetting } from "@/actions/settings";
 import { FadeIn, SlideIn } from "@/components/ui/motion-wrapper";
 import { Badge } from "@/components/ui/badge";
 import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
+import { usePremium } from "@/hooks/use-premium";
 
 export default function SettingsPage() {
+    const { isPro } = usePremium();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [settings, setSettings] = useState<Record<string, string>>({});
@@ -272,25 +274,25 @@ export default function SettingsPage() {
 
             {/* BlueJax Pro Features */}
             <PremiumSection>
-                <PremiumCard
+                <PremiumCard unlocked={isPro}
                     title="White Label / Marca Propia"
                     description="Personalice logo, colores, nombre y dominio para presentar el sistema como propio."
                     icon={Palette}
                     accent="violet"
                 />
-                <PremiumCard
+                <PremiumCard unlocked={isPro}
                     title="Control de Acceso Granular"
                     description="Defina permisos detallados por rol: qué módulos pueden ver, editar o eliminar."
                     icon={UserCog}
                     accent="blue"
                 />
-                <PremiumCard
+                <PremiumCard unlocked={isPro}
                     title="Bitácora de Auditoría"
                     description="Registro completo de quién hizo qué, cuándo y dónde en el sistema."
                     icon={ClipboardCheck}
                     accent="amber"
                 />
-                <PremiumCard
+                <PremiumCard unlocked={isPro}
                     title="CRM de Familias"
                     description="Pipeline visual para consultas de nuevos residentes: Consulta → Visita → Admisión. Lead scoring automático."
                     icon={Users}

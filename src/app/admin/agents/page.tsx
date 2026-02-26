@@ -32,6 +32,7 @@ import {
     Webhook,
     History,
 } from "lucide-react";
+import { usePremium } from "@/hooks/use-premium";
 
 interface AgentInfo {
     id: string;
@@ -87,6 +88,7 @@ const defaultColor = {
 };
 
 export default function AgentsPage() {
+    const { isPro } = usePremium();
     const [agents, setAgents] = useState<AgentInfo[]>([]);
     const [loading, setLoading] = useState(true);
     const [runningAgent, setRunningAgent] = useState<string | null>(null);
@@ -324,19 +326,19 @@ export default function AgentsPage() {
 
             {/* BlueJax Pro Features */}
             <PremiumSection>
-                <PremiumCard
+                <PremiumCard unlocked={isPro}
                     title="Constructor de Agentes Custom"
                     description="Cree agentes personalizados con reglas, triggers y acciones específicas para su operación."
                     icon={Wrench}
                     accent="violet"
                 />
-                <PremiumCard
+                <PremiumCard unlocked={isPro}
                     title="Integraciones Webhook"
                     description="Conecte agentes con sistemas externos: WhatsApp, Slack, ERPs y más."
                     icon={Webhook}
                     accent="blue"
                 />
-                <PremiumCard
+                <PremiumCard unlocked={isPro}
                     title="Historial de Ejecuciones"
                     description="Timeline completo de ejecuciones con logs detallados, duración y resultados."
                     icon={History}

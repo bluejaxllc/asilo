@@ -43,6 +43,7 @@ model Patient {
   logs      DailyLog[]
   medications PatientMedication[]
   tasks     Task[]
+  notifications Notification[]
   
   // Family Members linked to this patient
   familyMembers User[]
@@ -140,6 +141,9 @@ model Notification {
   recipientRole String?  // Target role: ADMIN, STAFF, DOCTOR, NURSE, KITCHEN, FAMILY, or null for ALL
   recipientName String?  // Optional specific person name
   
+  patientId     String?
+  patient       Patient? @relation(fields: [patientId], references: [id])
+
   createdAt DateTime @default(now())
 }
 

@@ -1,6 +1,52 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { reactor } from "@/agents/core/reactor";
+import "@/agents/core/registry"; // Ensure registry is loaded
+
+export async function runRiskAudit() {
+    return await reactor.run('patient-risk-audit');
+}
+
+export async function runInventoryAudit() {
+    return await reactor.run('low-stock-monitor');
+}
+
+export async function runEfficiencyAudit() {
+    return await reactor.run('efficiency-audit');
+}
+
+export async function runReputationAudit() {
+    return await reactor.run('reputation-audit');
+}
+
+export async function runMarketingAudit() {
+    return await reactor.run('marketing-audit');
+}
+
+export async function runTrendAudit() {
+    return await reactor.run('trend-analysis');
+}
+
+export async function getIAInsights() {
+    // Fetch the 5 most recent AI-generated notifications
+    const insights = await db.notification.findMany({
+        where: {
+            OR: [
+                { title: { contains: 'IA' } },
+                { title: { contains: '🚨' } },
+                { title: { contains: '⚠️' } },
+                { title: { contains: '📊' } },
+                { title: { contains: '📦' } }
+            ],
+            type: { in: ['CRITICAL', 'WARNING', 'INFO'] }
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 5
+    });
+
+    return insights;
+}
 
 export async function getReportStats(daysBack: number = 7) {
     const dateFrom = new Date();

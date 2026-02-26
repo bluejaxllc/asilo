@@ -19,10 +19,11 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { PatientForm } from "@/components/patients/patient-form";
-import { UserPlus, FileText, Activity, Users, Heart, BedDouble, AlertTriangle, Brain, TrendingUp, ShieldAlert } from "lucide-react";
+import { UserPlus, FileText, Activity, Users, Heart, BedDouble, AlertTriangle, Brain, TrendingUp, ShieldAlert, Zap } from "lucide-react";
 import Link from "next/link";
-import { FadeIn, HoverScale, SlideInRow } from "@/components/ui/motion-wrapper";
+import { FadeIn, SlideInRow } from "@/components/ui/motion-wrapper";
 import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -31,6 +32,8 @@ import { SearchInput } from "@/components/ui/search-input";
 import { useSearchParams } from "next/navigation";
 import { getPatients } from "@/actions/patients";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { executePremiumAgent } from "@/actions/premium";
+import { usePremium } from "@/hooks/use-premium";
 
 const avatarGradients = [
     "from-blue-400 to-blue-600",
@@ -50,6 +53,7 @@ export default function PatientsPage() {
 }
 
 function PatientsPageContent() {
+    const { isPro } = usePremium();
     const searchParams = useSearchParams();
     const query = searchParams.get('q') || "";
     const [patients, setPatients] = useState<any[]>([]);
@@ -273,25 +277,87 @@ function PatientsPageContent() {
 
             {/* BlueJax Pro Features */}
             <PremiumSection>
-                <PremiumCard
-                    title="Notas Clínicas con IA"
-                    description="Resúmenes clínicos auto-generados a partir de los registros diarios de cada residente."
-                    icon={Brain}
-                    accent="violet"
-                />
-                <PremiumCard
-                    title="Gráficas de Signos Vitales"
-                    description="Visualice tendencias de presión, glucosa y peso por residente con gráficas interactivas."
-                    icon={TrendingUp}
-                    accent="blue"
-                />
-                <PremiumCard
-                    title="Evaluación de Riesgo de Caídas"
-                    description="Score de riesgo calculado por IA basado en edad, medicamentos y movilidad."
-                    icon={ShieldAlert}
-                    accent="amber"
-                />
+                <div className="relative group">
+                    <PremiumCard unlocked={isPro}
+                        title="Notas Clínicas con IA"
+                        description="Resúmenes clínicos auto-generados a partir de los registros diarios de cada residente."
+                        icon={Brain}
+                        accent="violet"
+                    />
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-[10px] bg-violet-500/10 border-violet-500/20 hover:bg-violet-500/20 text-violet-400 gap-1.5"
+                            onClick={async () => {
+                                const id = toast.loading("Generando notas clínicas...");
+                                const res = await executePremiumAgent("clinical-notes-synthesis");
+                                if (res.success) {
+                                    toast.success("Notas clínicas generadas exitosamente.", { id });
+                                } else {
+                                    toast.error(res.message || "Error al generar notas.", { id });
+                                }
+                            }}
+                        >
+                            <FileText className="h-3 w-3" /> Ver Resúmenes
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="relative group">
+                    <PremiumCard unlocked={isPro}
+                        title="Gráficas de Signos Vitales"
+                        description="Visualice tendencias de presión, glucosa y peso por residente con gráficas interactivas."
+                        icon={TrendingUp}
+                        accent="blue"
+                    />
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-400 gap-1.5"
+                            onClick={async () => {
+                                const id = toast.loading("Calculando tendencias vitales...");
+                                const res = await executePremiumAgent("trend-analysis");
+                                if (res.success) {
+                                    toast.success("Tendencias actualizadas. Revisar gráficas.", { id });
+                                } else {
+                                    toast.error(res.message || "Error al generar tendencias.", { id });
+                                }
+                            }}
+                        >
+                            <TrendingUp className="h-3 w-3" /> Ver Tendencias
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="relative group">
+                    <PremiumCard unlocked={isPro}
+                        title="Evaluación de Riesgo de Caídas"
+                        description="Score de riesgo calculado por IA basado en edad, medicamentos y movilidad."
+                        icon={ShieldAlert}
+                        accent="amber"
+                    />
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-400 gap-1.5"
+                            onClick={async () => {
+                                const id = toast.loading("Calculando Score de Riesgo...");
+                                const res = await executePremiumAgent("patient-risk-audit");
+                                if (res.success) {
+                                    toast.warning((res as any).data?.insights?.[0] || "Auditoría de riesgo completada.", { id });
+                                } else {
+                                    toast.error(res.message || "Error al calcular riesgo.", { id });
+                                }
+                            }}
+                        >
+                            <Zap className="h-3 w-3" /> Auditoría de Riesgo
+                        </Button>
+                    </div>
+                </div>
             </PremiumSection>
-        </FadeIn>
+        </FadeIn >
     );
 }

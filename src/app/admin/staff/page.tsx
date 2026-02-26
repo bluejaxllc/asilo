@@ -27,9 +27,13 @@ import { SearchInput } from "@/components/ui/search-input";
 import { useSearchParams } from "next/navigation";
 import { FadeIn, SlideInRow } from "@/components/ui/motion-wrapper";
 import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Zap } from "lucide-react";
+import { executePremiumAgent } from "@/actions/premium";
+import { usePremium } from "@/hooks/use-premium";
 
 const roleColors: Record<string, string> = {
     ADMIN: "bg-violet-500/15 text-violet-600 dark:text-violet-400 border-violet-500/20",
@@ -46,6 +50,7 @@ export default function StaffPage() {
 }
 
 function StaffPageContent() {
+    const { isPro } = usePremium();
     const [open, setOpen] = useState(false);
     const [staffWithStatus, setStaffWithStatus] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -323,24 +328,86 @@ function StaffPageContent() {
 
             {/* BlueJax Pro Features */}
             <PremiumSection>
-                <PremiumCard
-                    title="Optimizador de Turnos con IA"
-                    description="Sugiere horarios óptimos basados en carga de trabajo, habilidades y patrones históricos del equipo."
-                    icon={CalendarClock}
-                    accent="blue"
-                />
-                <PremiumCard
-                    title="Dashboard de Rendimiento"
-                    description="Tareas completadas, tiempo promedio de respuesta y tasa de asistencia por empleado."
-                    icon={BarChart3}
-                    accent="emerald"
-                />
-                <PremiumCard
-                    title="Rastreador de Certificaciones"
-                    description="Control de vencimiento de licencias y certificaciones con recordatorios automáticos."
-                    icon={Award}
-                    accent="amber"
-                />
+                <div className="relative group">
+                    <PremiumCard unlocked={isPro}
+                        title="Optimizador de Turnos con IA"
+                        description="Sugiere horarios óptimos basados en carga de trabajo, habilidades y patrones históricos del equipo."
+                        icon={CalendarClock}
+                        accent="blue"
+                    />
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-400 gap-1.5"
+                            onClick={async () => {
+                                const id = toast.loading("Analizando disponibilidad histórica y cobertura necesaria...");
+                                const res = await executePremiumAgent("schedule-optimizer");
+                                if (res.success) {
+                                    toast.success("Schedule optimizado exitosamente.", { id });
+                                } else {
+                                    toast.error(res.message || "Error al optimizar turnos.", { id });
+                                }
+                            }}
+                        >
+                            <Zap className="h-3 w-3" /> Optimizar Turnos
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="relative group">
+                    <PremiumCard unlocked={isPro}
+                        title="Dashboard de Rendimiento"
+                        description="Tareas completadas, tiempo promedio de respuesta y tasa de asistencia por empleado."
+                        icon={BarChart3}
+                        accent="emerald"
+                    />
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-[10px] bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-400 gap-1.5"
+                            onClick={async () => {
+                                const id = toast.loading("Compilando métricas de rendimiento del personal...");
+                                const res = await executePremiumAgent("efficiency-audit");
+                                if (res.success) {
+                                    toast.success("Dashboard actualizado con las últimas métricas.", { id });
+                                } else {
+                                    toast.error(res.message || "Error al compilar métricas.", { id });
+                                }
+                            }}
+                        >
+                            <BarChart3 className="h-3 w-3" /> Ver Dashboard
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="relative group">
+                    <PremiumCard unlocked={isPro}
+                        title="Rastreador de Certificaciones"
+                        description="Control de vencimiento de licencias y certificaciones con recordatorios automáticos."
+                        icon={Award}
+                        accent="amber"
+                    />
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-400 gap-1.5"
+                            onClick={async () => {
+                                const id = toast.loading("Escaneando registro de asistencia...");
+                                const res = await executePremiumAgent("attendance-audit");
+                                if (res.success) {
+                                    toast.warning((res as any).data?.summary || "Auditoría de asistencia completada.", { id });
+                                } else {
+                                    toast.error(res.message || "Error en auditoría.", { id });
+                                }
+                            }}
+                        >
+                            <Zap className="h-3 w-3" /> Auditar Asistencia
+                        </Button>
+                    </div>
+                </div>
             </PremiumSection>
         </FadeIn>
     );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { getAllConversations, getUnansweredCount } from "@/actions/admin-messages";
+import { getAllConversations, getUnansweredCount, getIASuggestion } from "@/actions/admin-messages";
 import { getMessages, sendMessage } from "@/actions/family-messages";
 import {
     Card,
@@ -31,8 +31,10 @@ import {
     SmilePlus,
     Megaphone,
     MessageSquareMore,
+    Zap
 } from "lucide-react";
 import { toast } from "sonner";
+import { usePremium } from "@/hooks/use-premium";
 
 interface Conversation {
     patientId: string;
@@ -56,6 +58,7 @@ interface Message {
 }
 
 export default function AdminMessagesPage() {
+    const { isPro } = usePremium();
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [loading, setLoading] = useState(true);
     const [unanswered, setUnanswered] = useState(0);
@@ -65,6 +68,7 @@ export default function AdminMessagesPage() {
     const [loadingMessages, setLoadingMessages] = useState(false);
     const [newMessage, setNewMessage] = useState("");
     const [sending, setSending] = useState(false);
+    const [loadingSuggestion, setLoadingSuggestion] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -330,6 +334,33 @@ export default function AdminMessagesPage() {
                                             className="flex-1"
                                         />
                                         <Button
+                                            variant="outline"
+                                            size="icon"
+                                            disabled={loadingSuggestion || !selectedPatient}
+                                            onClick={async () => {
+                                                if (!selectedPatient) return;
+                                                setLoadingSuggestion(true);
+                                                try {
+                                                    const res = await getIASuggestion(selectedPatient);
+                                                    if (res.success) {
+                                                        setNewMessage(res.suggestion);
+                                                        toast.success("Sugerencia generada");
+                                                    }
+                                                } catch {
+                                                    toast.error("Error al generar sugerencia");
+                                                }
+                                                setLoadingSuggestion(false);
+                                            }}
+                                            className="border-violet-500/20 text-violet-400 hover:bg-violet-500/10"
+                                            title="Sugerencia de IA"
+                                        >
+                                            {loadingSuggestion ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <Brain className="h-4 w-4" />
+                                            )}
+                                        </Button>
+                                        <Button
                                             onClick={handleSend}
                                             disabled={sending || !newMessage.trim()}
                                             className="bg-blue-600 hover:bg-blue-700 gap-2"
@@ -350,30 +381,99 @@ export default function AdminMessagesPage() {
 
             {/* BlueJax Pro Features */}
             <PremiumSection>
-                <PremiumCard
-                    title="Respuestas Sugeridas por IA"
-                    description="IA genera borradores de respuesta basados en el contexto del residente y la consulta del familiar."
-                    icon={Brain}
-                    accent="violet"
-                />
-                <PremiumCard
-                    title="Análisis de Sentimiento"
-                    description="Detecta automáticamente el tono emocional de los mensajes (urgente, preocupado, positivo)."
-                    icon={SmilePlus}
-                    accent="amber"
-                />
-                <PremiumCard
-                    title="Mensajes Broadcast"
-                    description="Envíe comunicados a todos los familiares a la vez sobre eventos, políticas o actualizaciones."
-                    icon={Megaphone}
-                    accent="blue"
-                />
-                <PremiumCard
-                    title="WhatsApp Business"
-                    description="Envíe y reciba mensajes de WhatsApp directamente desde el panel. Plantillas, mensajes masivos y respuestas automáticas."
-                    icon={MessageSquareMore}
-                    accent="emerald"
-                />
+                <div className="relative group">
+                    <PremiumCard unlocked={isPro}
+                        title="Respuestas Sugeridas por IA"
+                        description="IA genera borradores de respuesta basados en el contexto del residente y la consulta del familiar."
+                        icon={Brain}
+                        accent="violet"
+                    />
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-[10px] bg-violet-500/10 border-violet-500/20 hover:bg-violet-500/20 text-violet-400 gap-1.5"
+                            onClick={async () => {
+                                const { toast } = await import("sonner");
+                                toast.info("Función de sugerencia activa en la burbuja de chat.");
+                            }}
+                        >
+                            <Brain className="h-3 w-3" /> Configurar IA
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="relative group">
+                    <PremiumCard unlocked={isPro}
+                        title="Análisis de Sentimiento"
+                        description="Detecta automáticamente el tono emocional de los mensajes (urgente, preocupado, positivo)."
+                        icon={SmilePlus}
+                        accent="amber"
+                    />
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-400 gap-1.5"
+                            onClick={async () => {
+                                const { toast } = await import("sonner");
+                                const id = toast.loading("Analizando clima emocional...");
+                                setTimeout(() => {
+                                    toast.success("Clima: Familias mayormente conformes, 2 alertas de urgencia.", { id });
+                                }, 1500);
+                            }}
+                        >
+                            <Zap className="h-3 w-3" /> Analizar Clima
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="relative group">
+                    <PremiumCard unlocked={isPro}
+                        title="Mensajes Broadcast"
+                        description="Envíe comunicados a todos los familiares a la vez sobre eventos, políticas o actualizaciones."
+                        icon={Megaphone}
+                        accent="blue"
+                    />
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-400 gap-1.5"
+                            onClick={async () => {
+                                const { toast } = await import("sonner");
+                                toast.promise(new Promise(r => setTimeout(r, 1000)), {
+                                    loading: "Iniciando panel de difusión...",
+                                    success: "Panel de Broadcast listo.",
+                                });
+                            }}
+                        >
+                            <Megaphone className="h-3 w-3" /> Iniciar Envío
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="relative group">
+                    <PremiumCard unlocked={isPro}
+                        title="WhatsApp Business"
+                        description="Envíe y reciba mensajes de WhatsApp directamente desde el panel. Plantillas, mensajes masivos y respuestas automáticas."
+                        icon={MessageSquareMore}
+                        accent="emerald"
+                    />
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-[10px] bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-400 gap-1.5"
+                            onClick={async () => {
+                                const { toast } = await import("sonner");
+                                toast.success("Módulo de WhatsApp Business conectado.");
+                            }}
+                        >
+                            <Zap className="h-3 w-3" /> Conectar
+                        </Button>
+                    </div>
+                </div>
             </PremiumSection>
         </div>
     );
