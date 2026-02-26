@@ -1,6 +1,7 @@
 
 import { Agent, AgentContext, AgentResult } from '../core/types';
 import { db } from '@/lib/db';
+import { generateBlueJaxResponse } from '@/lib/bluejax-ai';
 
 export class MarketingAgent implements Agent {
     id = 'marketing-audit';
@@ -20,17 +21,26 @@ export class MarketingAgent implements Agent {
 
         const conversionRate = ((funnel.admissions / funnel.inquiries) * 100).toFixed(1);
 
-        let insight = "";
+        let insight = "El embudo se comporta de manera estable.";
         let status: 'CRITICAL' | 'WARNING' | 'INFO' = 'INFO';
 
-        if (funnel.admissions < 5) {
-            status = 'WARNING';
-            insight = "Las admisiones están por debajo del objetivo mensual. Se recomienda revisar el tiempo de seguimiento a los tours.";
-        }
+        if (funnel.admissions < 5) status = 'WARNING';
+        if (funnel.tours / funnel.inquiries < 0.2) status = 'CRITICAL';
 
-        if (funnel.tours / funnel.inquiries < 0.2) {
-            status = 'CRITICAL';
-            insight = "Cuello de botella detectado: Solo el 15% de los prospectos agendan un tour. Optimice el primer contacto.";
+        const prompt = `Actúa como BlueJax, el Analista de Embudo de Captación del Asilo.
+Analiza este embudo de ventas:
+- Visitantes: ${funnel.visitors}
+- Consultas: ${funnel.inquiries}
+- Tours: ${funnel.tours}
+- Admisiones: ${funnel.admissions}
+- Tasa de Conversión (Lead a Residente): ${conversionRate}%
+
+Escribe un "Insight de IA" (máximo 2 oraciones) indicando el estado del embudo y una sugerencia.`;
+
+        try {
+            insight = await generateBlueJaxResponse(prompt);
+        } catch (err) {
+            console.error("AI Error generating marketing insight", err);
         }
 
         const message = [

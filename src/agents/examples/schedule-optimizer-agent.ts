@@ -1,5 +1,6 @@
 import { Agent, AgentContext, AgentResult } from '../core/types';
 import { db } from '@/lib/db';
+import { generateBlueJaxResponse } from '@/lib/bluejax-ai';
 
 export class ScheduleOptimizerAgent implements Agent {
     id = 'schedule-optimizer';
@@ -21,11 +22,21 @@ export class ScheduleOptimizerAgent implements Agent {
             ratio = pendingTasks / staff;
         }
 
+        const prompt = `Actúa como BlueJax, el Optimizador de Turnos Mágicos del Asilo.
+Analiza la siguiente carga de trabajo:
+- Total Personal Clínico/Admin: ${staff}
+- Tareas Abiertas Pendientes: ${pendingTasks}
+- Ratio de tareas por persona: ${ratio.toFixed(1)}
+
+Genera una recomendación breve (máximo 3 oraciones) sobre cómo balancear los turnos o si la carga es adecuada.
+Si el ratio es > 5, sugiere reasignación urgente. Si es bajo, sugiere optimización de costos.`;
+
         let message = '';
-        if (ratio > 5) {
-            message = `Schedule re-balanceado: Se sugiere reasignar tareas críticas. Carga muy alta (${ratio.toFixed(1)} tareas/persona).`;
-        } else {
-            message = `Schedule optimizado: Reducción del 14% en costos de tiempo extra estimativos basada en distribución ideal.`;
+        try {
+            message = await generateBlueJaxResponse(prompt);
+        } catch (err) {
+            console.error("AI Error generating schedule optimization", err);
+            message = `Error de IA. Carga actual: ${ratio.toFixed(1)} tareas por persona.`;
         }
 
         await db.notification.create({

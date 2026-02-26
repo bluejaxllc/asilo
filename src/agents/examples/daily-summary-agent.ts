@@ -1,6 +1,7 @@
 
 import { Agent, AgentContext, AgentResult } from '../core/types';
 import { db } from '@/lib/db';
+import { generateBlueJaxResponse } from '@/lib/bluejax-ai';
 
 export class DailySummaryAgent implements Agent {
     id = 'daily-summary';
@@ -48,7 +49,6 @@ export class DailySummaryAgent implements Agent {
         // Get patient count
         const patientCount = await db.patient.count();
 
-        // Create summary notification
         const typeLabels: Record<string, string> = {
             VITALS: 'Signos Vitales',
             FOOD: 'Alimentación',
@@ -60,14 +60,23 @@ export class DailySummaryAgent implements Agent {
 
         const summaryParts = Object.entries(byType).map(
             ([type, count]) => `${typeLabels[type] || type}: ${count}`
-        );
+        ).join(', ');
 
-        const summaryMessage = [
-            `📊 Resumen del día:`,
-            `• ${logs.length} registros en bitácora${summaryParts.length > 0 ? ` (${summaryParts.join(', ')})` : ''}`,
-            `• ${completedTasks} tareas completadas, ${pendingTasks} pendientes`,
-            `• ${patientCount} residentes activos`
-        ].join('\n');
+        const prompt = `Actúa como BlueJax, el Asistente Ejecutivo del Asilo.
+Genera un resumen diario (máximo 3 oraciones cortas) para la administración basado en estos datos:
+- Registros en bitácora hoy: ${logs.length} (${summaryParts})
+- Tareas completadas: ${completedTasks}
+- Tareas pendientes: ${pendingTasks}
+- Residentes activos: ${patientCount}
+Usa un tono profesional, alentador y conciso. No uses formato markdown.`;
+
+        let summaryMessage = '';
+        try {
+            summaryMessage = await generateBlueJaxResponse(prompt);
+        } catch (err) {
+            console.error("AI Error generating daily summary", err);
+            summaryMessage = `Resumen Diario: ${logs.length} registros, ${completedTasks} tareas completadas.`;
+        }
 
         await db.notification.create({
             data: {

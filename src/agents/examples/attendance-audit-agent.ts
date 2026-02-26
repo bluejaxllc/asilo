@@ -1,6 +1,7 @@
 
 import { Agent, AgentContext, AgentResult } from '../core/types';
 import { db } from '@/lib/db';
+import { generateBlueJaxResponse } from '@/lib/bluejax-ai';
 
 export class AttendanceAuditAgent implements Agent {
     id = 'attendance-audit';
@@ -38,10 +39,23 @@ export class AttendanceAuditAgent implements Agent {
                 minute: '2-digit'
             });
 
+            const prompt = `Actúa como BlueJax, el asistente de RRHH del Asilo.
+Genera un mensaje de alerta amistoso pero profesional (máximo 2 oraciones) dirigido al administrador indicando que el siguiente empleado olvidó registrar su salida de turno hoy.
+Empleado: ${record.user.name || record.user.email} (Rol: ${record.user.role})
+Hora de registro de entrada: ${checkInTime}
+IMPORTANTE: Responde solo con el texto del mensaje, sin comillas ni markdown.`;
+
+            let aiMessage = `${record.user.name || record.user.email} (${record.user.role}) registró entrada a las ${checkInTime} pero no ha marcado salida.`;
+            try {
+                aiMessage = await generateBlueJaxResponse(prompt);
+            } catch (err) {
+                console.error("AI Error generating attendance reminder", err);
+            }
+
             await db.notification.create({
                 data: {
                     title: `🕐 Salida pendiente: ${record.user.name || record.user.email}`,
-                    message: `${record.user.name || record.user.email} (${record.user.role}) registró entrada a las ${checkInTime} pero no ha marcado salida.`,
+                    message: aiMessage,
                     type: 'WARNING',
                 }
             });

@@ -2,6 +2,7 @@
 import { Agent, AgentContext, AgentResult } from '../core/types';
 import { db } from '@/lib/db';
 import { sendWhatsAppAlert } from '@/actions/whatsapp';
+import { generateBlueJaxResponse } from '@/lib/bluejax-ai';
 
 export class LowStockAgent implements Agent {
     id = 'low-stock-monitor';
@@ -21,27 +22,36 @@ export class LowStockAgent implements Agent {
 
         console.log(`[LowStockAgent] Found ${lowStockItems.length} items with low stock.`);
 
-        // Create notifications for each low-stock item
+        // Trigger individual WhatsApp alerts for critically out-of-stock items
         for (const item of lowStockItems) {
-            const isOutOfStock = item.stock === 0;
-            await db.notification.create({
-                data: {
-                    title: isOutOfStock ? `⚠️ AGOTADO: ${item.name}` : `📦 Stock Bajo: ${item.name}`,
-                    message: isOutOfStock
-                        ? `${item.name} está completamente agotado. Se requiere resurtir urgente.`
-                        : `${item.name} tiene ${item.stock} ${item.unit} (mínimo: ${item.minStock}).`,
-                    type: isOutOfStock ? 'CRITICAL' : 'WARNING',
-                }
-            });
-
-            // Trigger WhatsApp alert for critical stock (0)
-            if (isOutOfStock) {
+            if (item.stock === 0) {
                 await sendWhatsAppAlert(
                     "+521234567890", // Simulated admin number
                     `📦 STOCK AGOTADO: El artículo "${item.name}" se ha agotado por completo. Se requiere resurtir inmediatamente.`
                 );
             }
         }
+
+        const prompt = `Actúa como BlueJax, el Gestor de Inventario del Asilo.
+Tienes que reportar los siguientes artículos con stock bajo o agotado:
+${lowStockItems.map(i => `- ${i.name}: ${i.stock} ${i.unit} (Mínimo: ${i.minStock})`).join('\n')}
+Genera un mensaje de alerta de inventario (máximo 3 oraciones) para el administrador, destacando los artículos urgentes y recomendando la compra.`;
+
+        let message = `${lowStockItems.length} artículos detectados con stock bajo.`;
+        try {
+            message = await generateBlueJaxResponse(prompt);
+        } catch (err) {
+            console.error("AI Error generating low stock alert", err);
+        }
+
+        // Create a single aggregated summary notification
+        await db.notification.create({
+            data: {
+                title: `📦 Alerta de Inventario IA`,
+                message: message,
+                type: lowStockItems.some(i => i.stock === 0) ? 'CRITICAL' : 'WARNING',
+            }
+        });
 
         const itemNames = lowStockItems.map(i => `${i.name} (${i.stock}/${i.minStock})`).join(', ');
 

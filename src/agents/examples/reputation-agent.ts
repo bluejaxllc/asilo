@@ -1,6 +1,7 @@
 
 import { Agent, AgentContext, AgentResult } from '../core/types';
 import { db } from '@/lib/db';
+import { generateBlueJaxResponse } from '@/lib/bluejax-ai';
 
 export class ReputationAgent implements Agent {
     id = 'reputation-audit';
@@ -21,11 +22,19 @@ export class ReputationAgent implements Agent {
 
         for (const review of mockReviews) {
             // IA drafts a response based on rating and comment
-            let draft = "";
-            if (review.rating >= 4) {
-                draft = `¡Gracias ${review.author}! Nos alegra mucho saber que ${review.comment.includes('atención') ? 'nuestro equipo' : 'nuestras instalaciones'} cumplieron sus expectativas. Seguiremos trabajando con amor.`;
-            } else {
-                draft = `Estimada ${review.author}, lamentamos su experiencia. En Retiro BlueJax nos tomamos muy en serio sus comentarios sobre ${review.comment.toLowerCase().includes('comida') ? 'la alimentación' : 'nuestro servicio'}. Un coordinador se pondrá en contacto para resolver esto.`;
+            const prompt = `Actúa como BlueJax, el Coordinador de Relaciones Públicas del Asilo "Retiro BlueJax".
+Han dejado la siguiente reseña en Google:
+Autor: ${review.author}
+Calificación: ${review.rating} de 5 estrellas
+Comentario: "${review.comment}"
+
+Escribe un borrador de respuesta (máximo 2-3 oraciones) que sea empático, profesional y agradecido. Si hay una queja, asegura que se tomarán medidas. Responde solo con el texto de la respuesta.`;
+
+            let draft = `Gracias por tu comentario, ${review.author}.`;
+            try {
+                draft = await generateBlueJaxResponse(prompt);
+            } catch (err) {
+                console.error("AI Error generating review response", err);
             }
 
             // Create system notification for admin to approve the draft

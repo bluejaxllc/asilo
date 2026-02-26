@@ -31,7 +31,7 @@ async function main() {
         include: { patient: true }
     });
 
-    if (latestNote && latestNote.value.includes("Error") === false) {
+    if (latestNote && latestNote.value && latestNote.value.includes("Error") === false) {
         console.log(`\nFound generated note for patient: ${latestNote.patient?.name}`);
         console.log(`Note Content:\n${latestNote.value}`);
     } else {
