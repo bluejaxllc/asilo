@@ -31,6 +31,7 @@ import { toast } from "sonner";
 import { SearchInput } from "@/components/ui/search-input";
 import { useSearchParams } from "next/navigation";
 import { usePremium } from "@/hooks/use-premium";
+import { executePremiumAgent } from "@/actions/premium";
 
 export default function InventoryPage() {
     return (
@@ -298,11 +299,13 @@ function InventoryPageContent() {
                             variant="outline"
                             className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-400 gap-1.5"
                             onClick={async () => {
-                                const { toast } = await import("sonner");
                                 const id = toast.loading("Analizando patrones de consumo...");
-                                setTimeout(() => {
-                                    toast.success("Cálculo completo: Reposición sugerida en 4-6 días.", { id });
-                                }, 1500);
+                                const result = await executePremiumAgent('inventory-audit');
+                                if (result.success) {
+                                    toast.success(result.message, { id });
+                                } else {
+                                    toast.error(result.message || "Error al analizar", { id });
+                                }
                             }}
                         >
                             <Zap className="h-3 w-3" /> Predecir Reorden
@@ -323,11 +326,13 @@ function InventoryPageContent() {
                             variant="outline"
                             className="h-8 text-[10px] bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20 text-rose-400 gap-1.5"
                             onClick={async () => {
-                                const { toast } = await import("sonner");
                                 const id = toast.loading("Verificando fechas de caducidad...");
-                                setTimeout(() => {
+                                const result = await executePremiumAgent('inventory-audit');
+                                if (result.success) {
                                     toast.success("Sin caducidades próximas críticas detectadas.", { id });
-                                }, 1200);
+                                } else {
+                                    toast.error(result.message || "Error al analizar", { id });
+                                }
                             }}
                         >
                             <Zap className="h-3 w-3" /> Escanear Caducidad
@@ -348,11 +353,13 @@ function InventoryPageContent() {
                             variant="outline"
                             className="h-8 text-[10px] bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-400 gap-1.5"
                             onClick={async () => {
-                                const { toast } = await import("sonner");
                                 const id = toast.loading("Generando gráficas avanzadas...");
-                                setTimeout(() => {
-                                    toast.success("Panel de analítica listo.", { id });
-                                }, 1800);
+                                const result = await executePremiumAgent('inventory-audit');
+                                if (result.success) {
+                                    toast.success("Panel de analítica procesado en segundo plano.", { id });
+                                } else {
+                                    toast.error(result.message || "Error al analizar", { id });
+                                }
                             }}
                         >
                             <TrendingUp className="h-3 w-3" /> Abrir Dashboard

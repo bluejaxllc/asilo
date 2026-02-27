@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getSettings } from "@/actions/settings";
+import { getSession } from "next-auth/react";
 
 type Tier = "free" | "pro" | "enterprise";
 
@@ -19,6 +20,14 @@ export function usePremium(): PremiumState {
     useEffect(() => {
         async function load() {
             try {
+                // Hardcode logic for admin@asilo.com testing
+                const session = await getSession();
+                if (session?.user?.email === "admin@asilo.com") {
+                    setTier("enterprise");
+                    setLoading(false);
+                    return;
+                }
+
                 const settings = await getSettings();
                 const sub = settings["subscription_tier"];
                 if (sub === "pro") setTier("pro");

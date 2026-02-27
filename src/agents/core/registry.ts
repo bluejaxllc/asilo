@@ -14,6 +14,15 @@ import { TrendAnalysisAgent } from '../examples/trend-analysis-agent';
 import { ClinicalNotesAgent } from '../examples/clinical-notes-agent';
 import { ScheduleOptimizerAgent } from '../examples/schedule-optimizer-agent';
 import { LeadScoringAgent } from '../examples/lead-scoring-agent';
+import { InventoryAuditAgent } from '../examples/inventory-audit-agent';
+import { CampaignGeneratorAgent } from '../examples/campaign-generator-agent';
+import { LogAnalysisAgent } from '../examples/log-analysis-agent';
+import { VoiceToTaskAgent } from '../examples/voice-to-task-agent';
+import { MessageAuditAgent } from '../examples/message-audit-agent';
+import { PdfExportAgent } from '../examples/pdf-export-agent';
+import { TourBookingAgent } from '../examples/tour-booking-agent';
+import { SmartReplyAgent } from '../examples/smart-reply-agent';
+import { WhatsAppIntegrationAgent } from '../examples/whatsapp-integration-agent';
 
 // Initialize registry
 const registry = reactor;
@@ -33,6 +42,15 @@ registry.register(new TrendAnalysisAgent());
 registry.register(new ClinicalNotesAgent());
 registry.register(new ScheduleOptimizerAgent());
 registry.register(new LeadScoringAgent());
+registry.register(new InventoryAuditAgent());
+registry.register(new CampaignGeneratorAgent());
+registry.register(new LogAnalysisAgent());
+registry.register(new VoiceToTaskAgent());
+registry.register(new MessageAuditAgent());
+registry.register(new PdfExportAgent());
+registry.register(new TourBookingAgent());
+registry.register(new SmartReplyAgent());
+registry.register(new WhatsAppIntegrationAgent());
 
 export function getRegistry() {
     return registry;

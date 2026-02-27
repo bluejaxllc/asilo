@@ -51,6 +51,8 @@ import { getReportStats, getActivityTrends, getStaffPerformance, getOccupancyDat
 import { cn } from "@/lib/utils";
 import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
 import { usePremium } from "@/hooks/use-premium";
+import { executePremiumAgent } from "@/actions/premium";
+import { toast } from "sonner";
 
 export default function ReportsPage() {
     const { isPro } = usePremium();
@@ -410,11 +412,13 @@ export default function ReportsPage() {
                             variant="outline"
                             className="h-8 text-[10px] bg-violet-500/10 border-violet-500/20 hover:bg-violet-500/20 text-violet-400 gap-1.5"
                             onClick={async () => {
-                                const { toast } = await import("sonner");
                                 const id = toast.loading("IA redactando resumen ejecutivo...");
-                                setTimeout(() => {
+                                const result = await executePremiumAgent('trend-analysis');
+                                if (result.success) {
                                     toast.success("Resumen generado y enviado a su correo.", { id });
-                                }, 2000);
+                                } else {
+                                    toast.error(result.message || "Error al analizar", { id });
+                                }
                             }}
                         >
                             <Zap className="h-3 w-3" /> Generar Resumen
@@ -435,11 +439,13 @@ export default function ReportsPage() {
                             variant="outline"
                             className="h-8 text-[10px] bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-400 gap-1.5"
                             onClick={async () => {
-                                const { toast } = await import("sonner");
                                 const id = toast.loading("IA verificando cumplimiento normativo...");
-                                setTimeout(() => {
-                                    toast.success("Auditoría: 98% de cumplimiento detectado.", { id });
-                                }, 1500);
+                                const result = await executePremiumAgent('efficiency-audit');
+                                if (result.success) {
+                                    toast.success("Auditoría de cumplimiento detectada y lista.", { id });
+                                } else {
+                                    toast.error(result.message || "Error al auditar", { id });
+                                }
                             }}
                         >
                             <Zap className="h-3 w-3" /> Ejecutar Auditoría
@@ -460,11 +466,13 @@ export default function ReportsPage() {
                             variant="outline"
                             className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-400 gap-1.5"
                             onClick={async () => {
-                                const { toast } = await import("sonner");
                                 const id = toast.loading("Preparando documento PDF...");
-                                setTimeout(() => {
-                                    toast.success("PDF generado exitosamente.", { id });
-                                }, 1800);
+                                const result = await executePremiumAgent('pdf-export');
+                                if (result.success) {
+                                    toast.success(result.message, { id });
+                                } else {
+                                    toast.error(result.message || "Error al exportar", { id });
+                                }
                             }}
                         >
                             <FileDown className="h-3 w-3" /> Descargar PDF

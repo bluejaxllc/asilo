@@ -20,6 +20,8 @@ import { useSearchParams } from "next/navigation";
 import { FadeIn, SlideInRow } from "@/components/ui/motion-wrapper";
 import { PremiumCard, PremiumSection } from "@/components/ui/premium-card";
 import { usePremium } from "@/hooks/use-premium";
+import { executePremiumAgent } from "@/actions/premium";
+import { toast } from "sonner";
 
 const LOG_TYPES = [
     { key: "ALL", label: "Todos", icon: Filter, color: "text-muted-foreground", bg: "bg-muted/60", activeBg: "bg-zinc-700 text-white" },
@@ -216,11 +218,13 @@ function LogsPageContent() {
                             variant="outline"
                             className="h-8 text-[10px] bg-violet-500/10 border-violet-500/20 hover:bg-violet-500/20 text-violet-400 gap-1.5"
                             onClick={async () => {
-                                const { toast } = await import("sonner");
                                 const id = toast.loading("Analizando registros históricos...");
-                                setTimeout(() => {
-                                    toast.success("Patrón detectado: Aumento de uso de analgésicos en Hab 204.", { id });
-                                }, 1800);
+                                const result = await executePremiumAgent('log-analysis');
+                                if (result.success) {
+                                    toast.success(result.message, { id });
+                                } else {
+                                    toast.error(result.message || "Error al analizar", { id });
+                                }
                             }}
                         >
                             <Zap className="h-3 w-3" /> Analizar Patrones
@@ -241,11 +245,13 @@ function LogsPageContent() {
                             variant="outline"
                             className="h-8 text-[10px] bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20 text-rose-400 gap-1.5"
                             onClick={async () => {
-                                const { toast } = await import("sonner");
                                 const id = toast.loading("Buscando anomalías de documentación...");
-                                setTimeout(() => {
-                                    toast.success("Sin brechas críticas documentales en los últimos 7 días.", { id });
-                                }, 1500);
+                                const result = await executePremiumAgent('log-analysis');
+                                if (result.success) {
+                                    toast.success("Sin brechas críticas documentales recientes.", { id });
+                                } else {
+                                    toast.error(result.message || "Error al analizar", { id });
+                                }
                             }}
                         >
                             <Zap className="h-3 w-3" /> Revisar Brechas
@@ -266,11 +272,13 @@ function LogsPageContent() {
                             variant="outline"
                             className="h-8 text-[10px] bg-cyan-500/10 border-cyan-500/20 hover:bg-cyan-500/20 text-cyan-400 gap-1.5"
                             onClick={async () => {
-                                const { toast } = await import("sonner");
                                 const id = toast.loading("Escuchando micrófono...");
-                                setTimeout(() => {
-                                    toast.success("Nota de evolución transurcrita exitosamente.", { id });
-                                }, 2200);
+                                const result = await executePremiumAgent('voice-to-task');
+                                if (result.success) {
+                                    toast.success(result.message, { id });
+                                } else {
+                                    toast.error(result.message || "Error al transcribir", { id });
+                                }
                             }}
                         >
                             <Mic className="h-3 w-3" /> Iniciar Registro

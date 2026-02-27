@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePremium } from "@/hooks/use-premium";
+import { executePremiumAgent } from "@/actions/premium";
 
 interface Conversation {
     patientId: string;
@@ -394,8 +395,13 @@ export default function AdminMessagesPage() {
                             variant="outline"
                             className="h-8 text-[10px] bg-violet-500/10 border-violet-500/20 hover:bg-violet-500/20 text-violet-400 gap-1.5"
                             onClick={async () => {
-                                const { toast } = await import("sonner");
-                                toast.info("Función de sugerencia activa en la burbuja de chat.");
+                                const id = toast.loading("Configurando respuestas inteligentes...");
+                                const result = await executePremiumAgent('smart-reply');
+                                if (result.success) {
+                                    toast.success(result.message, { id });
+                                } else {
+                                    toast.error(result.message || "Error al configurar", { id });
+                                }
                             }}
                         >
                             <Brain className="h-3 w-3" /> Configurar IA
@@ -416,11 +422,13 @@ export default function AdminMessagesPage() {
                             variant="outline"
                             className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-400 gap-1.5"
                             onClick={async () => {
-                                const { toast } = await import("sonner");
                                 const id = toast.loading("Analizando clima emocional...");
-                                setTimeout(() => {
-                                    toast.success("Clima: Familias mayormente conformes, 2 alertas de urgencia.", { id });
-                                }, 1500);
+                                const result = await executePremiumAgent('message-audit');
+                                if (result.success) {
+                                    toast.success(result.message, { id });
+                                } else {
+                                    toast.error(result.message || "Error al analizar", { id });
+                                }
                             }}
                         >
                             <Zap className="h-3 w-3" /> Analizar Clima
@@ -441,11 +449,13 @@ export default function AdminMessagesPage() {
                             variant="outline"
                             className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-400 gap-1.5"
                             onClick={async () => {
-                                const { toast } = await import("sonner");
-                                toast.promise(new Promise(r => setTimeout(r, 1000)), {
-                                    loading: "Iniciando panel de difusión...",
-                                    success: "Panel de Broadcast listo.",
-                                });
+                                const id = toast.loading("Iniciando panel de difusión...");
+                                const result = await executePremiumAgent('campaign-generator');
+                                if (result.success) {
+                                    toast.success("Panel de Broadcast listo.", { id });
+                                } else {
+                                    toast.error(result.message || "Error al inicializar", { id });
+                                }
                             }}
                         >
                             <Megaphone className="h-3 w-3" /> Iniciar Envío
@@ -466,8 +476,13 @@ export default function AdminMessagesPage() {
                             variant="outline"
                             className="h-8 text-[10px] bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-400 gap-1.5"
                             onClick={async () => {
-                                const { toast } = await import("sonner");
-                                toast.success("Módulo de WhatsApp Business conectado.");
+                                const id = toast.loading("Conectando con WhatsApp Business API...");
+                                const result = await executePremiumAgent('whatsapp-integration');
+                                if (result.success) {
+                                    toast.success(result.message, { id });
+                                } else {
+                                    toast.error(result.message || "Error al conectar WhatsApp", { id });
+                                }
                             }}
                         >
                             <Zap className="h-3 w-3" /> Conectar

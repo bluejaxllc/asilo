@@ -129,8 +129,14 @@ export default function MarketingPage() {
                                 size="sm"
                                 variant="outline"
                                 className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-400 gap-1.5"
-                                onClick={() => {
-                                    toast.info("Configurando disponibilidad de tours en tiempo real...");
+                                onClick={async () => {
+                                    const id = toast.loading("Configurando disponibilidad de tours...");
+                                    const result = await executePremiumAgent('tour-booking');
+                                    if (result.success) {
+                                        toast.success(result.message, { id });
+                                    } else {
+                                        toast.error(result.message || "Error al configurar agenda", { id });
+                                    }
                                 }}
                             >
                                 <Zap className="h-3 w-3" /> Gestionar Agenda
@@ -154,11 +160,14 @@ export default function MarketingPage() {
                                 size="sm"
                                 variant="outline"
                                 className="h-8 text-[10px] bg-cyan-500/10 border-cyan-500/20 hover:bg-cyan-500/20 text-cyan-400 gap-1.5"
-                                onClick={() => {
-                                    toast.promise(new Promise(r => setTimeout(r, 1000)), {
-                                        loading: "Generando plantilla IA...",
-                                        success: "Plantilla de campaña lista para revisión.",
-                                    });
+                                onClick={async () => {
+                                    const id = toast.loading("Generando plantilla IA...");
+                                    const result = await executePremiumAgent('campaign-generator');
+                                    if (result.success) {
+                                        toast.success(result.message, { id });
+                                    } else {
+                                        toast.error(result.message || "Error al inicializar", { id });
+                                    }
                                 }}
                             >
                                 <Zap className="h-3 w-3" /> Crear Campaña
@@ -178,11 +187,14 @@ export default function MarketingPage() {
                                 size="sm"
                                 variant="outline"
                                 className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-400 gap-1.5"
-                                onClick={() => {
-                                    const id = toast.loading("Generando respuestas sugeridas para reseñas pendientes...");
-                                    setTimeout(() => {
+                                onClick={async () => {
+                                    const id = toast.loading("Analizando reseñas...");
+                                    const result = await executePremiumAgent('reputation-audit');
+                                    if (result.success) {
                                         toast.success("Borradores generados con tono empático y profesional.", { id });
-                                    }, 1800);
+                                    } else {
+                                        toast.error(result.message || "Error al analizar", { id });
+                                    }
                                 }}
                             >
                                 <Zap className="h-3 w-3" /> Gestionar reseñas
@@ -202,8 +214,14 @@ export default function MarketingPage() {
                                 size="sm"
                                 variant="outline"
                                 className="h-8 text-[10px] bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-400 gap-1.5"
-                                onClick={() => {
-                                    toast.success("Integración de WhatsApp Business activa.");
+                                onClick={async () => {
+                                    const id = toast.loading("Conectando con WhatsApp Business API...");
+                                    const result = await executePremiumAgent('whatsapp-integration');
+                                    if (result.success) {
+                                        toast.success(result.message, { id });
+                                    } else {
+                                        toast.error(result.message || "Error al conectar WhatsApp", { id });
+                                    }
                                 }}
                             >
                                 <Zap className="h-3 w-3" /> Ver Conexión
