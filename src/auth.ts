@@ -24,6 +24,10 @@ export const {
                 session.user.role = token.role as "ADMIN" | "STAFF" | "DOCTOR" | "NURSE" | "KITCHEN" | "FAMILY";
             }
 
+            if (token.email && session.user) {
+                session.user.email = token.email as string;
+            }
+
             return session;
         },
         async jwt({ token, user }) {
@@ -33,6 +37,7 @@ export const {
                 token.sub = user.id;
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 token.role = (user as any).role;
+                token.email = user.email;
                 return token;
             }
 
