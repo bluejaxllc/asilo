@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getSettings } from "@/actions/settings";
-import { getSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 type Tier = "free" | "pro" | "enterprise";
 
@@ -14,14 +14,16 @@ interface PremiumState {
 }
 
 export function usePremium(): PremiumState {
+    const { data: session, status } = useSession();
     const [tier, setTier] = useState<Tier>("free");
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function load() {
+            if (status === "loading") return;
+
             try {
                 // Hardcode logic for admin@asilo.com testing
-                const session = await getSession();
                 if (session?.user?.email === "admin@asilo.com") {
                     setTier("enterprise");
                     setLoading(false);
@@ -40,7 +42,7 @@ export function usePremium(): PremiumState {
             }
         }
         load();
-    }, []);
+    }, [session, status]);
 
     return {
         tier,
