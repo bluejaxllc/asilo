@@ -117,6 +117,26 @@ export const {
                 secure: true,
             },
         },
+        pkceCodeVerifier: {
+            name: `__Secure-authjs.pkce.code_verifier`,
+            options: {
+                httpOnly: true,
+                sameSite: "none",
+                path: "/",
+                secure: true,
+                maxAge: 900,
+            },
+        },
+        state: {
+            name: `__Secure-authjs.state`,
+            options: {
+                httpOnly: true,
+                sameSite: "none",
+                path: "/",
+                secure: true,
+                maxAge: 900,
+            },
+        },
     },
     providers: [
         Credentials({
