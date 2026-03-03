@@ -4,6 +4,7 @@ import * as z from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState, useTransition } from "react"
+import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
 
 import { UserPlus, Loader2 } from "lucide-react"
@@ -29,6 +30,7 @@ export const RegisterForm = () => {
     const [error, setError] = useState<string | undefined>("");
     const [success, setSuccess] = useState<string | undefined>("");
     const [isPending, startTransition] = useTransition();
+    const router = useRouter();
 
     const form = useForm<z.infer<typeof RegisterSchema>>({
         resolver: zodResolver(RegisterSchema),
@@ -46,8 +48,16 @@ export const RegisterForm = () => {
         startTransition(() => {
             register(values)
                 .then((data) => {
-                    setError(data?.error);
-                    setSuccess(data?.success);
+                    if (data?.error) {
+                        setError(data.error);
+                    }
+                    if (data?.success) {
+                        setSuccess(data.success);
+                        // Redirect to verification page
+                        setTimeout(() => {
+                            router.push(`/auth/verify?email=${encodeURIComponent(values.email)}`);
+                        }, 1500);
+                    }
                 })
         });
     };

@@ -2,11 +2,11 @@
 
 import * as z from "zod";
 import bcrypt from "bcryptjs";
-import { AuthError } from "next-auth";
 
 import { db } from "@/lib/db";
 import { RegisterSchema } from "@/schemas";
-import { signIn } from "@/auth";
+import { generateVerificationToken } from "@/lib/tokens";
+import { sendVerificationEmail } from "@/lib/mail";
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
     const validatedFields = RegisterSchema.safeParse(values);
@@ -29,7 +29,6 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
 
     // New signups default to ADMIN (facility owner); internal staff use role param
     const userRole = role || (plan ? "ADMIN" : "STAFF");
-    const redirectPath = userRole === "ADMIN" ? "/admin" : "/staff";
 
     // Create a Facility for new admin registrations
     let facilityId: string | undefined;
@@ -53,17 +52,9 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
         },
     });
 
-    // Auto sign-in after registration
-    try {
-        await signIn("credentials", {
-            email,
-            password,
-            redirectTo: redirectPath,
-        });
-    } catch (error) {
-        if (error instanceof AuthError) {
-            return { success: "Cuenta creada. Por favor inicia sesión." };
-        }
-        throw error; // Re-throw NEXT_REDIRECT
-    }
+    // Generate verification token and send email
+    const verificationToken = await generateVerificationToken(email);
+    await sendVerificationEmail(email, verificationToken.token);
+
+    return { success: "¡Correo de verificación enviado! Revisa tu bandeja de entrada." };
 };

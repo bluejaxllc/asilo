@@ -177,6 +177,19 @@ export const LoginForm = () => {
             });
 
             if (result?.error) {
+                // Check if this is an unverified email (error comes as generic CredentialsSignin)
+                // We need to check against a server action
+                const checkRes = await fetch(`${origin}/api/auth/check-verified?email=${encodeURIComponent(values.email)}`);
+                if (checkRes.ok) {
+                    const checkData = await checkRes.json();
+                    if (checkData.needsVerification) {
+                        setError("Tu correo no ha sido verificado. Redirigiendo...");
+                        setTimeout(() => {
+                            window.location.replace(`${origin}/auth/verify?email=${encodeURIComponent(values.email)}`);
+                        }, 1500);
+                        return;
+                    }
+                }
                 setError("Credenciales inválidas!");
                 setIsPending(false);
                 return;

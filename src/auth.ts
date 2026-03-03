@@ -164,7 +164,14 @@ export const {
                         (user as any).password,
                     );
 
-                    if (passwordsMatch) return user;
+                    if (passwordsMatch) {
+                        // Block unverified email accounts
+                        if (!user.emailVerified) {
+                            console.log("Auth Authorize: Email not verified for", user.email);
+                            throw new Error("EmailNotVerified");
+                        }
+                        return user;
+                    }
                 }
 
                 return null;
