@@ -3,6 +3,7 @@ import authConfig from "./auth.config"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { db } from "@/lib/db"
 import Credentials from "next-auth/providers/credentials"
+import Google from "next-auth/providers/google"
 import { LoginSchema } from "@/schemas"
 import bcrypt from "bcryptjs"
 
@@ -58,6 +59,32 @@ export const {
             token.facilityId = existingUser.facilityId ?? null;
 
             return token;
+        }
+    },
+    events: {
+        async linkAccount({ user }) {
+            // When an OAuth account is linked (first Google sign-in),
+            // create a Facility for the user if they don't have one
+            if (user.id) {
+                const existingUser = await db.user.findUnique({
+                    where: { id: user.id }
+                });
+                if (existingUser && !existingUser.facilityId) {
+                    const facility = await db.facility.create({
+                        data: {
+                            name: `Residencia de ${existingUser.name || 'Usuario'}`,
+                            plan: "FREE",
+                        }
+                    });
+                    await db.user.update({
+                        where: { id: user.id },
+                        data: {
+                            facilityId: facility.id,
+                            role: "ADMIN",
+                        }
+                    });
+                }
+            }
         }
     },
     adapter: PrismaAdapter(db),
@@ -122,6 +149,11 @@ export const {
 
                 return null;
             }
-        })
+        }),
+        Google({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            allowDangerousEmailAccountLinking: true,
+        }),
     ],
 })
