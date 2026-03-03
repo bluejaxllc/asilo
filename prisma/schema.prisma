@@ -14,6 +14,8 @@ model User {
   email     String   @unique
   name      String?
   role      String   @default("STAFF") // ADMIN, DOCTOR, NURSE, KITCHEN, FAMILY
+  plan      String   @default("FREE") // FREE, CORE, ENTERPRISE
+  facilityName String?
   password  String?
   image     String?
   
@@ -37,6 +39,7 @@ model Patient {
   room      String?
   status    String   @default("Estable") // Estable, Delicado, Hospitalizado
   age       Int?
+  dateOfBirth DateTime?
   medicalHistory String?
   dietaryNeeds   String?
   

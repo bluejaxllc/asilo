@@ -422,6 +422,9 @@ export default function Home() {
             <Link href="/auth/login">
               <Button variant="ghost" className="text-muted-foreground hover:text-foreground hover:bg-card/5 text-sm">Iniciar Sesión</Button>
             </Link>
+            <Link href="/auth/register">
+              <Button variant="ghost" className="text-muted-foreground hover:text-foreground hover:bg-card/5 text-sm">Crear Cuenta</Button>
+            </Link>
             <Link href="/auth/login?role=admin">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button className="bg-blue-600 hover:bg-blue-500/100 text-white text-sm h-9 px-4 rounded-lg border border-blue-500/50">Acceso al Sistema</Button>
@@ -946,12 +949,19 @@ export default function Home() {
               ))}
             </StaggerContainer>
 
-            <RevealSection delay={0.4} className="text-center mt-8">
+            <RevealSection delay={0.4} className="text-center mt-8 space-y-3">
               <Link href="/auth/login">
                 <Button variant="ghost" className="text-muted-foreground hover:text-foreground text-sm">
                   O inicie sesión con su correo directamente →
                 </Button>
               </Link>
+              <div>
+                <Link href="/auth/register">
+                  <Button variant="ghost" className="text-muted-foreground hover:text-foreground text-sm">
+                    ¿No tiene cuenta? Crear cuenta nueva →
+                  </Button>
+                </Link>
+              </div>
             </RevealSection>
           </div>
         </section>

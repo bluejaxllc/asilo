@@ -2,5 +2,11 @@
     "alias": [
         "retiro.bluejax.ai",
         "app.bluejax.ai"
+    ],
+    "crons": [
+        {
+            "path": "/api/cron/birthday",
+            "schedule": "0 6 * * *"
+        }
     ]
 }

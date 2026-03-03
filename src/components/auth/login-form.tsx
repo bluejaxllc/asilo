@@ -1,4 +1,5 @@
 "use client"
+import Link from "next/link"
 
 import * as z from "zod"
 import { useForm } from "react-hook-form"
@@ -284,13 +285,23 @@ export const LoginForm = () => {
 
                 {/* Footer */}
                 <div className="px-8 pb-8">
-                    <div className="border-t border-border pt-5 text-center">
-                        <a
-                            href="/"
-                            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                            {theme.backLabel}
-                        </a>
+                    <div className="border-t border-border pt-5 text-center space-y-3">
+                        <div>
+                            <Link
+                                href="/auth/register"
+                                className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium"
+                            >
+                                ¿No tiene cuenta? Crear cuenta nueva
+                            </Link>
+                        </div>
+                        <div>
+                            <a
+                                href="/"
+                                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                                {theme.backLabel}
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

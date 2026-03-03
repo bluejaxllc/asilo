@@ -15,7 +15,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
         return { error: "Campos inválidos!" };
     }
 
-    const { email, password, name, role } = validatedFields.data;
+    const { email, password, name, role, plan, facilityName } = validatedFields.data;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -27,12 +27,18 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
         return { error: "Este correo ya está en uso!" };
     }
 
+    // New signups default to ADMIN (facility owner); internal staff use role param
+    const userRole = role || (plan ? "ADMIN" : "STAFF");
+    const redirectPath = userRole === "ADMIN" ? "/admin" : "/staff";
+
     await db.user.create({
         data: {
             name,
             email,
             password: hashedPassword,
-            role: role || "STAFF",
+            role: userRole,
+            plan: plan || "FREE",
+            facilityName: facilityName || undefined,
         },
     });
 
@@ -41,7 +47,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
         await signIn("credentials", {
             email,
             password,
-            redirectTo: "/staff",
+            redirectTo: redirectPath,
         });
     } catch (error) {
         if (error instanceof AuthError) {

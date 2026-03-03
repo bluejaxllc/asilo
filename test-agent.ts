@@ -20,22 +20,26 @@ async function main() {
         console.log(`Inserted 4 mock logs for ${patient.name}`);
     }
 
-    console.log("Executing clinical-notes-synthesis agent...");
-    const result = await registry.run('clinical-notes-synthesis');
-    console.log("Agent Result:", result);
+    console.log("Executing marketing-audit agent...");
+    const mktResult = await registry.run('marketing-audit');
+    console.log("Marketing Agent Result:", mktResult);
 
-    console.log("\nChecking database for generated notes...");
-    const latestNote = await db.dailyLog.findFirst({
-        where: { type: 'NOTE' },
+    console.log("\nExecuting low-stock-monitor agent...");
+    const stockResult = await registry.run('low-stock-monitor');
+    console.log("Low Stock Agent Result:", stockResult);
+
+    console.log("\nExecuting reputation-audit agent...");
+    const repResult = await registry.run('reputation-audit');
+    console.log("Reputation Agent Result:", repResult);
+
+    console.log("\nChecking database for generated notifications...");
+    const latestNotifications = await db.notification.findMany({
         orderBy: { createdAt: 'desc' },
-        include: { patient: true }
+        take: 5
     });
 
-    if (latestNote && latestNote.value && latestNote.value.includes("Error") === false) {
-        console.log(`\nFound generated note for patient: ${latestNote.patient?.name}`);
-        console.log(`Note Content:\n${latestNote.value}`);
-    } else {
-        console.log("No notes found in the database. Did the agent create one?");
+    for (const notif of latestNotifications) {
+        console.log(`\n[${notif.type}] ${notif.title}\n${notif.message}`);
     }
 }
 

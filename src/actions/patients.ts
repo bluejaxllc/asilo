@@ -59,6 +59,7 @@ export const createPatient = async (values: z.infer<typeof PatientSchema>) => {
                 name: fullName,
                 room: roomNumber,
                 age: age > 0 ? age : undefined,
+                dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
                 medicalHistory: finalMedicalHistory,
                 dietaryNeeds: dietaryRequirements,
                 status: "Estable" // Default
