@@ -298,7 +298,7 @@ export const LoginForm = () => {
                         variant="outline"
                         size="lg"
                         disabled={isPending}
-                        onClick={() => signIn("google", { callbackUrl: "/" })}
+                        onClick={() => signIn("google", { callbackUrl: "/admin" })}
                         className="w-full h-12 rounded-xl border-border bg-card/5 text-foreground hover:bg-card/20 transition-all font-medium"
                     >
                         <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
