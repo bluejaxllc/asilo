@@ -17,8 +17,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
 
     const { email, password, name, role, plan, facilityName } = validatedFields.data;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    // Check if a verified user already exists
     const existingUser = await db.user.findUnique({
         where: { email }
     });
@@ -27,28 +26,28 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
         return { error: "Este correo ya está en uso!" };
     }
 
-    // New signups default to ADMIN (facility owner); internal staff use role param
-    const userRole = role || (plan ? "ADMIN" : "STAFF");
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a Facility for new admin registrations
-    let facilityId: string | undefined;
-    if (userRole === "ADMIN") {
-        const facility = await db.facility.create({
-            data: {
-                name: facilityName || `Residencia de ${name}`,
-                plan: plan || "FREE",
-            },
-        });
-        facilityId = facility.id;
-    }
+    // Public signups are always ADMIN (facility owner); internal staff use role param
+    const userRole = role || "ADMIN";
 
-    await db.user.create({
-        data: {
+    // Upsert into PendingRegistration (replaces any previous unverified attempt)
+    await db.pendingRegistration.upsert({
+        where: { email },
+        update: {
             name,
-            email,
-            password: hashedPassword,
+            hashedPassword,
             role: userRole,
-            facilityId,
+            facilityName: facilityName || null,
+            plan: plan || null,
+        },
+        create: {
+            email,
+            name,
+            hashedPassword,
+            role: userRole,
+            facilityName: facilityName || null,
+            plan: plan || null,
         },
     });
 
@@ -59,9 +58,8 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
         await sendVerificationEmail(email, verificationToken.token);
     } catch (error) {
         console.error("[REGISTER] Failed to send verification email:", error);
-        // Account is created but email failed — user can still verify if they know the code
-        // or can re-register (will get "email in use" error)
+        return { success: "Cuenta pendiente. No pudimos enviar el correo — usa el botón de reenviar." };
     }
 
-    return { success: "¡Correo de verificación enviado! Revisa tu bandeja de entrada." };
+    return { success: "¡Código de verificación enviado! Revisa tu bandeja de entrada." };
 };

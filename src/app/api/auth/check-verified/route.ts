@@ -8,14 +8,10 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ needsVerification: false });
     }
 
-    const user = await db.user.findUnique({
+    // Check if there's a pending registration (user hasn't verified yet)
+    const pending = await db.pendingRegistration.findUnique({
         where: { email },
-        select: { emailVerified: true, password: true },
     });
 
-    // Only flag as needs verification if user exists, has a password (credential user),
-    // and has NOT verified their email
-    const needsVerification = !!user && !!user.password && !user.emailVerified;
-
-    return NextResponse.json({ needsVerification });
+    return NextResponse.json({ needsVerification: !!pending });
 }

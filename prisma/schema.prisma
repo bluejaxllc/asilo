@@ -94,6 +94,18 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+// Pending Registration (holds signup data until email verified)
+model PendingRegistration {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String
+  hashedPassword String
+  role           String   @default("ADMIN")
+  facilityName   String?
+  plan           String?
+  createdAt      DateTime @default(now())
+}
+
 // Patient / Resident
 model Patient {
   id        String   @id @default(cuid())

@@ -2,12 +2,13 @@
 
 import { useState, useTransition, useRef, useEffect } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
-import { ShieldCheck, Loader2, CheckCircle, Mail } from "lucide-react"
+import { ShieldCheck, Loader2, CheckCircle, Mail, RefreshCw } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { FormError } from "@/components/form-error"
 import { FormSuccess } from "@/components/form-success"
 import { verifyEmail } from "@/actions/verify-email"
+import { resendVerification } from "@/actions/resend-verification"
 
 export default function VerifyPage() {
     const searchParams = useSearchParams()
@@ -18,12 +19,21 @@ export default function VerifyPage() {
     const [error, setError] = useState<string | undefined>("")
     const [success, setSuccess] = useState<string | undefined>("")
     const [isPending, startTransition] = useTransition()
+    const [resendCooldown, setResendCooldown] = useState(0)
+    const [isResending, setIsResending] = useState(false)
     const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
     // Auto-focus first input
     useEffect(() => {
         inputRefs.current[0]?.focus()
     }, [])
+
+    // Cooldown timer
+    useEffect(() => {
+        if (resendCooldown <= 0) return
+        const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000)
+        return () => clearTimeout(timer)
+    }, [resendCooldown])
 
     const handleChange = (index: number, value: string) => {
         if (!/^\d*$/.test(value)) return // Only digits
@@ -78,6 +88,29 @@ export default function VerifyPage() {
                 }, 2000)
             }
         })
+    }
+
+    const onResend = async () => {
+        if (resendCooldown > 0 || isResending) return
+        setError("")
+        setSuccess("")
+        setIsResending(true)
+
+        try {
+            const result = await resendVerification(email)
+            if (result?.error) {
+                setError(result.error)
+            }
+            if (result?.success) {
+                setSuccess(result.success)
+                setResendCooldown(60) // 60 second cooldown
+                // Clear code inputs for new code
+                setCode(["", "", "", "", "", ""])
+                inputRefs.current[0]?.focus()
+            }
+        } finally {
+            setIsResending(false)
+        }
     }
 
     if (!email) {
@@ -156,16 +189,30 @@ export default function VerifyPage() {
                     )}
                 </Button>
 
-                {/* Help text */}
-                <p className="text-center text-xs text-muted-foreground">
-                    ¿No recibiste el correo? Revisa tu carpeta de spam o{" "}
-                    <button
-                        onClick={() => router.push("/auth/register")}
-                        className="text-indigo-400 hover:underline"
+                {/* Resend */}
+                <div className="text-center space-y-2">
+                    <p className="text-xs text-muted-foreground">
+                        ¿No recibiste el correo? Revisa tu carpeta de spam.
+                    </p>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        disabled={resendCooldown > 0 || isResending}
+                        onClick={onResend}
+                        className="text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10"
                     >
-                        intenta de nuevo
-                    </button>
-                </p>
+                        {isResending ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                        )}
+                        {resendCooldown > 0
+                            ? `Reenviar en ${resendCooldown}s`
+                            : "Reenviar código"
+                        }
+                    </Button>
+                </div>
             </div>
         </div>
     )

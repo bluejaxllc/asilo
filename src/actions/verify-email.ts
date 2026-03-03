@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 
 /**
  * Verify a user's email using a 6-digit code.
- * On success, sets emailVerified. User then logs in manually.
+ * On success, creates the actual User + Facility from PendingRegistration data.
  */
 export async function verifyEmail(email: string, code: string) {
     if (!email || !code) {
@@ -30,25 +30,55 @@ export async function verifyEmail(email: string, code: string) {
                 },
             },
         });
-        return { error: "El código ha expirado. Registra una nueva cuenta." };
+        return { error: "El código ha expirado. Solicita un nuevo código." };
     }
 
-    // Find user
-    const user = await db.user.findUnique({
+    // Find pending registration
+    const pending = await db.pendingRegistration.findUnique({
         where: { email },
     });
 
-    if (!user) {
-        return { error: "Usuario no encontrado." };
+    if (!pending) {
+        return { error: "No se encontró un registro pendiente para este correo." };
     }
 
-    // Mark email as verified
-    await db.user.update({
-        where: { id: user.id },
-        data: { emailVerified: new Date() },
+    // Check if user already exists (edge case: verified twice)
+    const existingUser = await db.user.findUnique({ where: { email } });
+    if (existingUser) {
+        // Clean up
+        await db.pendingRegistration.delete({ where: { email } });
+        await db.verificationToken.delete({
+            where: { identifier_token: { identifier: token.identifier, token: token.token } },
+        });
+        return { success: "¡Cuenta ya verificada! Ya puedes iniciar sesión." };
+    }
+
+    // Create Facility for ADMIN users
+    let facilityId: string | undefined;
+    if (pending.role === "ADMIN") {
+        const facility = await db.facility.create({
+            data: {
+                name: pending.facilityName || `Residencia de ${pending.name}`,
+                plan: pending.plan || "FREE",
+            },
+        });
+        facilityId = facility.id;
+    }
+
+    // Create the actual User
+    await db.user.create({
+        data: {
+            email: pending.email,
+            name: pending.name,
+            password: pending.hashedPassword,
+            role: pending.role,
+            emailVerified: new Date(),
+            facilityId,
+        },
     });
 
-    // Clean up token
+    // Clean up pending registration and token
+    await db.pendingRegistration.delete({ where: { email } });
     await db.verificationToken.delete({
         where: {
             identifier_token: {
