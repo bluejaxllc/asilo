@@ -27,17 +27,22 @@ model Facility {
 
 // User model for Staff and Admins
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  role      String   @default("STAFF") // ADMIN, DOCTOR, NURSE, KITCHEN, FAMILY
-  password  String?
-  image     String?
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  emailVerified DateTime?
+  role          String    @default("STAFF") // ADMIN, DOCTOR, NURSE, KITCHEN, FAMILY
+  password      String?
+  image         String?
 
   // Facility link (tenant)
   facilityId String?
   facility   Facility? @relation(fields: [facilityId], references: [id])
   
+  // OAuth adapter relations
+  accounts   Account[]
+  sessions   Session[]
+
   attendance Attendance[]
   assignedTasks Task[]
   logs       DailyLog[]
@@ -49,6 +54,44 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// OAuth Account (required by @auth/prisma-adapter)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+// Session (required by @auth/prisma-adapter)
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Verification Token (required by @auth/prisma-adapter)
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 // Patient / Resident
