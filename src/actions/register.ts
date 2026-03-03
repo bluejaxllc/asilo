@@ -31,14 +31,25 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     const userRole = role || (plan ? "ADMIN" : "STAFF");
     const redirectPath = userRole === "ADMIN" ? "/admin" : "/staff";
 
+    // Create a Facility for new admin registrations
+    let facilityId: string | undefined;
+    if (userRole === "ADMIN") {
+        const facility = await db.facility.create({
+            data: {
+                name: facilityName || `Residencia de ${name}`,
+                plan: plan || "FREE",
+            },
+        });
+        facilityId = facility.id;
+    }
+
     await db.user.create({
         data: {
             name,
             email,
             password: hashedPassword,
             role: userRole,
-            plan: plan || "FREE",
-            facilityName: facilityName || undefined,
+            facilityId,
         },
     });
 

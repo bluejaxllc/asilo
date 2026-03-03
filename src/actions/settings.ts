@@ -2,10 +2,14 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { getCurrentFacilityId } from "@/lib/facility";
 
 export const getSettings = async () => {
     try {
-        const settings = await db.systemSetting.findMany();
+        const facilityId = await getCurrentFacilityId();
+        const settings = await db.facilitySetting.findMany({
+            where: { facilityId },
+        });
         // Convert array to object for easier consumption
         return settings.reduce((acc, curr) => {
             acc[curr.key] = curr.value;
@@ -19,11 +23,23 @@ export const getSettings = async () => {
 
 export const updateSetting = async (key: string, value: string) => {
     try {
-        await db.systemSetting.upsert({
-            where: { key },
-            update: { value },
-            create: { key, value }
+        const facilityId = await getCurrentFacilityId();
+
+        // Find existing setting for this facility+key
+        const existing = await db.facilitySetting.findFirst({
+            where: { facilityId, key },
         });
+
+        if (existing) {
+            await db.facilitySetting.update({
+                where: { id: existing.id },
+                data: { value },
+            });
+        } else {
+            await db.facilitySetting.create({
+                data: { key, value, facilityId },
+            });
+        }
 
         revalidatePath("/admin/settings");
         return { success: "Configuración actualizada" };

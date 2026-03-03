@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { getCurrentFacilityId } from "@/lib/facility";
 import { cn } from "@/lib/utils";
 import {
     Card,
@@ -30,8 +31,10 @@ const getMealPeriod = () => {
 export default async function KitchenPage({ searchParams }: KitchenPageProps) {
     const query = searchParams.q || "";
 
+    const facilityId = await getCurrentFacilityId();
     const patients = await db.patient.findMany({
         where: {
+            ...(facilityId ? { facilityId } : {}),
             OR: [
                 { name: { contains: query, mode: 'insensitive' } },
                 { room: { contains: query, mode: 'insensitive' } }

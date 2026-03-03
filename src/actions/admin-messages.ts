@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { getCurrentFacilityId } from "@/lib/facility";
 
 export async function getIASuggestion(patientId: string) {
     // In a real scenario, this would send the message history to a LLM provider.
@@ -35,9 +36,10 @@ export async function getIASuggestion(patientId: string) {
 }
 
 export async function getAllConversations() {
-    // Get all patients that have messages
+    const facilityId = await getCurrentFacilityId();
     const patients = await db.patient.findMany({
         where: {
+            ...(facilityId ? { facilityId } : {}),
             familyMessages: { some: {} }
         },
         include: {
@@ -70,9 +72,10 @@ export async function getAllConversations() {
 }
 
 export async function getUnansweredCount() {
-    // Find patient threads where the last message is from family (unanswered)
+    const facilityId = await getCurrentFacilityId();
     const patients = await db.patient.findMany({
         where: {
+            ...(facilityId ? { facilityId } : {}),
             familyMessages: { some: {} }
         },
         include: {

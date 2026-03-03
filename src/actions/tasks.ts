@@ -2,10 +2,13 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { getCurrentFacilityId } from "@/lib/facility";
 
 export const getStaffList = async () => {
+    const facilityId = await getCurrentFacilityId();
     return await db.user.findMany({
         where: {
+            ...(facilityId ? { facilityId } : {}),
             role: { notIn: ["ADMIN", "FAMILY"] }
         },
         select: { id: true, name: true, role: true },
@@ -39,8 +42,9 @@ export const getMyTasks = async (email: string) => {
 };
 
 export const getAllTasks = async () => {
-    // Patient data will be joined on the client side.
+    const facilityId = await getCurrentFacilityId();
     return await db.task.findMany({
+        where: facilityId ? { facilityId } : {},
         include: {
             patient: true,
             assignedTo: {
@@ -61,6 +65,7 @@ export const createTask = async (
     dueDate?: string
 ) => {
     try {
+        const facilityId = await getCurrentFacilityId();
         await db.task.create({
             data: {
                 title,
@@ -68,7 +73,8 @@ export const createTask = async (
                 patientId: patientId || null,
                 assignedToId: assignedToId || null,
                 dueDate: dueDate ? new Date(dueDate) : null,
-                status: "PENDING"
+                status: "PENDING",
+                facilityId,
             }
         });
         revalidatePath("/admin/tasks");

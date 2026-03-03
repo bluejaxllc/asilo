@@ -4,14 +4,19 @@ import { getLatestTodayAttendance } from "@/actions/attendance";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import bcrypt from "bcryptjs";
+import { auth } from "@/auth";
 
 export async function GET(request: Request) {
     try {
+        const session = await auth();
+        const facilityId = (session?.user as any)?.facilityId ?? null;
+
         const { searchParams } = new URL(request.url);
         const query = searchParams.get('q');
 
         const staffUsers = await db.user.findMany({
             where: {
+                facilityId,
                 ...(query ? {
                     OR: [
                         { name: { contains: query, mode: 'insensitive' } },
@@ -62,6 +67,9 @@ export async function GET(request: Request) {
 
 export async function POST(req: Request) {
     try {
+        const session = await auth();
+        const facilityId = (session?.user as any)?.facilityId ?? null;
+
         const { name, email, role, password, patientId } = await req.json();
 
         // Validate required fields
@@ -95,13 +103,14 @@ export async function POST(req: Request) {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create user
+        // Create user linked to admin's facility
         const user = await db.user.create({
             data: {
                 name,
                 email,
                 password: hashedPassword,
                 role,
+                facilityId,
                 ...(patientId ? { patientId } : {})
             }
         });

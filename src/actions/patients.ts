@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { PatientSchema } from "@/schemas";
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/role-guard";
+import { getCurrentFacilityId } from "@/lib/facility";
 
 export const createPatient = async (values: z.infer<typeof PatientSchema>) => {
     const check = await requireRole("ADMIN");
@@ -54,6 +55,7 @@ export const createPatient = async (values: z.infer<typeof PatientSchema>) => {
     }
 
     try {
+        const facilityId = await getCurrentFacilityId();
         await db.patient.create({
             data: {
                 name: fullName,
@@ -62,7 +64,8 @@ export const createPatient = async (values: z.infer<typeof PatientSchema>) => {
                 dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
                 medicalHistory: finalMedicalHistory,
                 dietaryNeeds: dietaryRequirements,
-                status: "Estable" // Default
+                status: "Estable",
+                facilityId,
             }
         });
 
@@ -141,12 +144,16 @@ export const updatePatient = async (
 
 export const getPatients = async (query?: string) => {
     try {
-        const whereClause = query ? {
-            OR: [
-                { name: { contains: query, mode: 'insensitive' as const } },
-                { room: { contains: query, mode: 'insensitive' as const } }
-            ]
-        } : {};
+        const facilityId = await getCurrentFacilityId();
+        const whereClause = {
+            ...(facilityId ? { facilityId } : {}),
+            ...(query ? {
+                OR: [
+                    { name: { contains: query, mode: 'insensitive' as const } },
+                    { room: { contains: query, mode: 'insensitive' as const } }
+                ]
+            } : {})
+        };
 
         const patients = await db.patient.findMany({
             where: whereClause,

@@ -28,6 +28,10 @@ export const {
                 session.user.email = token.email as string;
             }
 
+            if (session.user) {
+                (session.user as any).facilityId = token.facilityId ?? null;
+            }
+
             return session;
         },
         async jwt({ token, user }) {
@@ -38,6 +42,7 @@ export const {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 token.role = (user as any).role;
                 token.email = user.email;
+                token.facilityId = (user as any).facilityId ?? null;
                 return token;
             }
 
@@ -50,6 +55,7 @@ export const {
             if (!existingUser) return token;
 
             token.role = existingUser.role;
+            token.facilityId = existingUser.facilityId ?? null;
 
             return token;
         }
