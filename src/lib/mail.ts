@@ -8,11 +8,12 @@ const FROM_EMAIL = "Retiro BlueJax <onboarding@resend.dev>";
  * Send a verification email with a 6-digit code.
  */
 export async function sendVerificationEmail(email: string, code: string) {
-    await resend.emails.send({
-        from: FROM_EMAIL,
-        to: email,
-        subject: "Verifica tu cuenta — Retiro BlueJax",
-        html: `
+    try {
+        const { data, error } = await resend.emails.send({
+            from: FROM_EMAIL,
+            to: email,
+            subject: "Verifica tu cuenta — Retiro BlueJax",
+            html: `
 <!DOCTYPE html>
 <html>
 <head>
@@ -66,6 +67,17 @@ export async function sendVerificationEmail(email: string, code: string) {
     </table>
 </body>
 </html>
-        `,
-    });
+            `,
+        });
+
+        if (error) {
+            console.error("[MAIL] Resend error:", JSON.stringify(error));
+            throw new Error(`Failed to send verification email: ${error.message}`);
+        }
+
+        console.log("[MAIL] Verification email sent to", email, "id:", data?.id);
+    } catch (err) {
+        console.error("[MAIL] Failed to send email to", email, err);
+        throw err;
+    }
 }

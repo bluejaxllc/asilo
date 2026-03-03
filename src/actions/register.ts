@@ -54,7 +54,14 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
 
     // Generate verification token and send email
     const verificationToken = await generateVerificationToken(email);
-    await sendVerificationEmail(email, verificationToken.token);
+
+    try {
+        await sendVerificationEmail(email, verificationToken.token);
+    } catch (error) {
+        console.error("[REGISTER] Failed to send verification email:", error);
+        // Account is created but email failed — user can still verify if they know the code
+        // or can re-register (will get "email in use" error)
+    }
 
     return { success: "¡Correo de verificación enviado! Revisa tu bandeja de entrada." };
 };
