@@ -20,7 +20,7 @@ export const RegisterSchema = z.object({
         message: "Name is required",
     }),
     role: z.string().optional(),
-    plan: z.enum(["FREE", "CORE", "ENTERPRISE"]).default("FREE"),
+    plan: z.enum(["FREE", "CORE", "ENTERPRISE"]).optional().default("FREE"),
     facilityName: z.string().optional(),
 });
 
