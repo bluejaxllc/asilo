@@ -156,6 +156,7 @@ export default function FamilyPage() {
             case "VITALS": return <Activity className="h-4 w-4 text-blue-600 dark:text-blue-500" />;
             case "FOOD": return <Utensils className="h-4 w-4 text-orange-600 dark:text-orange-500" />;
             case "MEDS": return <Pill className="h-4 w-4 text-green-600 dark:text-green-500" />;
+            case "PREMIUM": return <ShoppingBag className="h-4 w-4 text-pink-600 dark:text-pink-500" />;
             default: return <FileText className="h-4 w-4 text-purple-600 dark:text-purple-500" />;
         }
     };
@@ -166,9 +167,38 @@ export default function FamilyPage() {
             case "FOOD": return "Alimentación";
             case "MEDS": return "Medicamento";
             case "ACTIVITY": return "Actividad";
+            case "PREMIUM": return "Servicio Premium";
             default: return type;
         }
     };
+
+    // Build unified timeline merging activity logs + premium purchases
+    const unifiedTimeline = [
+        ...activity.map((log: any) => ({
+            id: log.id,
+            type: log.type,
+            value: log.value || log.notes || "—",
+            notes: log.notes,
+            author: log.author?.name || "Personal",
+            createdAt: new Date(log.createdAt),
+            source: "log" as const,
+        })),
+        ...purchases.map((p: any) => {
+            const freqLabel = p.frequency && p.frequency !== "ONCE"
+                ? ` (${p.frequency === "DAILY" ? "Diario" : p.frequency === "WEEKLY" ? "Semanal" : "Quincenal"})`
+                : "";
+            return {
+                id: `purchase-${p.id}`,
+                type: "PREMIUM",
+                value: `${p.service?.name || "Servicio"}${freqLabel}`,
+                notes: `$${p.service?.price?.toLocaleString("es-MX")} MXN • ${p.status === "FULFILLED" ? "Entregado" : p.status === "PAID" ? "Pagado" : "Pendiente"}`,
+                author: "Familiar",
+                createdAt: new Date(p.createdAt),
+                source: "purchase" as const,
+                frequency: p.frequency,
+            };
+        }),
+    ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
     const getTimeOfDayIcon = () => {
         const hour = new Date().getHours();
@@ -334,26 +364,29 @@ export default function FamilyPage() {
                                     <Clock className="h-4 w-4 text-blue-600 dark:text-blue-500" />
                                     Actividad Reciente
                                 </CardTitle>
-                                <CardDescription>Últimos 5 registros</CardDescription>
+                                <CardDescription>Últimos 5 registros (incluye servicios premium)</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                {activity.length === 0 ? (
+                                {unifiedTimeline.length === 0 ? (
                                     <p className="text-sm text-muted-foreground text-center py-8">Sin actividad registrada</p>
                                 ) : (
                                     <div className="space-y-2">
-                                        {activity.slice(0, 5).map((log) => (
-                                            <div key={log.id} className="flex items-center gap-3 p-3 bg-card/[0.02] rounded-lg hover:bg-card transition-colors">
-                                                <div className="h-8 w-8 rounded-lg bg-card border flex items-center justify-center">
-                                                    {getLogIcon(log.type)}
+                                        {unifiedTimeline.slice(0, 5).map((item) => (
+                                            <div key={item.id} className={`flex items-center gap-3 p-3 rounded-lg hover:bg-card transition-colors ${item.type === "PREMIUM" ? "bg-pink-500/5 border border-pink-500/10" : "bg-card/[0.02]"}`}>
+                                                <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${item.type === "PREMIUM" ? "bg-pink-500/15" : "bg-card border"}`}>
+                                                    {getLogIcon(item.type)}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-xs font-semibold text-muted-foreground">{getLogTypeName(log.type)}</span>
+                                                        <span className="text-xs font-semibold text-muted-foreground">{getLogTypeName(item.type)}</span>
                                                     </div>
-                                                    <p className="text-sm text-foreground truncate">{log.value || log.notes || "—"}</p>
+                                                    <p className="text-sm text-foreground truncate">{item.value}</p>
+                                                    {item.type === "PREMIUM" && item.notes && (
+                                                        <p className="text-[11px] text-pink-500/80 mt-0.5">{item.notes}</p>
+                                                    )}
                                                 </div>
                                                 <span className="text-[11px] text-muted-foreground whitespace-nowrap">
-                                                    {new Date(log.createdAt).toLocaleString("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                                                    {item.createdAt.toLocaleString("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                                                 </span>
                                             </div>
                                         ))}
@@ -373,34 +406,34 @@ export default function FamilyPage() {
                                 <Activity className="h-5 w-5 text-blue-600 dark:text-blue-500" />
                                 Historial de Actividad
                             </CardTitle>
-                            <CardDescription>{activity.length} registros</CardDescription>
+                            <CardDescription>{unifiedTimeline.length} registros (incluye servicios premium)</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            {activity.length === 0 ? (
+                            {unifiedTimeline.length === 0 ? (
                                 <div className="text-center py-12 text-muted-foreground">
                                     <Activity className="h-10 w-10 mx-auto mb-3 opacity-30" />
                                     <p className="text-sm">Sin actividad registrada aún</p>
                                 </div>
                             ) : (
                                 <div className="space-y-2">
-                                    {activity.map((log, i) => (
-                                        <SlideIn key={log.id} delay={Math.min(i * 0.04, 0.8)}>
-                                            <div className="flex items-start gap-3 p-4 bg-card/[0.02] rounded-xl border border-border/60 hover:border-border transition-colors">
-                                                <div className="h-10 w-10 rounded-xl bg-card border flex items-center justify-center flex-shrink-0 shadow-sm">
-                                                    {getLogIcon(log.type)}
+                                    {unifiedTimeline.map((item, i) => (
+                                        <SlideIn key={item.id} delay={Math.min(i * 0.04, 0.8)}>
+                                            <div className={`flex items-start gap-3 p-4 rounded-xl border transition-colors ${item.type === "PREMIUM" ? "bg-pink-500/5 border-pink-500/15 hover:border-pink-500/30" : "bg-card/[0.02] border-border/60 hover:border-border"}`}>
+                                                <div className={`h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm ${item.type === "PREMIUM" ? "bg-pink-500/15 border border-pink-500/20" : "bg-card border"}`}>
+                                                    {getLogIcon(item.type)}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center gap-2 mb-0.5">
-                                                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-semibold">{getLogTypeName(log.type)}</Badge>
+                                                        <Badge variant="outline" className={`text-[10px] px-1.5 py-0 font-semibold ${item.type === "PREMIUM" ? "border-pink-500/30 text-pink-600 dark:text-pink-400 bg-pink-500/10" : ""}`}>{getLogTypeName(item.type)}</Badge>
                                                         <span className="text-[11px] text-muted-foreground">
-                                                            por {log.author?.name || "Personal"}
+                                                            por {item.author}
                                                         </span>
                                                     </div>
-                                                    <p className="text-sm font-medium text-foreground">{log.value || "—"}</p>
-                                                    {log.notes && <p className="text-xs text-muted-foreground mt-0.5">{log.notes}</p>}
+                                                    <p className="text-sm font-medium text-foreground">{item.value}</p>
+                                                    {item.notes && <p className={`text-xs mt-0.5 ${item.type === "PREMIUM" ? "text-pink-500/70" : "text-muted-foreground"}`}>{item.notes}</p>}
                                                 </div>
                                                 <span className="text-[11px] text-muted-foreground whitespace-nowrap flex-shrink-0">
-                                                    {new Date(log.createdAt).toLocaleString("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                                                    {item.createdAt.toLocaleString("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                                                 </span>
                                             </div>
                                         </SlideIn>
@@ -690,8 +723,8 @@ export default function FamilyPage() {
                                                                     key={f.key}
                                                                     onClick={() => setSelectedFrequencies(prev => ({ ...prev, [svc.id]: f.key }))}
                                                                     className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${isSelected
-                                                                            ? "bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-sm"
-                                                                            : "bg-card/80 text-muted-foreground border border-border hover:border-pink-500/40 hover:text-foreground"
+                                                                        ? "bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-sm"
+                                                                        : "bg-card/80 text-muted-foreground border border-border hover:border-pink-500/40 hover:text-foreground"
                                                                         }`}
                                                                 >
                                                                     {f.label}
