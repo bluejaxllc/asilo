@@ -119,14 +119,27 @@ export default function FamilyPage() {
     const handlePurchase = async (service: any) => {
         const freq = selectedFrequencies[service.id] || "ONCE";
         const freqLabel = freq === "ONCE" ? "" : ` (${freq === "DAILY" ? "Diario" : freq === "WEEKLY" ? "Semanal" : "Quincenal"})`;
-        if (!service.paymentUrl) {
-            toast.error("Este servicio no tiene configurado un enlace de pago.");
-            return;
+
+        try {
+            // Always record the purchase first
+            toast.loading("Procesando solicitud...");
+            await recordPremiumPurchase(service.id, `Compra${freqLabel} desde Portal de Familiares`, freq);
+
+            // Refresh purchases so timeline updates immediately
+            const updatedPurchases = await getPurchaseHistory();
+            setPurchases(updatedPurchases);
+            toast.dismiss();
+
+            if (service.paymentUrl) {
+                toast.success("Solicitud registrada. Redirigiendo al pago...");
+                window.open(service.paymentUrl, '_blank');
+            } else {
+                toast.success(`¡${service.name} solicitado${freqLabel}! El equipo se pondrá en contacto.`);
+            }
+        } catch {
+            toast.dismiss();
+            toast.error("Error al procesar la solicitud.");
         }
-        toast.loading(`Redirigiendo al pago seguro${freqLabel}...`);
-        await recordPremiumPurchase(service.id, `Compra${freqLabel} desde Portal de Familiares`, freq);
-        window.open(service.paymentUrl, '_blank');
-        toast.dismiss();
     };
 
     const getFrequencyPrice = (service: any, freq: string) => {
