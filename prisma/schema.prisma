@@ -324,11 +324,14 @@ model PremiumService {
   name        String
   description String?
   category    String  @default("EXPERIENCIAS") // EXPERIENCIAS, COMIDAS, TERAPIAS, CUIDADOS
-  price       Float // Price in MXN/USD
-  paymentUrl  String? // The BlueJax payment link URL
-  icon        String? // Name of the lucide-react icon
-  image       String? // Optional image URL for the service card
-  isActive    Boolean @default(true)
+  price         Float   // Base single-use price in MXN
+  priceDaily    Float?  // Monthly package price if delivered daily
+  priceWeekly   Float?  // Monthly package price if delivered weekly
+  priceBiweekly Float?  // Monthly package price if delivered biweekly
+  paymentUrl    String? // The BlueJax payment link URL
+  icon          String? // Name of the lucide-react icon
+  image         String? // Optional image URL for the service card
+  isActive      Boolean @default(true)
 
   facilityId String
   facility   Facility @relation(fields: [facilityId], references: [id])
@@ -341,9 +344,10 @@ model PremiumService {
 
 // Phase 3: Premium Purchases (Records of what families bought)
 model PremiumPurchase {
-  id     String  @id @default(cuid())
-  status String  @default("PENDING") // PENDING, PAID, FULFILLED
-  notes  String? // Special instructions from family
+  id        String  @id @default(cuid())
+  status    String  @default("PENDING") // PENDING, PAID, FULFILLED
+  frequency String  @default("ONCE")    // ONCE, DAILY, WEEKLY, BIWEEKLY
+  notes     String? // Special instructions from family
 
   serviceId String
   service   PremiumService @relation(fields: [serviceId], references: [id])

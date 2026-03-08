@@ -478,10 +478,35 @@ async function main() {
     })
 
     for (const svc of premiumServices) {
+        // Auto-calculate frequency package pricing based on category
+        // Daily = price * 30 with ~20% discount, Weekly = price * 4 with ~15% discount, Biweekly = price * 2 with ~10% discount
+        let priceDaily: number | null = null;
+        let priceWeekly: number | null = null;
+        let priceBiweekly: number | null = null;
+
+        if (svc.category === 'COMIDAS') {
+            // Meals: all 3 frequencies make sense
+            priceDaily = Math.round(svc.price * 30 * 0.80);    // 20% off
+            priceWeekly = Math.round(svc.price * 4 * 0.85);     // 15% off
+            priceBiweekly = Math.round(svc.price * 2 * 0.90);   // 10% off
+        } else if (svc.category === 'TERAPIAS') {
+            // Therapies: weekly and biweekly
+            priceWeekly = Math.round(svc.price * 4 * 0.85);
+            priceBiweekly = Math.round(svc.price * 2 * 0.90);
+        } else if (svc.category === 'CUIDADOS' && svc.price > 0) {
+            // Care: biweekly and weekly (not daily — too intense)
+            priceWeekly = Math.round(svc.price * 4 * 0.85);
+            priceBiweekly = Math.round(svc.price * 2 * 0.90);
+        }
+        // EXPERIENCIAS: one-time only, no frequency pricing
+
         await prisma.premiumService.create({
             data: {
                 ...svc,
                 facilityId: facility.id,
+                ...(priceDaily ? { priceDaily } : {}),
+                ...(priceWeekly ? { priceWeekly } : {}),
+                ...(priceBiweekly ? { priceBiweekly } : {}),
             }
         })
     }

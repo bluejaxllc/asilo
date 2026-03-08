@@ -36,7 +36,9 @@ import {
     Package,
     CheckCircle2,
     Clock4,
-    ArrowRight
+    ArrowRight,
+    Repeat,
+    CalendarDays
 } from "lucide-react";
 import { FadeIn, SlideIn, SlideInRow } from "@/components/ui/motion-wrapper";
 import { toast } from "sonner";
@@ -61,6 +63,7 @@ export default function FamilyPage() {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<TabKey>("overview");
     const [activeCategory, setActiveCategory] = useState("TODOS");
+    const [selectedFrequencies, setSelectedFrequencies] = useState<Record<string, string>>({});
     const [newMessage, setNewMessage] = useState("");
     const [sendingMessage, setSendingMessage] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -114,15 +117,29 @@ export default function FamilyPage() {
     };
 
     const handlePurchase = async (service: any) => {
+        const freq = selectedFrequencies[service.id] || "ONCE";
+        const freqLabel = freq === "ONCE" ? "" : ` (${freq === "DAILY" ? "Diario" : freq === "WEEKLY" ? "Semanal" : "Quincenal"})`;
         if (!service.paymentUrl) {
             toast.error("Este servicio no tiene configurado un enlace de pago.");
             return;
         }
-        toast.loading("Redirigiendo al pago seguro...");
-        await recordPremiumPurchase(service.id, "Compra desde Portal de Familiares");
-        // Open BlueJax payment link in new window
+        toast.loading(`Redirigiendo al pago seguro${freqLabel}...`);
+        await recordPremiumPurchase(service.id, `Compra${freqLabel} desde Portal de Familiares`, freq);
         window.open(service.paymentUrl, '_blank');
         toast.dismiss();
+    };
+
+    const getFrequencyPrice = (service: any, freq: string) => {
+        switch (freq) {
+            case "DAILY": return service.priceDaily;
+            case "WEEKLY": return service.priceWeekly;
+            case "BIWEEKLY": return service.priceBiweekly;
+            default: return service.price;
+        }
+    };
+
+    const hasAnyFrequency = (service: any) => {
+        return service.priceDaily || service.priceWeekly || service.priceBiweekly;
     };
 
     const getStatusColor = (status: string) => {
@@ -559,8 +576,8 @@ export default function FamilyPage() {
                                     key={cat}
                                     onClick={() => setActiveCategory(cat)}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${isActive
-                                            ? "bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-md shadow-pink-500/20"
-                                            : "bg-card text-muted-foreground hover:text-foreground border border-border hover:border-pink-500/30"
+                                        ? "bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-md shadow-pink-500/20"
+                                        : "bg-card text-muted-foreground hover:text-foreground border border-border hover:border-pink-500/30"
                                         }`}
                                 >
                                     <CatIcon className="h-4 w-4" />
@@ -625,6 +642,16 @@ export default function FamilyPage() {
                                     const SvcIcon = categoryIcons[svc.category] || Gift;
                                     const iconColor = categoryColors[svc.category] || categoryColors.EXPERIENCIAS;
 
+                                    const currentFreq = selectedFrequencies[svc.id] || "ONCE";
+                                    const currentPrice = getFrequencyPrice(svc, currentFreq) || svc.price;
+                                    const isRecurring = currentFreq !== "ONCE";
+                                    const freqOptions = [
+                                        { key: "ONCE", label: "Una vez", available: true },
+                                        { key: "DAILY", label: "Diario", available: !!svc.priceDaily },
+                                        { key: "WEEKLY", label: "Semanal", available: !!svc.priceWeekly },
+                                        { key: "BIWEEKLY", label: "Quincenal", available: !!svc.priceBiweekly },
+                                    ].filter(f => f.available);
+
                                     return (
                                         <SlideIn key={svc.id} delay={Math.min(i * 0.08, 0.4)}>
                                             <div className={`group relative rounded-2xl border bg-gradient-to-br ${gradient} p-5 transition-all hover:shadow-lg cursor-default h-full flex flex-col`}>
@@ -633,31 +660,62 @@ export default function FamilyPage() {
                                                     <div className={`h-11 w-11 rounded-xl ${iconColor} flex items-center justify-center`}>
                                                         <SvcIcon className="h-5 w-5" />
                                                     </div>
-                                                    <Badge variant="outline" className="text-[10px] font-semibold uppercase tracking-wider bg-card/50 border-border">
-                                                        {svc.category?.toLowerCase() || "premium"}
-                                                    </Badge>
+                                                    <div className="flex items-center gap-1.5">
+                                                        {hasAnyFrequency(svc) && (
+                                                            <Badge className="text-[10px] bg-purple-500/15 text-purple-400 border-purple-500/20 border gap-1">
+                                                                <Repeat className="h-2.5 w-2.5" /> Suscripción
+                                                            </Badge>
+                                                        )}
+                                                        <Badge variant="outline" className="text-[10px] font-semibold uppercase tracking-wider bg-card/50 border-border">
+                                                            {svc.category?.toLowerCase() || "premium"}
+                                                        </Badge>
+                                                    </div>
                                                 </div>
 
                                                 {/* Name + Description */}
                                                 <h3 className="font-bold text-foreground text-lg mb-1 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
                                                     {svc.name}
                                                 </h3>
-                                                <p className="text-sm text-muted-foreground flex-1 mb-4 line-clamp-2">
+                                                <p className="text-sm text-muted-foreground flex-1 mb-3 line-clamp-2">
                                                     {svc.description || "Servicio premium para tu familiar."}
                                                 </p>
+
+                                                {/* Frequency Toggle */}
+                                                {freqOptions.length > 1 && (
+                                                    <div className="flex flex-wrap gap-1.5 mb-4">
+                                                        {freqOptions.map(f => {
+                                                            const isSelected = currentFreq === f.key;
+                                                            return (
+                                                                <button
+                                                                    key={f.key}
+                                                                    onClick={() => setSelectedFrequencies(prev => ({ ...prev, [svc.id]: f.key }))}
+                                                                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${isSelected
+                                                                            ? "bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-sm"
+                                                                            : "bg-card/80 text-muted-foreground border border-border hover:border-pink-500/40 hover:text-foreground"
+                                                                        }`}
+                                                                >
+                                                                    {f.label}
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
 
                                                 {/* Price + CTA */}
                                                 <div className="flex items-center justify-between mt-auto pt-3 border-t border-border/50">
                                                     <div>
-                                                        <span className="text-2xl font-bold text-foreground">${svc.price?.toLocaleString("es-MX")}</span>
+                                                        <span className="text-2xl font-bold text-foreground">${currentPrice?.toLocaleString("es-MX")}</span>
                                                         <span className="text-xs text-muted-foreground ml-1 font-mono">MXN</span>
+                                                        {isRecurring && (
+                                                            <span className="text-[10px] text-purple-400 ml-1.5 font-medium">/mes</span>
+                                                        )}
                                                     </div>
                                                     <Button
                                                         size="sm"
                                                         className="bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white shadow-md shadow-pink-500/20 gap-1.5 font-semibold"
                                                         onClick={() => handlePurchase(svc)}
                                                     >
-                                                        Comprar <ArrowRight className="h-3.5 w-3.5" />
+                                                        {isRecurring ? "Suscribirse" : "Comprar"} <ArrowRight className="h-3.5 w-3.5" />
                                                     </Button>
                                                 </div>
                                             </div>
@@ -696,9 +754,17 @@ export default function FamilyPage() {
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <p className="text-sm font-semibold text-foreground truncate">{p.service?.name || "Servicio"}</p>
-                                                        <p className="text-xs text-muted-foreground">
-                                                            {new Date(p.createdAt).toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" })}
-                                                        </p>
+                                                        <div className="flex items-center gap-2">
+                                                            <p className="text-xs text-muted-foreground">
+                                                                {new Date(p.createdAt).toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" })}
+                                                            </p>
+                                                            {p.frequency && p.frequency !== "ONCE" && (
+                                                                <Badge className="text-[9px] bg-purple-500/15 text-purple-400 border-purple-500/20 border gap-0.5 py-0">
+                                                                    <Repeat className="h-2 w-2" />
+                                                                    {p.frequency === "DAILY" ? "Diario" : p.frequency === "WEEKLY" ? "Semanal" : "Quincenal"}
+                                                                </Badge>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                     <span className="text-sm font-bold text-foreground">${p.service?.price?.toLocaleString("es-MX")}</span>
                                                     <Badge className={`${st.color} border text-[10px] gap-1`}>

@@ -81,7 +81,7 @@ export const getPremiumServices = async () => {
     return services;
 };
 
-export const recordPremiumPurchase = async (serviceId: string, notes?: string) => {
+export const recordPremiumPurchase = async (serviceId: string, notes?: string, frequency: string = "ONCE") => {
     const session = await auth();
     const user = session?.user;
     if (!user) return { error: "No autorizado" };
@@ -102,7 +102,8 @@ export const recordPremiumPurchase = async (serviceId: string, notes?: string) =
                 patientId: dbUser.patient.id,
                 familyMemberId: user.id || "unknown_user",
                 facilityId: dbUser.patient.facilityId,
-                status: "PENDING", // Will be updated manually by staff or via webhook
+                status: "PENDING",
+                frequency,
                 ...(notes ? { notes } : {})
             }
         });
@@ -110,6 +111,12 @@ export const recordPremiumPurchase = async (serviceId: string, notes?: string) =
         // Trigger webhook mapped to GHL
         const service = await db.premiumService.findUnique({ where: { id: serviceId } });
         if (service) {
+            const freqLabels: Record<string, string> = {
+                ONCE: "Una vez",
+                DAILY: "Diario (paquete mensual)",
+                WEEKLY: "Semanal (paquete mensual)",
+                BIWEEKLY: "Quincenal (paquete mensual)"
+            };
             await sendGhlWebhook({
                 type: "PREMIUM_PURCHASE",
                 patientId: dbUser.patient.id,
@@ -118,6 +125,7 @@ export const recordPremiumPurchase = async (serviceId: string, notes?: string) =
                 details: {
                     serviceName: service.name,
                     price: service.price,
+                    frequency: freqLabels[frequency] || frequency,
                     notes: notes || "Ninguna"
                 }
             });
