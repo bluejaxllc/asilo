@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { getFamilyPatient, getPatientActivity } from "@/actions/family";
+import { getFamilyPatient, getPatientActivity, getPremiumServices, recordPremiumPurchase, getPurchaseHistory } from "@/actions/family";
 import { getMessages, sendMessage, getPatientMedications } from "@/actions/family-messages";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,17 +24,31 @@ import {
     User,
     BedDouble,
     FileText,
+    Store,
+    Star,
+    ExternalLink,
+    Sparkles,
+    ShoppingBag,
+    Gift,
+    Stethoscope,
+    HandHeart,
+    ChefHat,
+    Package,
+    CheckCircle2,
+    Clock4,
+    ArrowRight
 } from "lucide-react";
 import { FadeIn, SlideIn, SlideInRow } from "@/components/ui/motion-wrapper";
 import { toast } from "sonner";
 
-type TabKey = "overview" | "activity" | "medications" | "messages";
+type TabKey = "overview" | "activity" | "medications" | "messages" | "services";
 
 const TABS: { key: TabKey; label: string; icon: any }[] = [
     { key: "overview", label: "Resumen", icon: Heart },
     { key: "activity", label: "Actividad", icon: Activity },
     { key: "medications", label: "Medicamentos", icon: Pill },
     { key: "messages", label: "Mensajes", icon: MessageCircle },
+    { key: "services", label: "Servicios", icon: Store },
 ];
 
 export default function FamilyPage() {
@@ -42,8 +56,11 @@ export default function FamilyPage() {
     const [activity, setActivity] = useState<any[]>([]);
     const [medications, setMedications] = useState<any[]>([]);
     const [messages, setMessages] = useState<any[]>([]);
+    const [services, setServices] = useState<any[]>([]);
+    const [purchases, setPurchases] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<TabKey>("overview");
+    const [activeCategory, setActiveCategory] = useState("TODOS");
     const [newMessage, setNewMessage] = useState("");
     const [sendingMessage, setSendingMessage] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -60,14 +77,18 @@ export default function FamilyPage() {
             }
             const p = result.success;
             setPatient(p);
-            const [activityData, medsData, msgsData] = await Promise.all([
+            const [activityData, medsData, msgsData, svcsData, purchData] = await Promise.all([
                 getPatientActivity(p.id),
                 getPatientMedications(p.id),
                 getMessages(p.id),
+                getPremiumServices(),
+                getPurchaseHistory(),
             ]);
             setActivity(activityData);
             setMedications(medsData);
             setMessages(msgsData);
+            setServices(svcsData);
+            setPurchases(purchData);
             setLoading(false);
         };
         load();
@@ -92,21 +113,33 @@ export default function FamilyPage() {
         setSendingMessage(false);
     };
 
+    const handlePurchase = async (service: any) => {
+        if (!service.paymentUrl) {
+            toast.error("Este servicio no tiene configurado un enlace de pago.");
+            return;
+        }
+        toast.loading("Redirigiendo al pago seguro...");
+        await recordPremiumPurchase(service.id, "Compra desde Portal de Familiares");
+        // Open BlueJax payment link in new window
+        window.open(service.paymentUrl, '_blank');
+        toast.dismiss();
+    };
+
     const getStatusColor = (status: string) => {
         switch (status) {
-            case "Estable": return "bg-emerald-500/15 text-emerald-400 border-emerald-500/20";
-            case "Delicado": return "bg-amber-500/15 text-amber-400 border-amber-500/20";
-            case "Hospitalizado": return "bg-red-500/15 text-red-400 border-red-500/20";
+            case "Estable": return "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
+            case "Delicado": return "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/20";
+            case "Hospitalizado": return "bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/20";
             default: return "bg-zinc-500/15 text-muted-foreground border-border";
         }
     };
 
     const getLogIcon = (type: string) => {
         switch (type) {
-            case "VITALS": return <Activity className="h-4 w-4 text-blue-500" />;
-            case "FOOD": return <Utensils className="h-4 w-4 text-orange-500" />;
-            case "MEDS": return <Pill className="h-4 w-4 text-green-500" />;
-            default: return <FileText className="h-4 w-4 text-purple-500" />;
+            case "VITALS": return <Activity className="h-4 w-4 text-blue-600 dark:text-blue-500" />;
+            case "FOOD": return <Utensils className="h-4 w-4 text-orange-600 dark:text-orange-500" />;
+            case "MEDS": return <Pill className="h-4 w-4 text-green-600 dark:text-green-500" />;
+            default: return <FileText className="h-4 w-4 text-purple-600 dark:text-purple-500" />;
         }
     };
 
@@ -123,14 +156,14 @@ export default function FamilyPage() {
     const getTimeOfDayIcon = () => {
         const hour = new Date().getHours();
         return hour >= 6 && hour < 18
-            ? <Sun className="h-5 w-5 text-amber-500" />
+            ? <Sun className="h-5 w-5 text-amber-600 dark:text-amber-500" />
             : <Moon className="h-5 w-5 text-indigo-400" />;
     };
 
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh] gap-3">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-500" />
                 <span className="text-sm text-muted-foreground">Cargando información...</span>
             </div>
         );
@@ -139,7 +172,7 @@ export default function FamilyPage() {
     if (error || !patient) {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh] gap-3">
-                <AlertCircle className="h-12 w-12 text-red-400" />
+                <AlertCircle className="h-12 w-12 text-red-600 dark:text-red-400" />
                 <p className="text-lg font-semibold text-secondary-foreground">{error || "Sin paciente asignado"}</p>
                 <p className="text-sm text-muted-foreground">Contacte al administrador para vincular su cuenta.</p>
             </div>
@@ -217,7 +250,7 @@ export default function FamilyPage() {
                         <Card className="shadow-sm h-full">
                             <CardHeader className="pb-3">
                                 <CardTitle className="flex items-center gap-2 text-base">
-                                    <Heart className="h-4 w-4 text-red-500" />
+                                    <Heart className="h-4 w-4 text-red-600 dark:text-red-500" />
                                     Estado Actual
                                 </CardTitle>
                             </CardHeader>
@@ -232,7 +265,7 @@ export default function FamilyPage() {
                                 </div>
                                 <div className="flex items-center justify-between p-3 bg-card/[0.02] rounded-lg">
                                     <span className="text-sm text-muted-foreground">Medicamentos</span>
-                                    <span className="text-sm font-semibold text-blue-400">{medications.length} activos</span>
+                                    <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">{medications.length} activos</span>
                                 </div>
                             </CardContent>
                         </Card>
@@ -240,24 +273,34 @@ export default function FamilyPage() {
 
                     {/* Contact Card */}
                     <SlideIn delay={0.2}>
-                        <Card className="shadow-sm h-full">
+                        <Card className="shadow-sm h-full font-mono relative overflow-hidden">
+                            {/* Review Banner */}
+                            <div className="absolute top-0 right-0 p-4">
+                                <a href="https://g.page/r/bluejax" target="_blank" rel="noopener noreferrer"
+                                    className="flex flex-col items-center justify-center h-12 w-12 bg-card rounded-full shadow-lg border border-amber-500/20 hover:scale-110 transition-transform group cursor-pointer"
+                                    title="Déjanos una reseña en Google"
+                                >
+                                    <Star className="h-5 w-5 text-amber-500 group-hover:fill-amber-500 transition-all" />
+                                </a>
+                            </div>
+
                             <CardHeader className="pb-3">
-                                <CardTitle className="flex items-center gap-2 text-base">
-                                    <Phone className="h-4 w-4 text-green-500" />
+                                <CardTitle className="flex items-center gap-2 text-base font-sans">
+                                    <Phone className="h-4 w-4 text-green-600 dark:text-green-500" />
                                     Contacto de Emergencia
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-3">
+                            <CardContent className="space-y-3 font-sans">
                                 <div className="p-4 bg-card/[0.03] rounded-xl border border-border">
                                     <p className="font-semibold text-foreground">{emergencyName}</p>
                                     {emergencyPhone && (
-                                        <p className="text-sm text-blue-400 mt-1 font-mono">{emergencyPhone}</p>
+                                        <p className="text-sm text-blue-600 dark:text-blue-400 mt-1 font-mono">{emergencyPhone}</p>
                                     )}
                                 </div>
                                 {patient.medicalHistory && (
                                     <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
-                                        <p className="text-xs text-amber-400 font-medium mb-1">Historial Médico</p>
-                                        <p className="text-sm text-amber-300/80 line-clamp-3">
+                                        <p className="text-xs text-amber-600 dark:text-amber-400 font-medium mb-1">Historial Médico</p>
+                                        <p className="text-sm text-amber-600 dark:text-amber-300/80 line-clamp-3">
                                             {patient.medicalHistory.replace(/CONTACTO:.*$/, "").trim() || "Sin datos"}
                                         </p>
                                     </div>
@@ -271,7 +314,7 @@ export default function FamilyPage() {
                         <Card className="shadow-sm">
                             <CardHeader className="pb-3">
                                 <CardTitle className="flex items-center gap-2 text-base">
-                                    <Clock className="h-4 w-4 text-blue-500" />
+                                    <Clock className="h-4 w-4 text-blue-600 dark:text-blue-500" />
                                     Actividad Reciente
                                 </CardTitle>
                                 <CardDescription>Últimos 5 registros</CardDescription>
@@ -310,7 +353,7 @@ export default function FamilyPage() {
                     <Card className="shadow-sm">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-lg">
-                                <Activity className="h-5 w-5 text-blue-500" />
+                                <Activity className="h-5 w-5 text-blue-600 dark:text-blue-500" />
                                 Historial de Actividad
                             </CardTitle>
                             <CardDescription>{activity.length} registros</CardDescription>
@@ -357,7 +400,7 @@ export default function FamilyPage() {
                     <Card className="shadow-sm">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-lg">
-                                <Pill className="h-5 w-5 text-green-500" />
+                                <Pill className="h-5 w-5 text-green-600 dark:text-green-500" />
                                 Medicamentos Actuales
                             </CardTitle>
                             <CardDescription>{medications.length} medicamentos asignados</CardDescription>
@@ -376,7 +419,7 @@ export default function FamilyPage() {
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div className="flex items-center gap-2">
                                                         <div className="h-8 w-8 rounded-lg bg-emerald-500/15 flex items-center justify-center">
-                                                            <Pill className="h-4 w-4 text-emerald-400" />
+                                                            <Pill className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                                                         </div>
                                                         <h4 className="font-semibold text-foreground">{med.medication.name}</h4>
                                                     </div>
@@ -435,7 +478,7 @@ export default function FamilyPage() {
                                                     {msg.isFromFamily ? "Tú" : msg.fromUser?.name || "Personal"}
                                                 </p>
                                                 <p className="text-sm">{msg.content}</p>
-                                                <p className={`text-[10px] mt-1 ${msg.isFromFamily ? "text-blue-200" : "text-muted-foreground"}`}>
+                                                <p className={`text-[10px] mt-1 ${msg.isFromFamily ? "text-blue-600 dark:text-blue-200" : "text-muted-foreground"}`}>
                                                     {new Date(msg.createdAt).toLocaleString("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                                                 </p>
                                             </div>
@@ -469,6 +512,206 @@ export default function FamilyPage() {
                             </div>
                         </CardContent>
                     </Card>
+                </FadeIn>
+            )}
+
+            {activeTab === "services" && (
+                <FadeIn className="space-y-6">
+                    {/* Store Hero Banner */}
+                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-pink-600 via-purple-600 to-indigo-700 p-6 md:p-8 shadow-xl shadow-purple-500/10">
+                        <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+                        <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+                        <div className="relative z-10">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Sparkles className="h-5 w-5 text-amber-300" />
+                                <span className="text-xs font-bold uppercase tracking-widest text-pink-200">Tienda Premium</span>
+                            </div>
+                            <h2 className="text-2xl md:text-3xl font-bold text-white">
+                                Servicios para {patient.name.split(" ")[0]}
+                            </h2>
+                            <p className="text-pink-100/80 mt-2 text-sm max-w-md">
+                                Experiencias, comidas especiales, terapias y cuidados extra. Todo al alcance de un click.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Category Filter Pills */}
+                    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                        {["TODOS", "EXPERIENCIAS", "COMIDAS", "TERAPIAS", "CUIDADOS"].map((cat) => {
+                            const isActive = activeCategory === cat;
+                            const catIcons: Record<string, any> = {
+                                TODOS: ShoppingBag,
+                                EXPERIENCIAS: Gift,
+                                COMIDAS: ChefHat,
+                                TERAPIAS: Stethoscope,
+                                CUIDADOS: HandHeart
+                            };
+                            const CatIcon = catIcons[cat];
+                            const catLabels: Record<string, string> = {
+                                TODOS: "Todos",
+                                EXPERIENCIAS: "Experiencias",
+                                COMIDAS: "Comidas",
+                                TERAPIAS: "Terapias",
+                                CUIDADOS: "Cuidados"
+                            };
+                            return (
+                                <button
+                                    key={cat}
+                                    onClick={() => setActiveCategory(cat)}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${isActive
+                                            ? "bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-md shadow-pink-500/20"
+                                            : "bg-card text-muted-foreground hover:text-foreground border border-border hover:border-pink-500/30"
+                                        }`}
+                                >
+                                    <CatIcon className="h-4 w-4" />
+                                    {catLabels[cat]}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* Services Grid */}
+                    {(() => {
+                        const filtered = activeCategory === "TODOS"
+                            ? services
+                            : services.filter((s: any) => s.category === activeCategory);
+
+                        if (services.length === 0) {
+                            return (
+                                <div className="text-center py-16 bg-card rounded-2xl border border-dashed border-border">
+                                    <ShoppingBag className="h-12 w-12 mx-auto text-muted-foreground opacity-20 mb-4" />
+                                    <h3 className="text-lg font-medium text-foreground">Aún no hay servicios disponibles</h3>
+                                    <p className="text-muted-foreground text-sm max-w-sm mx-auto mt-2">
+                                        La residencia pronto agregará servicios extra que podrás adquirir aquí.
+                                    </p>
+                                </div>
+                            );
+                        }
+
+                        if (filtered.length === 0) {
+                            return (
+                                <div className="text-center py-12 bg-card rounded-2xl border border-border">
+                                    <Package className="h-10 w-10 mx-auto text-muted-foreground opacity-30 mb-3" />
+                                    <p className="text-sm text-muted-foreground">No hay servicios en esta categoría.</p>
+                                </div>
+                            );
+                        }
+
+                        const categoryGradients: Record<string, string> = {
+                            EXPERIENCIAS: "from-amber-500/10 to-orange-500/5 border-amber-500/20 hover:border-amber-500/40",
+                            COMIDAS: "from-green-500/10 to-emerald-500/5 border-green-500/20 hover:border-green-500/40",
+                            TERAPIAS: "from-blue-500/10 to-cyan-500/5 border-blue-500/20 hover:border-blue-500/40",
+                            CUIDADOS: "from-pink-500/10 to-rose-500/5 border-pink-500/20 hover:border-pink-500/40",
+                        };
+
+                        const categoryIcons: Record<string, any> = {
+                            EXPERIENCIAS: Gift,
+                            COMIDAS: ChefHat,
+                            TERAPIAS: Stethoscope,
+                            CUIDADOS: HandHeart
+                        };
+
+                        const categoryColors: Record<string, string> = {
+                            EXPERIENCIAS: "text-amber-500 bg-amber-500/15",
+                            COMIDAS: "text-green-500 bg-green-500/15",
+                            TERAPIAS: "text-blue-500 bg-blue-500/15",
+                            CUIDADOS: "text-pink-500 bg-pink-500/15",
+                        };
+
+                        return (
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                {filtered.map((svc: any, i: number) => {
+                                    const gradient = categoryGradients[svc.category] || categoryGradients.EXPERIENCIAS;
+                                    const SvcIcon = categoryIcons[svc.category] || Gift;
+                                    const iconColor = categoryColors[svc.category] || categoryColors.EXPERIENCIAS;
+
+                                    return (
+                                        <SlideIn key={svc.id} delay={Math.min(i * 0.08, 0.4)}>
+                                            <div className={`group relative rounded-2xl border bg-gradient-to-br ${gradient} p-5 transition-all hover:shadow-lg cursor-default h-full flex flex-col`}>
+                                                {/* Icon + Category */}
+                                                <div className="flex items-start justify-between mb-3">
+                                                    <div className={`h-11 w-11 rounded-xl ${iconColor} flex items-center justify-center`}>
+                                                        <SvcIcon className="h-5 w-5" />
+                                                    </div>
+                                                    <Badge variant="outline" className="text-[10px] font-semibold uppercase tracking-wider bg-card/50 border-border">
+                                                        {svc.category?.toLowerCase() || "premium"}
+                                                    </Badge>
+                                                </div>
+
+                                                {/* Name + Description */}
+                                                <h3 className="font-bold text-foreground text-lg mb-1 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
+                                                    {svc.name}
+                                                </h3>
+                                                <p className="text-sm text-muted-foreground flex-1 mb-4 line-clamp-2">
+                                                    {svc.description || "Servicio premium para tu familiar."}
+                                                </p>
+
+                                                {/* Price + CTA */}
+                                                <div className="flex items-center justify-between mt-auto pt-3 border-t border-border/50">
+                                                    <div>
+                                                        <span className="text-2xl font-bold text-foreground">${svc.price?.toLocaleString("es-MX")}</span>
+                                                        <span className="text-xs text-muted-foreground ml-1 font-mono">MXN</span>
+                                                    </div>
+                                                    <Button
+                                                        size="sm"
+                                                        className="bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white shadow-md shadow-pink-500/20 gap-1.5 font-semibold"
+                                                        onClick={() => handlePurchase(svc)}
+                                                    >
+                                                        Comprar <ArrowRight className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </SlideIn>
+                                    );
+                                })}
+                            </div>
+                        );
+                    })()}
+
+                    {/* Purchase History */}
+                    {purchases.length > 0 && (
+                        <SlideIn delay={0.3}>
+                            <Card className="shadow-sm">
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="flex items-center gap-2 text-base">
+                                        <ShoppingBag className="h-4 w-4 text-purple-500" />
+                                        Mis Compras
+                                    </CardTitle>
+                                    <CardDescription>{purchases.length} compra{purchases.length > 1 ? "s" : ""} realizadas</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-2">
+                                        {purchases.map((p: any) => {
+                                            const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
+                                                PENDING: { label: "Pendiente", color: "bg-amber-500/15 text-amber-600 border-amber-500/20", icon: Clock4 },
+                                                PAID: { label: "Pagado", color: "bg-blue-500/15 text-blue-600 border-blue-500/20", icon: CheckCircle2 },
+                                                FULFILLED: { label: "Entregado", color: "bg-emerald-500/15 text-emerald-600 border-emerald-500/20", icon: CheckCircle2 },
+                                            };
+                                            const st = statusConfig[p.status] || statusConfig.PENDING;
+                                            const StIcon = st.icon;
+                                            return (
+                                                <div key={p.id} className="flex items-center gap-3 p-3 rounded-xl bg-card/[0.02] border border-border/60 hover:border-border transition-colors">
+                                                    <div className="h-9 w-9 rounded-lg bg-purple-500/10 flex items-center justify-center flex-shrink-0">
+                                                        <Store className="h-4 w-4 text-purple-500" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-semibold text-foreground truncate">{p.service?.name || "Servicio"}</p>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {new Date(p.createdAt).toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" })}
+                                                        </p>
+                                                    </div>
+                                                    <span className="text-sm font-bold text-foreground">${p.service?.price?.toLocaleString("es-MX")}</span>
+                                                    <Badge className={`${st.color} border text-[10px] gap-1`}>
+                                                        <StIcon className="h-3 w-3" /> {st.label}
+                                                    </Badge>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </SlideIn>
+                    )}
                 </FadeIn>
             )}
         </FadeIn>

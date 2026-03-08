@@ -10,9 +10,15 @@ datasource db {
 
 // Facility / Retirement Home (tenant)
 model Facility {
-  id        String   @id @default(cuid())
-  name      String
-  plan      String   @default("FREE") // FREE, CORE, ENTERPRISE
+  id   String @id @default(cuid())
+  name String
+  plan String @default("FREE") // FREE, CORE, ENTERPRISE
+
+  // Billing Fields (powered by BlueJax payment links)
+  billingCustomerId      String?   @unique @map(name: "stripe_customer_id")
+  billingSubscriptionId  String?   @unique @map(name: "stripe_subscription_id")
+  billingPlanId          String?   @map(name: "stripe_price_id")
+  billingPeriodEnd       DateTime? @map(name: "stripe_current_period_end")
 
   users         User[]
   patients      Patient[]
@@ -21,8 +27,26 @@ model Facility {
   notifications Notification[]
   settings      FacilitySetting[]
 
+  // Phase 3 Relations
+  premiumServices  PremiumService[]
+  premiumPurchases PremiumPurchase[]
+  auditLogs        AuditLog[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Invitation tokens for staff magic-link flow
+model InviteToken {
+  id         String   @id @default(cuid())
+  email      String
+  name       String
+  token      String   @unique
+  role       String   @default("STAFF")
+  facilityId String
+  patientId  String?
+  expires    DateTime
+  createdAt  DateTime @default(now())
 }
 
 // User model for Staff and Admins
@@ -38,19 +62,25 @@ model User {
   // Facility link (tenant)
   facilityId String?
   facility   Facility? @relation(fields: [facilityId], references: [id])
-  
-  // OAuth adapter relations
-  accounts   Account[]
-  sessions   Session[]
 
-  attendance Attendance[]
+  mustChangePassword Boolean @default(false)
+
+  // OAuth adapter relations
+  accounts Account[]
+  sessions Session[]
+
+  attendance    Attendance[]
   assignedTasks Task[]
-  logs       DailyLog[]
-  sentMessages FamilyMessage[] @relation("SentMessages")
+  logs          DailyLog[]
+  sentMessages  FamilyMessage[] @relation("SentMessages")
 
   // Relation to Patient (for Family Members)
   patientId String?
   patient   Patient? @relation(fields: [patientId], references: [id])
+
+  // Phase 3 Relations
+  familyPurchases PremiumPurchase[] @relation("FamilyPurchases")
+  auditLogs       AuditLog[]        @relation("UserAuditLogs")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -108,130 +138,147 @@ model PendingRegistration {
 
 // Patient / Resident
 model Patient {
-  id        String   @id @default(cuid())
-  name      String
-  room      String?
-  status    String   @default("Estable") // Estable, Delicado, Hospitalizado
-  age       Int?
-  dateOfBirth DateTime?
+  id             String    @id @default(cuid())
+  name           String
+  room           String?
+  status         String    @default("Estable") // Estable, Delicado, Hospitalizado
+  age            Int?
+  dateOfBirth    DateTime?
   medicalHistory String?
   dietaryNeeds   String?
 
   // Facility link (tenant)
   facilityId String?
   facility   Facility? @relation(fields: [facilityId], references: [id])
-  
-  logs      DailyLog[]
-  medications PatientMedication[]
-  tasks     Task[]
+
+  logs          DailyLog[]
+  medications   PatientMedication[]
+  tasks         Task[]
   notifications Notification[]
-  
+
   // Family Members linked to this patient
-  familyMembers User[]
+  familyMembers  User[]
   familyMessages FamilyMessage[]
-  
+
+  // Phase 3 Relations
+  premiumPurchases PremiumPurchase[]
+  summaries        PatientSummary[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([facilityId])
 }
 
 // Tasks for Staff
 model Task {
-  id        String   @id @default(cuid())
-  title     String
+  id          String    @id @default(cuid())
+  title       String
   description String?
-  priority  String   @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
-  status    String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
-  dueDate   DateTime?
-  
+  priority    String    @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  status      String    @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
+  dueDate     DateTime?
+
   assignedToId String?
   assignedTo   User?   @relation(fields: [assignedToId], references: [id])
-  
-  patientId   String?
-  patient     Patient? @relation(fields: [patientId], references: [id])
+
+  patientId String?
+  patient   Patient? @relation(fields: [patientId], references: [id])
 
   // Facility link (tenant)
   facilityId String?
   facility   Facility? @relation(fields: [facilityId], references: [id])
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([facilityId])
+  @@index([patientId])
+  @@index([assignedToId])
 }
 
 // Daily Logs (Bitácora)
 model DailyLog {
-  id        String   @id @default(cuid())
-  type      String   // VITALS, FOOD, HYGIENE, INCIDENT
-  notes     String?
-  value     String?  // e.g., "120/80" for BP, "All ate" for Food
-  
+  id    String  @id @default(cuid())
+  type  String // VITALS, FOOD, HYGIENE, INCIDENT
+  notes String?
+  value String? // e.g., "120/80" for BP, "All ate" for Food
+
   patientId String?
   patient   Patient? @relation(fields: [patientId], references: [id])
-  
-  authorId  String
-  author    User     @relation(fields: [authorId], references: [id])
-  
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
   createdAt DateTime @default(now())
+
+  @@index([patientId])
+  @@index([authorId])
+  @@index([createdAt])
 }
 
 // Inventory & Medications
 model Medication {
-  id        String   @id @default(cuid())
-  name      String
-  stock     Int
-  unit      String   // pills, ml, boxes
-  minStock  Int      @default(10)
+  id         String    @id @default(cuid())
+  name       String
+  stock      Int
+  unit       String // pills, ml, boxes
+  minStock   Int       @default(10)
   expiryDate DateTime?
 
   // Facility link (tenant)
   facilityId String?
   facility   Facility? @relation(fields: [facilityId], references: [id])
-  
-  patients  PatientMedication[]
-  
+
+  patients PatientMedication[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 // Junction table for Patient <-> Medication
 model PatientMedication {
-  id           String     @id @default(cuid())
-  patientId    String
-  patient      Patient    @relation(fields: [patientId], references: [id])
-  
+  id        String  @id @default(cuid())
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
   medicationId String
   medication   Medication @relation(fields: [medicationId], references: [id])
-  
-  dosage       String     // e.g., "1 tablet every 8 hours"
-  schedule     String?    // JSON or simple string text
-  
-  createdAt    DateTime   @default(now())
+
+  dosage   String // e.g., "1 tablet every 8 hours"
+  schedule String? // JSON or simple string text
+
+  createdAt DateTime @default(now())
 }
 
 // Staff Attendance
 model Attendance {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  
-  checkIn   DateTime @default(now())
-  checkOut  DateTime?
-  
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  checkIn  DateTime  @default(now())
+  checkOut DateTime?
+
   createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([checkIn])
 }
 
 // Notifications (Admin Alerts)
 model Notification {
-  id        String   @id @default(cuid())
-  title     String
-  message   String
-  type      String   // INFO, WARNING, CRITICAL
-  read      Boolean  @default(false)
-  
-  recipientRole String?  // Target role: ADMIN, STAFF, DOCTOR, NURSE, KITCHEN, FAMILY, or null for ALL
-  recipientName String?  // Optional specific person name
-  
-  patientId     String?
-  patient       Patient? @relation(fields: [patientId], references: [id])
+  id      String  @id @default(cuid())
+  title   String
+  message String
+  type    String // INFO, WARNING, CRITICAL
+  read    Boolean @default(false)
+
+  recipientRole String? // Target role: ADMIN, STAFF, DOCTOR, NURSE, KITCHEN, FAMILY, or null for ALL
+  recipientName String? // Optional specific person name
+
+  patientId String?
+  patient   Patient? @relation(fields: [patientId], references: [id])
 
   // Facility link (tenant)
   facilityId String?
@@ -248,7 +295,7 @@ model FacilitySetting {
 
   facilityId String?
   facility   Facility? @relation(fields: [facilityId], references: [id])
-  
+
   updatedAt DateTime @updatedAt
 
   @@unique([facilityId, key])
@@ -256,15 +303,94 @@ model FacilitySetting {
 
 // Family Messages (Family <-> Staff communication about a patient)
 model FamilyMessage {
-  id          String   @id @default(cuid())
-  content     String
+  id           String  @id @default(cuid())
+  content      String
   isFromFamily Boolean @default(true)
-  
-  fromUserId  String
-  fromUser    User     @relation("SentMessages", fields: [fromUserId], references: [id])
-  
-  patientId   String
-  patient     Patient  @relation(fields: [patientId], references: [id])
-  
-  createdAt   DateTime @default(now())
+
+  fromUserId String
+  fromUser   User   @relation("SentMessages", fields: [fromUserId], references: [id])
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([patientId])
+}
+
+// Phase 3: Premium Services (Storefront items for Family Portal)
+model PremiumService {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  category    String  @default("EXPERIENCIAS") // EXPERIENCIAS, COMIDAS, TERAPIAS, CUIDADOS
+  price       Float // Price in MXN/USD
+  paymentUrl  String? // The BlueJax payment link URL
+  icon        String? // Name of the lucide-react icon
+  image       String? // Optional image URL for the service card
+  isActive    Boolean @default(true)
+
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id])
+
+  purchases PremiumPurchase[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Phase 3: Premium Purchases (Records of what families bought)
+model PremiumPurchase {
+  id     String  @id @default(cuid())
+  status String  @default("PENDING") // PENDING, PAID, FULFILLED
+  notes  String? // Special instructions from family
+
+  serviceId String
+  service   PremiumService @relation(fields: [serviceId], references: [id])
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  familyMemberId String
+  familyMember   User   @relation("FamilyPurchases", fields: [familyMemberId], references: [id])
+
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([facilityId])
+  @@index([patientId])
+}
+
+// Phase 3: AI Smart Summaries
+model PatientSummary {
+  id              String  @id @default(cuid())
+  content         String  @db.Text
+  riskLevel       String // LOW, MEDIUM, HIGH
+  recommendations String? // JSON array of recommendations
+  generatedBy     String  @default("AI")
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+// Phase 3: Audit Trail (Bitácora de Auditoría)
+model AuditLog {
+  id       String  @id @default(cuid())
+  action   String // CREATE, UPDATE, DELETE, VIEW, LOGIN
+  entity   String // The table/model name
+  entityId String? // ID of the modified record
+  details  String? @db.Text // JSON string of changes
+
+  userId String
+  user   User   @relation("UserAuditLogs", fields: [userId], references: [id])
+
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id])
+
+  createdAt DateTime @default(now())
 }
