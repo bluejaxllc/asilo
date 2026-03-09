@@ -48,9 +48,9 @@ const getGreeting = () => {
 };
 
 const priorityConfig: Record<string, { border: string; bg: string; text: string; badge: string }> = {
-    ALTA: { border: "border-l-red-500", bg: "bg-red-500/10", text: "text-red-400", badge: "bg-red-500/15 text-red-400 border-red-500/20" },
-    MEDIA: { border: "border-l-amber-500", bg: "bg-amber-500/10", text: "text-amber-400", badge: "bg-amber-500/15 text-amber-400 border-amber-500/20" },
-    BAJA: { border: "border-l-emerald-500", bg: "bg-emerald-500/10", text: "text-emerald-400", badge: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20" },
+    ALTA: { border: "border-l-red-500", bg: "bg-red-500/10", text: "text-red-600 dark:text-red-400", badge: "bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/20" },
+    MEDIA: { border: "border-l-amber-500", bg: "bg-amber-500/10", text: "text-amber-600 dark:text-amber-400", badge: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/20" },
+    BAJA: { border: "border-l-emerald-500", bg: "bg-emerald-500/10", text: "text-emerald-600 dark:text-emerald-400", badge: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" },
 };
 
 export default function StaffPage() {
@@ -160,11 +160,11 @@ export default function StaffPage() {
 
                 <div className="relative p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div>
-                        <p className={`text-sm uppercase tracking-widest font-semibold mb-1 ${isClockedIn ? 'text-blue-200' : 'text-muted-foreground'}`}>
+                        <p className={`text-sm uppercase tracking-widest font-semibold mb-1 ${isClockedIn ? 'text-blue-600 dark:text-blue-200' : 'text-muted-foreground'}`}>
                             {isClockedIn ? "Turno en Curso" : "Fuera de Turno"}
                         </p>
                         <h2 className="text-3xl md:text-4xl font-bold text-white">
-                            {getGreeting()}, <span className={isClockedIn ? 'text-blue-200' : 'text-muted-foreground'}>{session?.user?.name || "Usuario"}</span>
+                            {getGreeting()}, <span className={isClockedIn ? 'text-blue-600 dark:text-blue-200' : 'text-muted-foreground'}>{session?.user?.name || "Usuario"}</span>
                         </h2>
                         <p className={`mt-2 text-base ${isClockedIn ? 'text-blue-100' : 'text-muted-foreground'}`}>
                             {isClockedIn
@@ -265,8 +265,8 @@ export default function StaffPage() {
             {/* Loading */}
             {loading && (
                 <div className="flex justify-center items-center py-16">
-                    <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-                    <span className="ml-3 text-blue-500 font-medium">Cargando tareas...</span>
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-500" />
+                    <span className="ml-3 text-blue-600 dark:text-blue-500 font-medium">Cargando tareas...</span>
                 </div>
             )}
 
@@ -295,7 +295,7 @@ export default function StaffPage() {
                                             {task.patient}
                                         </CardDescription>
                                         {isInProgress && (
-                                            <div className="mt-3 p-2.5 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400 font-semibold text-sm border border-blue-500/20">
+                                            <div className="mt-3 p-2.5 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 font-semibold text-sm border border-blue-500/20">
                                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" /> En Curso...
                                             </div>
                                         )}
@@ -311,7 +311,7 @@ export default function StaffPage() {
                                         )}
                                         <Button
                                             variant={isInProgress ? "default" : "outline"}
-                                            className={`flex-1 h-14 text-lg font-bold shadow-sm rounded-xl ${isInProgress ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white' : 'border-2 hover:border-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-400'}`}
+                                            className={`flex-1 h-14 text-lg font-bold shadow-sm rounded-xl ${isInProgress ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white' : 'border-2 hover:border-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-600 dark:text-emerald-400'}`}
                                             onClick={() => handleCompleteTask(task.id)}
                                         >
                                             <CheckCircle className="mr-2 h-5 w-5" /> Listo
@@ -334,7 +334,7 @@ export default function StaffPage() {
                         <h3 className="text-2xl font-bold text-foreground mb-2">¡Todo listo por ahora! 🎉</h3>
                         <p className="text-lg text-muted-foreground">Has completado todas tus tareas asignadas.</p>
                         {completedCount > 0 && (
-                            <p className="text-sm text-emerald-400 font-semibold mt-2">{completedCount} tarea{completedCount !== 1 ? 's' : ''} completada{completedCount !== 1 ? 's' : ''} hoy</p>
+                            <p className="text-sm text-emerald-600 dark:text-emerald-400 font-semibold mt-2">{completedCount} tarea{completedCount !== 1 ? 's' : ''} completada{completedCount !== 1 ? 's' : ''} hoy</p>
                         )}
                     </div>
                 </ScaleIn>

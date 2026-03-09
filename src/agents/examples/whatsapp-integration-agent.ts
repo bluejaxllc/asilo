@@ -13,7 +13,7 @@ export class WhatsAppIntegrationAgent implements Agent {
             data: {
                 title: `🟢 Conexión de WhatsApp Exitosa`,
                 message: `El webhook de WhatsApp Business ha sido verificado y está listo para enviar y recibir mensajes.`,
-                type: 'SUCCESS',
+                type: 'INFO',
                 recipientRole: 'ADMIN'
             }
         });

@@ -52,7 +52,7 @@ export const ClinicalNotes = ({ notes, patientId }: ClinicalNotesProps) => {
                     onClick={() => setIsAdding(!isAdding)}
                     className={cn(
                         "transition-all duration-300",
-                        isAdding ? "bg-red-500/15 text-red-400 hover:bg-red-200" : "bg-blue-600 hover:bg-blue-700"
+                        isAdding ? "bg-red-500/15 text-red-600 dark:text-red-400 hover:bg-red-200" : "bg-blue-600 hover:bg-blue-700"
                     )}
                 >
                     {isAdding ? "Cancelar" : <><Plus className="h-4 w-4 mr-2" /> Nueva Nota</>}
@@ -91,7 +91,7 @@ export const ClinicalNotes = ({ notes, patientId }: ClinicalNotesProps) => {
                     notes.map((note) => (
                         <div key={note.id} className="group flex gap-4 p-4 border rounded-xl hover:bg-muted/50 transition-colors bg-card shadow-sm hover:shadow-md">
                             <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
-                                <AvatarFallback className="bg-blue-500/15 text-blue-400 font-bold">
+                                <AvatarFallback className="bg-blue-500/15 text-blue-600 dark:text-blue-400 font-bold">
                                     {note.author?.name?.charAt(0) || "U"}
                                 </AvatarFallback>
                             </Avatar>

@@ -109,7 +109,7 @@ const tiers = [
             "Bitácora de auditoría completa",
         ],
         cta: "Activar Pro",
-        ctaHref: "https://www.bluejax.ai/contact",
+        ctaHref: process.env.NEXT_PUBLIC_CHECKOUT_LINK || "https://links.bluejax.ai/payment-link/69aa5d3584b2d70ea05f9733",
     },
     {
         name: "Enterprise",
@@ -170,12 +170,12 @@ const comparisonRows = [
    ACCENT MAP
    ════════════════════════════════════════ */
 const accentColors: Record<string, { bg: string; text: string; border: string }> = {
-    blue: { bg: "bg-blue-500/10", text: "text-blue-500", border: "border-blue-500/20" },
-    emerald: { bg: "bg-emerald-500/10", text: "text-emerald-500", border: "border-emerald-500/20" },
+    blue: { bg: "bg-blue-500/10", text: "text-blue-600 dark:text-blue-500", border: "border-blue-500/20" },
+    emerald: { bg: "bg-emerald-500/10", text: "text-emerald-600 dark:text-emerald-500", border: "border-emerald-500/20" },
     violet: { bg: "bg-violet-500/10", text: "text-violet-500", border: "border-violet-500/20" },
-    amber: { bg: "bg-amber-500/10", text: "text-amber-500", border: "border-amber-500/20" },
-    cyan: { bg: "bg-cyan-500/10", text: "text-cyan-500", border: "border-cyan-500/20" },
-    rose: { bg: "bg-rose-500/10", text: "text-rose-500", border: "border-rose-500/20" },
+    amber: { bg: "bg-amber-500/10", text: "text-amber-600 dark:text-amber-500", border: "border-amber-500/20" },
+    cyan: { bg: "bg-cyan-500/10", text: "text-cyan-600 dark:text-cyan-500", border: "border-cyan-500/20" },
+    rose: { bg: "bg-rose-500/10", text: "text-rose-600 dark:text-rose-500", border: "border-rose-500/20" },
     fuchsia: { bg: "bg-fuchsia-500/10", text: "text-fuchsia-500", border: "border-fuchsia-500/20" },
 };
 
@@ -238,7 +238,7 @@ export default function UpgradePage() {
 
                     <div className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
                         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest mb-6">
+                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-widest mb-6">
                             <Sparkles className="h-3 w-3" /> BlueJax Pro
                         </motion.div>
                         <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.1 }}
@@ -290,7 +290,7 @@ export default function UpgradePage() {
                                             <div className="flex-1 space-y-2.5 mb-6">
                                                 {tier.features.map((f) => (
                                                     <div key={f} className="flex items-center gap-2.5 text-sm">
-                                                        <Check className={`h-4 w-4 flex-shrink-0 ${isPopular ? "text-blue-500" : tier.accent === "violet" ? "text-violet-500" : "text-emerald-500"}`} />
+                                                        <Check className={`h-4 w-4 flex-shrink-0 ${isPopular ? "text-blue-600 dark:text-blue-500" : tier.accent === "violet" ? "text-violet-500" : "text-emerald-600 dark:text-emerald-500"}`} />
                                                         <span className="text-muted-foreground">{f}</span>
                                                     </div>
                                                 ))}
@@ -328,7 +328,7 @@ export default function UpgradePage() {
 
                     <div className="max-w-6xl mx-auto px-6">
                         <FadeUp className="text-center mb-14">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest mb-4">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-widest mb-4">
                                 <Sparkles className="h-3 w-3" /> Funcionalidades Pro
                             </div>
                             <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -376,7 +376,7 @@ export default function UpgradePage() {
                                                 <th className="text-left p-4 font-semibold text-muted-foreground">Funcionalidad</th>
                                                 <th className="text-center p-4 font-semibold text-muted-foreground w-28">Esencial</th>
                                                 <th className="text-center p-4 font-semibold w-28">
-                                                    <span className="text-blue-400">Pro</span>
+                                                    <span className="text-blue-600 dark:text-blue-400">Pro</span>
                                                 </th>
                                                 <th className="text-center p-4 font-semibold w-28">
                                                     <span className="text-violet-400">Enterprise</span>
@@ -389,12 +389,12 @@ export default function UpgradePage() {
                                                     <td className="p-4 text-foreground">{row.feature}</td>
                                                     <td className="p-4 text-center">
                                                         {row.essential
-                                                            ? <Check className="h-4 w-4 text-emerald-500 mx-auto" />
+                                                            ? <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-500 mx-auto" />
                                                             : <X className="h-4 w-4 text-muted-foreground/30 mx-auto" />}
                                                     </td>
                                                     <td className="p-4 text-center">
                                                         {row.pro
-                                                            ? <Check className="h-4 w-4 text-blue-500 mx-auto" />
+                                                            ? <Check className="h-4 w-4 text-blue-600 dark:text-blue-500 mx-auto" />
                                                             : <X className="h-4 w-4 text-muted-foreground/30 mx-auto" />}
                                                     </td>
                                                     <td className="p-4 text-center">
@@ -420,7 +420,7 @@ export default function UpgradePage() {
 
                     <FadeUp className="max-w-3xl mx-auto px-6 text-center">
                         <div className="rounded-2xl border border-blue-500/20 bg-gradient-to-b from-blue-500/5 to-transparent p-10 md:p-14">
-                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-wider mb-5">
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wider mb-5">
                                 <Sparkles className="h-3 w-3" /> Listo para empezar
                             </div>
                             <h2 className="text-3xl md:text-4xl font-bold mb-4">

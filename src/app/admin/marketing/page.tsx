@@ -33,7 +33,7 @@ export default function MarketingPage() {
                         <div>
                             <div className="flex items-center gap-3 mb-2">
                                 <div className="p-2 rounded-xl bg-gradient-to-br from-pink-500/20 to-fuchsia-500/20 border border-pink-500/10">
-                                    <Megaphone className="h-6 w-6 text-pink-300" />
+                                    <Megaphone className="h-6 w-6 text-pink-600 dark:text-pink-300" />
                                 </div>
                                 <h1 className="text-3xl font-bold text-white tracking-tight">Marketing</h1>
                                 <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 text-[10px] font-bold px-2">
@@ -41,7 +41,7 @@ export default function MarketingPage() {
                                     PRO
                                 </Badge>
                             </div>
-                            <p className="text-pink-200/60 text-sm max-w-lg">
+                            <p className="text-pink-600 dark:text-pink-200/60 text-sm max-w-lg">
                                 Herramientas de crecimiento para su retiro: capte nuevos residentes, gestione reputación y comuníquese masivamente con familias.
                             </p>
                         </div>
@@ -49,11 +49,11 @@ export default function MarketingPage() {
                         <div className="hidden sm:flex gap-4">
                             <div className="text-center p-4 rounded-xl bg-card/5 border border-border min-w-[100px]">
                                 <p className="text-2xl font-bold text-white">6</p>
-                                <p className="text-xs text-pink-300/50 mt-1">Herramientas</p>
+                                <p className="text-xs text-pink-600 dark:text-pink-300/50 mt-1">Herramientas</p>
                             </div>
                             <div className="text-center p-4 rounded-xl bg-card/5 border border-border min-w-[100px]">
-                                <TrendingUp className="h-6 w-6 text-emerald-400 mx-auto" />
-                                <p className="text-xs text-pink-300/50 mt-1">Crecimiento</p>
+                                <TrendingUp className="h-6 w-6 text-emerald-600 dark:text-emerald-400 mx-auto" />
+                                <p className="text-xs text-pink-600 dark:text-pink-300/50 mt-1">Crecimiento</p>
                             </div>
                         </div>
                     </div>
@@ -74,7 +74,7 @@ export default function MarketingPage() {
                             <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-8 text-[10px] bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20 text-rose-400 gap-1.5"
+                                className="h-8 text-[10px] bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 gap-1.5"
                                 onClick={async () => {
                                     const id = toast.loading("Analizando tasa de conversión del embudo...");
                                     const result = await executePremiumAgent('marketing-audit');
@@ -128,7 +128,7 @@ export default function MarketingPage() {
                             <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-400 gap-1.5"
+                                className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 gap-1.5"
                                 onClick={async () => {
                                     const id = toast.loading("Configurando disponibilidad de tours...");
                                     const result = await executePremiumAgent('tour-booking');
@@ -159,7 +159,7 @@ export default function MarketingPage() {
                             <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-8 text-[10px] bg-cyan-500/10 border-cyan-500/20 hover:bg-cyan-500/20 text-cyan-400 gap-1.5"
+                                className="h-8 text-[10px] bg-cyan-500/10 border-cyan-500/20 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 gap-1.5"
                                 onClick={async () => {
                                     const id = toast.loading("Generando plantilla IA...");
                                     const result = await executePremiumAgent('campaign-generator');
@@ -186,7 +186,7 @@ export default function MarketingPage() {
                             <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-400 gap-1.5"
+                                className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 gap-1.5"
                                 onClick={async () => {
                                     const id = toast.loading("Analizando reseñas...");
                                     const result = await executePremiumAgent('reputation-audit');
@@ -213,7 +213,7 @@ export default function MarketingPage() {
                             <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-8 text-[10px] bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-400 gap-1.5"
+                                className="h-8 text-[10px] bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 gap-1.5"
                                 onClick={async () => {
                                     const id = toast.loading("Conectando con WhatsApp Business API...");
                                     const result = await executePremiumAgent('whatsapp-integration');

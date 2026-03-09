@@ -41,11 +41,11 @@ import { EditPatientDialog } from "@/components/patients/edit-patient-dialog";
 import { cn } from "@/lib/utils";
 
 const logTypeConfig: Record<string, { label: string; icon: any; color: string; bg: string }> = {
-    VITALS: { label: "Vitales", icon: Activity, color: "text-blue-400", bg: "bg-blue-500/15" },
-    FOOD: { label: "Alimentos", icon: Utensils, color: "text-orange-400", bg: "bg-orange-500/15" },
-    MEDS: { label: "Meds", icon: Pill, color: "text-emerald-400", bg: "bg-emerald-500/15" },
+    VITALS: { label: "Vitales", icon: Activity, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-500/15" },
+    FOOD: { label: "Alimentos", icon: Utensils, color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-500/15" },
+    MEDS: { label: "Meds", icon: Pill, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/15" },
     NOTE: { label: "Nota", icon: FileText, color: "text-violet-400", bg: "bg-violet-500/15" },
-    INCIDENT: { label: "Incidente", icon: AlertTriangle, color: "text-red-400", bg: "bg-red-500/15" },
+    INCIDENT: { label: "Incidente", icon: AlertTriangle, color: "text-red-600 dark:text-red-400", bg: "bg-red-500/15" },
 };
 
 export default async function PatientDetailsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -225,7 +225,7 @@ export default async function PatientDetailsPage({ params }: { params: Promise<{
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <IAInsights insights={patient.notifications as any} />
+                                        <IAInsights summaries={(patient.summaries || []) as any[]} patientId={patient.id} />
                                     </CardContent>
                                 </Card>
 
@@ -257,7 +257,7 @@ export default async function PatientDetailsPage({ params }: { params: Promise<{
                                                     <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors border border-border hover:border-border hover:shadow-sm">
                                                         <div className="flex items-start gap-3">
                                                             <div className="p-2 bg-blue-500/15 rounded-lg">
-                                                                <Pill className="h-5 w-5 text-blue-500" />
+                                                                <Pill className="h-5 w-5 text-blue-600 dark:text-blue-500" />
                                                             </div>
                                                             <div>
                                                                 <h4 className="font-semibold text-foreground">{pm.medication.name}</h4>

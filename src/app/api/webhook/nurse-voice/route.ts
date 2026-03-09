@@ -25,6 +25,7 @@ import {
     addContactNote,
     formatNoteBody,
 } from '@/lib/ghl';
+import { sendDirectorAlert, incrementMonthlyExtras } from '@/lib/whatsapp';
 import { REALTIME_STATE, STATUS_FLAGS } from '@/lib/ghl-fields';
 
 export const dynamic = 'force-dynamic';
@@ -145,14 +146,22 @@ export async function POST(request: Request) {
         // ── Step 5: Handle Critical Status escalation ──
         if (parsed.statusFlag === STATUS_FLAGS.CRITICAL) {
             console.log(`[Nurse Webhook] 🚨 CRITICAL STATUS — Triggering escalation for ${parsed.residentName}`);
-            // TODO: Trigger BlueJax internal alert workflow
-            // This would fire a webhook back to BlueJax to notify the facility director
+            await sendDirectorAlert({
+                residentName: parsed.residentName,
+                residentId: resolvedContactId,
+                reason: `Estado CRÍTICO detectado en nota de voz. Notas: ${parsed.generalNotes || 'N/A'}`,
+                statusFlag: 'Critical',
+            });
         }
 
         // ── Step 6: Handle extra services (billing increment) ──
         if (parsed.extraServices.length > 0) {
             console.log(`[Nurse Webhook] 💰 Extra services detected:`, parsed.extraServices);
-            // TODO: Increment Current_Month_Extras_MXN via separate logic
+            await incrementMonthlyExtras({
+                residentName: parsed.residentName,
+                residentId: resolvedContactId,
+                services: parsed.extraServices,
+            });
         }
 
         return NextResponse.json({

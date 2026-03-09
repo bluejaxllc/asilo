@@ -2,12 +2,13 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { sendGhlWebhook } from "@/lib/whatsapp";
 import { auth } from "@/auth"; // Depending on how auth is setup, or just use email from args if verified in component, but better safe. 
 // Actually I used session in component and passed email, let's stick to passing email for simplicity if auth() helper isn't ready.
 // Better: get user by email inside action.
 
 export const createLog = async (data: {
-    type: "VITALS" | "FOOD" | "MEDS" | "NOTE";
+    type: "VITALS" | "FOOD" | "MEDS" | "NOTE" | "INCIDENT";
     value: string;
     notes?: string;
     patientId: string;
@@ -31,6 +32,22 @@ export const createLog = async (data: {
                 authorId: user.id
             }
         });
+
+        if (data.type === "INCIDENT") {
+            const patient = await db.patient.findUnique({ where: { id: data.patientId } });
+            if (patient) {
+                await sendGhlWebhook({
+                    type: "INCIDENT",
+                    patientId: patient.id,
+                    patientName: patient.name,
+                    message: data.notes || data.value,
+                    details: {
+                        incidentType: data.value,
+                        reportedBy: user.name
+                    }
+                });
+            }
+        }
 
         revalidatePath("/staff/patients");
         revalidatePath("/admin"); // Updates dashboard feed

@@ -83,7 +83,7 @@ export const MealLogButton = ({ patientId, patientName }: MealLogButtonProps) =>
                 <Button
                     size="sm"
                     variant="outline"
-                    className="gap-1.5 border-orange-500/30 text-orange-400 hover:bg-orange-500/10 hover:text-orange-300 hover:border-orange-500/50 transition-all"
+                    className="gap-1.5 border-orange-500/30 text-orange-600 dark:text-orange-400 hover:bg-orange-500/10 hover:text-orange-600 dark:text-orange-300 hover:border-orange-500/50 transition-all"
                 >
                     <UtensilsCrossed className="h-3.5 w-3.5" />
                     Registrar

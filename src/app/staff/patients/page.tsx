@@ -35,7 +35,7 @@ const avatarGradients = [
 
 export default function StaffPatientsPage() {
     return (
-        <Suspense fallback={<div className="p-8 flex justify-center"><Loader2 className="h-8 w-8 animate-spin text-blue-500" /></div>}>
+        <Suspense fallback={<div className="p-8 flex justify-center"><Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-500" /></div>}>
             <StaffPatientsContent />
         </Suspense>
     );
@@ -151,8 +151,8 @@ function StaffPatientsContent() {
             {/* Patient Cards */}
             {loading ? (
                 <div className="flex justify-center items-center py-16">
-                    <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-                    <span className="ml-3 text-blue-500 font-medium">Cargando residentes...</span>
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-500" />
+                    <span className="ml-3 text-blue-600 dark:text-blue-500 font-medium">Cargando residentes...</span>
                 </div>
             ) : patients.length === 0 ? (
                 <div className="text-center py-16 text-muted-foreground bg-card/[0.02] rounded-2xl border border-dashed border-border">
@@ -174,7 +174,7 @@ function StaffPatientsContent() {
                                                 <CardTitle className="text-xl font-bold text-foreground truncate">{p.name}</CardTitle>
                                                 <span className="text-sm text-muted-foreground font-mono">Hab. {p.room || "N/A"}</span>
                                             </div>
-                                            <Badge className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${p.status === 'Estable' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' : 'bg-red-500/15 text-red-400 border-red-500/20'}`} variant="outline">
+                                            <Badge className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${p.status === 'Estable' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' : 'bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/20'}`} variant="outline">
                                                 <span className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${p.status === 'Estable' ? 'bg-emerald-500/100' : 'bg-red-500/100'}`} />
                                                 {p.status}
                                             </Badge>
@@ -185,12 +185,12 @@ function StaffPatientsContent() {
                                     <CardContent className="py-4 flex-grow">
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="bg-blue-500/10 p-3 rounded-xl text-center border border-blue-500/20">
-                                                <span className="block text-[10px] font-bold text-blue-400 uppercase tracking-wider">Última Vital</span>
-                                                <span className="block text-lg font-bold text-blue-400 mt-0.5">{p.lastVitalTime}</span>
+                                                <span className="block text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Última Vital</span>
+                                                <span className="block text-lg font-bold text-blue-600 dark:text-blue-400 mt-0.5">{p.lastVitalTime}</span>
                                             </div>
                                             <div className="bg-orange-500/10 p-3 rounded-xl text-center border border-orange-500/20">
-                                                <span className="block text-[10px] font-bold text-orange-400 uppercase tracking-wider">Dieta</span>
-                                                <span className="block text-sm font-bold text-orange-400 mt-0.5 truncate">{p.dietaryNeeds || "General"}</span>
+                                                <span className="block text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase tracking-wider">Dieta</span>
+                                                <span className="block text-sm font-bold text-orange-600 dark:text-orange-400 mt-0.5 truncate">{p.dietaryNeeds || "General"}</span>
                                             </div>
                                         </div>
                                     </CardContent>
@@ -200,7 +200,7 @@ function StaffPatientsContent() {
                                         <Dialog>
                                             <DialogTrigger asChild>
                                                 <Button variant="outline" className="flex flex-col h-20 gap-1.5 border-2 border-border hover:border-blue-400 hover:bg-blue-500/10 active:scale-95 transition-all rounded-xl" title="Registrar Vitales">
-                                                    <div className="p-1.5 bg-blue-500/15 rounded-lg text-blue-400">
+                                                    <div className="p-1.5 bg-blue-500/15 rounded-lg text-blue-600 dark:text-blue-400">
                                                         <Activity className="h-5 w-5" />
                                                     </div>
                                                     <span className="text-xs font-bold text-muted-foreground">Vitales</span>
@@ -218,7 +218,7 @@ function StaffPatientsContent() {
                                         <Dialog>
                                             <DialogTrigger asChild>
                                                 <Button variant="outline" className="flex flex-col h-20 gap-1.5 border-2 border-border hover:border-orange-400 hover:bg-orange-500/10 active:scale-95 transition-all rounded-xl" title="Registrar Alimentos">
-                                                    <div className="p-1.5 bg-orange-500/15 rounded-lg text-orange-400">
+                                                    <div className="p-1.5 bg-orange-500/15 rounded-lg text-orange-600 dark:text-orange-400">
                                                         <Utensils className="h-5 w-5" />
                                                     </div>
                                                     <span className="text-xs font-bold text-muted-foreground">Alimentos</span>
@@ -236,7 +236,7 @@ function StaffPatientsContent() {
                                         <Dialog>
                                             <DialogTrigger asChild>
                                                 <Button variant="outline" className="flex flex-col h-20 gap-1.5 border-2 border-border hover:border-emerald-400 hover:bg-emerald-500/10 active:scale-95 transition-all rounded-xl" title="Registrar Medicamentos">
-                                                    <div className="p-1.5 bg-emerald-500/15 rounded-lg text-emerald-400">
+                                                    <div className="p-1.5 bg-emerald-500/15 rounded-lg text-emerald-600 dark:text-emerald-400">
                                                         <Pill className="h-5 w-5" />
                                                     </div>
                                                     <span className="text-xs font-bold text-muted-foreground">Meds</span>

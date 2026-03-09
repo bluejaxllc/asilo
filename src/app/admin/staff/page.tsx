@@ -255,7 +255,7 @@ function StaffPageContent() {
                                 </TableCell>
                                 <TableCell className="text-muted-foreground text-sm">{staff.lastActive}</TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="ghost" size="sm" onClick={() => handleViewHistory(staff)} className="gap-1.5 text-xs hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-500/10">
+                                    <Button variant="ghost" size="sm" onClick={() => handleViewHistory(staff)} className="gap-1.5 text-xs hover:text-blue-600 dark:hover:text-blue-600 dark:text-blue-400 hover:bg-blue-500/10">
                                         <Clock className="h-3.5 w-3.5" /> Historial
                                     </Button>
                                 </TableCell>
@@ -307,9 +307,9 @@ function StaffPageContent() {
                                         return (
                                             <TableRow key={record.id} className="hover:bg-accent/50">
                                                 <TableCell className="font-medium">{format(checkInDate, "dd/MM/yyyy", { locale: es })}</TableCell>
-                                                <TableCell className="text-emerald-400 font-mono">{format(checkInDate, "HH:mm", { locale: es })}</TableCell>
-                                                <TableCell className="text-red-400 font-mono">
-                                                    {checkOutDate ? format(checkOutDate, "HH:mm", { locale: es }) : <span className="text-emerald-400 animate-pulse">En turno</span>}
+                                                <TableCell className="text-emerald-600 dark:text-emerald-400 font-mono">{format(checkInDate, "HH:mm", { locale: es })}</TableCell>
+                                                <TableCell className="text-red-600 dark:text-red-400 font-mono">
+                                                    {checkOutDate ? format(checkOutDate, "HH:mm", { locale: es }) : <span className="text-emerald-600 dark:text-emerald-400 animate-pulse">En turno</span>}
                                                 </TableCell>
                                                 <TableCell>
                                                     <Badge variant="outline" className="font-mono text-xs">
@@ -339,7 +339,7 @@ function StaffPageContent() {
                         <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-400 gap-1.5"
+                            className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 gap-1.5"
                             onClick={async () => {
                                 const id = toast.loading("Analizando disponibilidad histórica y cobertura necesaria...");
                                 const res = await executePremiumAgent("schedule-optimizer");
@@ -366,7 +366,7 @@ function StaffPageContent() {
                         <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 text-[10px] bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-400 gap-1.5"
+                            className="h-8 text-[10px] bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 gap-1.5"
                             onClick={async () => {
                                 const id = toast.loading("Compilando métricas de rendimiento del personal...");
                                 const res = await executePremiumAgent("efficiency-audit");
@@ -393,7 +393,7 @@ function StaffPageContent() {
                         <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-400 gap-1.5"
+                            className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 gap-1.5"
                             onClick={async () => {
                                 const id = toast.loading("Escaneando registro de asistencia...");
                                 const res = await executePremiumAgent("attendance-audit");

@@ -26,10 +26,10 @@ const FamilyLayout = ({
                         <Link href="/family">
                             <div className="flex items-center gap-2">
                                 <div className="bg-orange-500/15 p-2 rounded-full border border-orange-500/20">
-                                    <Heart className="h-6 w-6 text-orange-400" fill="currentColor" />
+                                    <Heart className="h-6 w-6 text-orange-600 dark:text-orange-400" fill="currentColor" />
                                 </div>
                                 <h1 className="text-2xl font-bold text-foreground">
-                                    <span className="text-orange-400">.blue_jax</span> <span className="text-muted-foreground font-normal text-sm">Familia</span>
+                                    <span className="text-orange-600 dark:text-orange-400">.blue_jax</span> <span className="text-muted-foreground font-normal text-sm">Familia</span>
                                 </h1>
                             </div>
                         </Link>
@@ -41,7 +41,7 @@ const FamilyLayout = ({
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-muted-foreground hover:text-red-400 hover:bg-red-500/10"
+                                className="text-muted-foreground hover:text-red-600 dark:text-red-400 hover:bg-red-500/10"
                                 onClick={() => signOut({ callbackUrl: "/" })}
                             >
                                 <LogOut className="h-4 w-4 mr-2" />

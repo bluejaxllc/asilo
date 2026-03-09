@@ -23,7 +23,7 @@ const accentMap: Record<string, { border: string; iconBg: string; iconText: stri
     blue: {
         border: "border-blue-500/30 hover:border-blue-500/50",
         iconBg: "bg-blue-500/10",
-        iconText: "text-blue-500",
+        iconText: "text-blue-600 dark:text-blue-500",
         glow: "shadow-blue-500/5",
         badge: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
         gradient: "from-blue-500/5 via-transparent to-transparent",
@@ -31,7 +31,7 @@ const accentMap: Record<string, { border: string; iconBg: string; iconText: stri
     emerald: {
         border: "border-emerald-500/30 hover:border-emerald-500/50",
         iconBg: "bg-emerald-500/10",
-        iconText: "text-emerald-500",
+        iconText: "text-emerald-600 dark:text-emerald-500",
         glow: "shadow-emerald-500/5",
         badge: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
         gradient: "from-emerald-500/5 via-transparent to-transparent",
@@ -47,7 +47,7 @@ const accentMap: Record<string, { border: string; iconBg: string; iconText: stri
     amber: {
         border: "border-amber-500/30 hover:border-amber-500/50",
         iconBg: "bg-amber-500/10",
-        iconText: "text-amber-500",
+        iconText: "text-amber-600 dark:text-amber-500",
         glow: "shadow-amber-500/5",
         badge: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
         gradient: "from-amber-500/5 via-transparent to-transparent",
@@ -55,7 +55,7 @@ const accentMap: Record<string, { border: string; iconBg: string; iconText: stri
     rose: {
         border: "border-rose-500/30 hover:border-rose-500/50",
         iconBg: "bg-rose-500/10",
-        iconText: "text-rose-500",
+        iconText: "text-rose-600 dark:text-rose-500",
         glow: "shadow-rose-500/5",
         badge: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
         gradient: "from-rose-500/5 via-transparent to-transparent",
@@ -63,7 +63,7 @@ const accentMap: Record<string, { border: string; iconBg: string; iconText: stri
     cyan: {
         border: "border-cyan-500/30 hover:border-cyan-500/50",
         iconBg: "bg-cyan-500/10",
-        iconText: "text-cyan-500",
+        iconText: "text-cyan-600 dark:text-cyan-500",
         glow: "shadow-cyan-500/5",
         badge: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20",
         gradient: "from-cyan-500/5 via-transparent to-transparent",

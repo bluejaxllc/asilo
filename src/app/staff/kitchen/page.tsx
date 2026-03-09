@@ -23,8 +23,8 @@ interface KitchenPageProps {
 
 const getMealPeriod = () => {
     const hour = new Date().getHours();
-    if (hour >= 6 && hour < 11) return { label: "Desayuno", icon: Sun, color: "text-amber-500" };
-    if (hour >= 11 && hour < 16) return { label: "Comida", icon: Sunset, color: "text-orange-500" };
+    if (hour >= 6 && hour < 11) return { label: "Desayuno", icon: Sun, color: "text-amber-600 dark:text-amber-500" };
+    if (hour >= 11 && hour < 16) return { label: "Comida", icon: Sunset, color: "text-orange-600 dark:text-orange-500" };
     return { label: "Cena", icon: Moon, color: "text-indigo-500" };
 };
 
@@ -171,7 +171,7 @@ export default async function KitchenPage({ searchParams }: KitchenPageProps) {
                                     <CardContent className="space-y-3 pt-0">
                                         <div>
                                             <div className="flex items-center gap-2 mb-2 text-muted-foreground font-medium text-xs uppercase tracking-wider">
-                                                <Utensils className="h-3.5 w-3.5 text-orange-500" />
+                                                <Utensils className="h-3.5 w-3.5 text-orange-600 dark:text-orange-500" />
                                                 <span>Régimen Alimenticio</span>
                                             </div>
                                             <div className={cn(
@@ -180,7 +180,7 @@ export default async function KitchenPage({ searchParams }: KitchenPageProps) {
                                             )}>
                                                 <span className={cn(
                                                     "text-base font-bold block",
-                                                    hasSpecialDiet ? "text-orange-400" : "text-emerald-400"
+                                                    hasSpecialDiet ? "text-orange-600 dark:text-orange-400" : "text-emerald-600 dark:text-emerald-400"
                                                 )}>
                                                     {p.dietaryNeeds || "Normal / Sin Restricciones"}
                                                 </span>
@@ -190,11 +190,11 @@ export default async function KitchenPage({ searchParams }: KitchenPageProps) {
                                         {hasAllergy && (
                                             <div className="bg-red-500/10 p-3 rounded-xl border border-red-500/20 flex items-start gap-3">
                                                 <div className="p-1 bg-red-500/15 rounded-lg mt-0.5">
-                                                    <AlertTriangle className="h-4 w-4 text-red-400" />
+                                                    <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
                                                 </div>
                                                 <div>
-                                                    <div className="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-0.5">Alerta de Alergia</div>
-                                                    <div className="text-xs text-red-400 leading-snug">
+                                                    <div className="text-[10px] font-bold text-red-600 dark:text-red-400 uppercase tracking-widest mb-0.5">Alerta de Alergia</div>
+                                                    <div className="text-xs text-red-600 dark:text-red-400 leading-snug">
                                                         Verificar expediente clínico para detalles específicos.
                                                     </div>
                                                 </div>

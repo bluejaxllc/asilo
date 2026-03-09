@@ -58,7 +58,7 @@ function StaffNavbar() {
                             <RoleIcon className="h-5 w-5 text-white" />
                         </div>
                         <span className="text-lg font-bold text-foreground hidden sm:block">
-                            .blue_jax <span className="text-blue-400 font-normal text-sm">{config.label}</span>
+                            .blue_jax <span className="text-blue-600 dark:text-blue-400 font-normal text-sm">{config.label}</span>
                         </span>
                     </Link>
 
@@ -69,15 +69,15 @@ function StaffNavbar() {
                             const Icon = item.icon;
                             const colorClasses = item.color === "orange"
                                 ? active
-                                    ? "text-orange-400 bg-orange-500/10 border-orange-400/50"
-                                    : "text-muted-foreground hover:text-orange-400 hover:bg-orange-500/5 border-transparent"
+                                    ? "text-orange-600 dark:text-orange-400 bg-orange-500/10 border-orange-400/50"
+                                    : "text-muted-foreground hover:text-orange-600 dark:text-orange-400 hover:bg-orange-500/5 border-transparent"
                                 : item.color === "pink"
                                     ? active
-                                        ? "text-pink-400 bg-pink-500/10 border-pink-400/50"
-                                        : "text-muted-foreground hover:text-pink-400 hover:bg-pink-500/5 border-transparent"
+                                        ? "text-pink-600 dark:text-pink-400 bg-pink-500/10 border-pink-400/50"
+                                        : "text-muted-foreground hover:text-pink-600 dark:text-pink-400 hover:bg-pink-500/5 border-transparent"
                                     : active
-                                        ? "text-blue-400 bg-blue-500/10 border-blue-400/50"
-                                        : "text-muted-foreground hover:text-blue-400 hover:bg-blue-500/5 border-transparent";
+                                        ? "text-blue-600 dark:text-blue-400 bg-blue-500/10 border-blue-400/50"
+                                        : "text-muted-foreground hover:text-blue-600 dark:text-blue-400 hover:bg-blue-500/5 border-transparent";
 
                             return (
                                 <Link key={item.href} href={item.href}>
@@ -97,10 +97,10 @@ function StaffNavbar() {
                                 <span className="text-sm text-muted-foreground font-mono">
                                     {session.user.name}
                                 </span>
-                                <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${role === "DOCTOR" ? "bg-emerald-500/15 text-emerald-400" :
-                                    role === "NURSE" ? "bg-pink-500/15 text-pink-400" :
-                                        role === "KITCHEN" ? "bg-orange-500/15 text-orange-400" :
-                                            "bg-blue-500/15 text-blue-400"
+                                <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${role === "DOCTOR" ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" :
+                                    role === "NURSE" ? "bg-pink-500/15 text-pink-600 dark:text-pink-400" :
+                                        role === "KITCHEN" ? "bg-orange-500/15 text-orange-600 dark:text-orange-400" :
+                                            "bg-blue-500/15 text-blue-600 dark:text-blue-400"
                                     }`}>
                                     {config.label}
                                 </span>
@@ -110,7 +110,7 @@ function StaffNavbar() {
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-10 w-10 rounded-xl text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                            className="h-10 w-10 rounded-xl text-muted-foreground hover:text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-colors"
                             onClick={() => signOut({ callbackUrl: "/" })}
                         >
                             <LogOut className="h-5 w-5" />

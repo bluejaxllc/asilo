@@ -1,33 +1,40 @@
-"use client";
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
+import { db } from "@/lib/db";
+import AdminClientLayout from "./admin-client-layout";
 
-import { Navbar } from "@/components/admin/navbar";
-import { Sidebar } from "@/components/admin/sidebar";
-import { SessionProvider } from "next-auth/react";
+export const dynamic = "force-dynamic";
 
-import { AttendanceProvider } from "@/context/attendance-context";
-
-const AdminLayout = ({
+export default async function AdminLayout({
     children
 }: {
     children: React.ReactNode;
-}) => {
-    return (
-        <SessionProvider>
-            <AttendanceProvider>
-                <div className="h-full relative bg-background">
-                    <div className="hidden h-full md:flex md:w-72 md:flex-col md:fixed md:inset-y-0 z-[80]">
-                        <Sidebar />
-                    </div>
-                    <main className="md:pl-72 min-h-screen">
-                        <Navbar />
-                        <div className="p-0">
-                            {children}
-                        </div>
-                    </main>
-                </div>
-            </AttendanceProvider>
-        </SessionProvider>
-    );
-}
+}) {
+    // 1. Get user session
+    const session = await auth();
+    const facilityId = (session?.user as any)?.facilityId;
 
-export default AdminLayout;
+    // 2. If no facility, they might be logged out or missing tenant info
+    // (Middleware handles unauthorized access, but we double check)
+    if (!facilityId) {
+        return <AdminClientLayout>{children}</AdminClientLayout>;
+    }
+
+    const setting = await db.facilitySetting.findFirst({
+        where: {
+            facilityId,
+            key: "ONBOARDING_COMPLETED"
+        }
+    });
+
+    console.log("[DEBUG AdminLayout] facilityId:", facilityId, "setting:", setting);
+
+    // 4. Redirect if not completed
+    if (!setting || setting.value !== "true") {
+        console.log("[DEBUG AdminLayout] REDIRECTING TO /ONBOARDING");
+        redirect("/onboarding");
+    }
+
+    // 5. If completed, render the normal client layout
+    return <AdminClientLayout>{children}</AdminClientLayout>;
+}

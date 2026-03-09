@@ -35,7 +35,7 @@ import { executePremiumAgent } from "@/actions/premium";
 
 export default function InventoryPage() {
     return (
-        <Suspense fallback={<div className="p-8 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-blue-400" /></div>}>
+        <Suspense fallback={<div className="p-8 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-blue-600 dark:text-blue-400" /></div>}>
             <InventoryPageContent />
         </Suspense>
     );
@@ -151,27 +151,27 @@ function InventoryPageContent() {
                         <div className="flex items-center justify-between p-4 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
                             <div className="flex items-center gap-3">
                                 <div className="h-3 w-3 rounded-full bg-emerald-500/100" />
-                                <span className="font-medium text-emerald-200">En Orden</span>
+                                <span className="font-medium text-emerald-700 dark:text-emerald-300">En Orden</span>
                             </div>
-                            <span className="font-bold text-emerald-400 text-xl">
+                            <span className="font-bold text-emerald-700 dark:text-emerald-400 text-xl">
                                 {Math.round((okCount / total) * 100)}%
                             </span>
                         </div>
                         <div className="flex items-center justify-between p-4 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
                             <div className="flex items-center gap-3">
                                 <div className="h-3 w-3 rounded-full bg-yellow-500/100" />
-                                <span className="font-medium text-yellow-300">Stock Bajo</span>
+                                <span className="font-medium text-yellow-700 dark:text-yellow-300">Stock Bajo</span>
                             </div>
-                            <span className="font-bold text-yellow-400 text-xl">
+                            <span className="font-bold text-yellow-700 dark:text-yellow-400 text-xl">
                                 {Math.round((lowCount / total) * 100)}%
                             </span>
                         </div>
                         <div className="flex items-center justify-between p-4 bg-red-500/10 rounded-lg border border-red-500/20">
                             <div className="flex items-center gap-3">
                                 <div className="h-3 w-3 rounded-full bg-red-500/100" />
-                                <span className="font-medium text-red-300">Agotado</span>
+                                <span className="font-medium text-red-700 dark:text-red-300">Agotado</span>
                             </div>
-                            <span className="font-bold text-red-400 text-xl">
+                            <span className="font-bold text-red-700 dark:text-red-400 text-xl">
                                 {Math.round((outCount / total) * 100)}%
                             </span>
                         </div>
@@ -205,7 +205,7 @@ function InventoryPageContent() {
                             <TableRow>
                                 <TableCell colSpan={5} className="text-center py-12">
                                     <div className="flex justify-center items-center gap-2 text-muted-foreground">
-                                        <Loader2 className="h-5 w-5 animate-spin text-blue-400" /> Cargando inventario...
+                                        <Loader2 className="h-5 w-5 animate-spin text-blue-600 dark:text-blue-400" /> Cargando inventario...
                                     </div>
                                 </TableCell>
                             </TableRow>
@@ -228,7 +228,7 @@ function InventoryPageContent() {
                                 <TableCell className="font-medium">
                                     <div className="flex items-center">
                                         <div className="h-8 w-8 rounded-full bg-blue-500/10 flex items-center justify-center mr-3 group-hover:bg-blue-500/15 transition-colors">
-                                            <Pill className="h-4 w-4 text-blue-400" />
+                                            <Pill className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                                         </div>
                                         <span className="text-secondary-foreground">{item.name}</span>
                                     </div>
@@ -236,12 +236,12 @@ function InventoryPageContent() {
                                 <TableCell className="font-mono text-muted-foreground">{item.stock} <span className="text-xs text-muted-foreground">{item.unit}</span></TableCell>
                                 <TableCell className="font-mono text-muted-foreground">{item.min} <span className="text-xs">{item.unit}</span></TableCell>
                                 <TableCell>
-                                    {item.status === 'OK' && <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-sm">En Stock</Badge>}
-                                    {item.status === 'BAJO' && <Badge variant="outline" className="bg-yellow-500/10 text-yellow-400 border-yellow-500/20 shadow-sm animate-pulse">Stock Bajo</Badge>}
+                                    {item.status === 'OK' && <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 shadow-sm">En Stock</Badge>}
+                                    {item.status === 'BAJO' && <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20 shadow-sm animate-pulse">Stock Bajo</Badge>}
                                     {item.status === 'AGOTADO' && <Badge variant="destructive" className="shadow-sm">Agotado</Badge>}
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="ghost" size="sm" onClick={() => openUpdateDialog(item)} className="hover:text-blue-400">
+                                    <Button variant="ghost" size="sm" onClick={() => openUpdateDialog(item)} className="hover:text-blue-600 dark:text-blue-400">
                                         Actualizar
                                     </Button>
                                 </TableCell>
@@ -297,7 +297,7 @@ function InventoryPageContent() {
                         <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-400 gap-1.5"
+                            className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 gap-1.5"
                             onClick={async () => {
                                 const id = toast.loading("Analizando patrones de consumo...");
                                 const result = await executePremiumAgent('inventory-audit');
@@ -324,7 +324,7 @@ function InventoryPageContent() {
                         <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 text-[10px] bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20 text-rose-400 gap-1.5"
+                            className="h-8 text-[10px] bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 gap-1.5"
                             onClick={async () => {
                                 const id = toast.loading("Verificando fechas de caducidad...");
                                 const result = await executePremiumAgent('inventory-audit');
@@ -351,7 +351,7 @@ function InventoryPageContent() {
                         <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 text-[10px] bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-400 gap-1.5"
+                            className="h-8 text-[10px] bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 gap-1.5"
                             onClick={async () => {
                                 const id = toast.loading("Generando gráficas avanzadas...");
                                 const result = await executePremiumAgent('inventory-audit');

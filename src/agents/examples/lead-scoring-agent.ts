@@ -27,7 +27,7 @@ Genera un mensaje de alerta amistoso (máximo 2 oraciones) indicando que el mode
             data: {
                 title: `🎯 Prospectos Calificados`,
                 message: message,
-                type: 'SUCCESS',
+                type: 'INFO',
                 recipientRole: 'ADMIN'
             }
         });

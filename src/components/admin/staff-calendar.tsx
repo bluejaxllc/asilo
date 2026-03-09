@@ -111,7 +111,7 @@ export const StaffCalendar = ({ tasks }: CalendarProps) => {
                                                         "text-xs p-1.5 rounded border truncate cursor-pointer",
                                                         task.status === "COMPLETED"
                                                             ? "bg-card/50 text-muted-foreground line-through border-border"
-                                                            : "bg-blue-500/10 border-blue-500/20 text-blue-400 hover:border-blue-400/40"
+                                                            : "bg-blue-500/10 border-blue-500/20 text-blue-600 dark:text-blue-400 hover:border-blue-400/40"
                                                     )}
                                                 >
                                                     {task.title}

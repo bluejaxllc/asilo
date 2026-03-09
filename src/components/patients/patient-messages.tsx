@@ -109,7 +109,7 @@ export const PatientMessages = ({ patientId, initialMessages }: PatientMessagesP
                                 <p className="text-sm">{msg.content}</p>
                                 <p className={cn(
                                     "text-[10px] mt-1",
-                                    msg.isFromFamily ? "text-muted-foreground" : "text-blue-200"
+                                    msg.isFromFamily ? "text-muted-foreground" : "text-blue-600 dark:text-blue-200"
                                 )}>
                                     {new Date(msg.createdAt).toLocaleString("es-MX", {
                                         day: "numeric", month: "short",

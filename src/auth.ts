@@ -31,6 +31,7 @@ export const {
 
             if (session.user) {
                 (session.user as any).facilityId = token.facilityId ?? null;
+                (session.user as any).mustChangePassword = token.mustChangePassword ?? false;
             }
 
             return session;
@@ -44,6 +45,7 @@ export const {
                 token.role = (user as any).role;
                 token.email = user.email;
                 token.facilityId = (user as any).facilityId ?? null;
+                token.mustChangePassword = (user as any).mustChangePassword ?? false;
                 return token;
             }
 
@@ -57,6 +59,7 @@ export const {
 
             token.role = existingUser.role;
             token.facilityId = existingUser.facilityId ?? null;
+            token.mustChangePassword = existingUser.mustChangePassword ?? false;
 
             return token;
         }

@@ -63,7 +63,7 @@ const agentColors: Record<string, { bg: string; border: string; text: string; gl
     'low-stock-monitor': {
         bg: 'from-emerald-500/10 to-teal-600/10',
         border: 'border-emerald-500/20',
-        text: 'text-emerald-400',
+        text: 'text-emerald-600 dark:text-emerald-400',
         glow: 'shadow-emerald-500/10',
     },
     'daily-summary': {
@@ -75,7 +75,7 @@ const agentColors: Record<string, { bg: string; border: string; text: string; gl
     'attendance-audit': {
         bg: 'from-amber-500/10 to-orange-600/10',
         border: 'border-amber-500/20',
-        text: 'text-amber-400',
+        text: 'text-amber-600 dark:text-amber-400',
         glow: 'shadow-amber-500/10',
     },
 };
@@ -143,7 +143,7 @@ export default function AgentsPage() {
     if (loading) {
         return (
             <div className="flex items-center justify-center h-[60vh]">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-500" />
             </div>
         );
     }
@@ -160,7 +160,7 @@ export default function AgentsPage() {
                         <div>
                             <div className="flex items-center gap-3 mb-2">
                                 <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500/20 to-violet-500/20 border border-blue-500/10">
-                                    <Bot className="h-6 w-6 text-blue-400" />
+                                    <Bot className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                                 </div>
                                 <h1 className="text-3xl font-bold text-white tracking-tight">Agentes</h1>
                             </div>
@@ -175,11 +175,11 @@ export default function AgentsPage() {
                                 <p className="text-xs text-muted-foreground mt-1">Agentes</p>
                             </div>
                             <div className="text-center p-4 rounded-xl bg-card/5 border border-border min-w-[100px]">
-                                <p className="text-2xl font-bold text-emerald-400">{totalRuns}</p>
+                                <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{totalRuns}</p>
                                 <p className="text-xs text-muted-foreground mt-1">Ejecuciones</p>
                             </div>
                             <div className="text-center p-4 rounded-xl bg-card/5 border border-border min-w-[100px]">
-                                <p className="text-2xl font-bold text-amber-400">
+                                <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">
                                     {Object.values(results).filter(r => r?.success).length}
                                 </p>
                                 <p className="text-xs text-muted-foreground mt-1">Exitosos</p>
@@ -278,13 +278,13 @@ export default function AgentsPage() {
                                             >
                                                 <div className="flex items-center gap-2">
                                                     {result.success ? (
-                                                        <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                                                        <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                                                     ) : (
-                                                        <XCircle className="h-4 w-4 text-red-400" />
+                                                        <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
                                                     )}
                                                     <span className={cn(
                                                         "text-sm font-medium",
-                                                        result.success ? "text-emerald-400" : "text-red-400"
+                                                        result.success ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
                                                     )}>
                                                         {result.success ? 'Completado' : 'Error'}
                                                     </span>

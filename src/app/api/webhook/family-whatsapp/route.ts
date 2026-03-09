@@ -38,6 +38,7 @@ import {
     type GHLContact,
 } from '@/lib/ghl';
 import { REALTIME_STATE, CASHFLOW, RESIDENT_CORE, GUARDIAN_ACCESS, STATUS_FLAGS } from '@/lib/ghl-fields';
+import { sendDirectorAlert } from '@/lib/whatsapp';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -138,8 +139,13 @@ export async function POST(request: Request) {
             console.log(`[Family Bot] 🚨 ESCALATION — ${residentId} has status: ${statusFlag}`);
 
             if (statusFlag === STATUS_FLAGS.CRITICAL) {
-                // Director internal alert (TODO: send via BlueJax workflow)
                 console.log(`[Family Bot] 📱 DIRECTOR ALERT: ${DIRECTOR_ALERT(residentId)}`);
+                await sendDirectorAlert({
+                    residentName: residentId,
+                    residentId: contact.id,
+                    reason: DIRECTOR_ALERT(residentId),
+                    statusFlag: 'Critical',
+                });
 
                 return NextResponse.json({
                     reply: ESCALATION_MESSAGE(familyName, residentId),
@@ -231,7 +237,13 @@ export async function POST(request: Request) {
                 console.log(`[Family Bot] 🚨 EMERGENCY intent detected — hardcoded response`);
                 reply = EMERGENCY_RESPONSE;
 
-                // TODO: Trigger human escalation workflow in BlueJax
+                // Trigger human escalation workflow
+                await sendDirectorAlert({
+                    residentName: residentId,
+                    residentId: contact.id,
+                    reason: `🚨 EMERGENCIA: Familia reporta emergencia via WhatsApp. Mensaje: "${message.substring(0, 200)}"`,
+                    statusFlag: 'Critical',
+                });
                 break;
             }
 

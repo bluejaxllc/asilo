@@ -88,7 +88,7 @@ export default function ReportsPage() {
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-32 gap-3">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-500" />
                 <span className="text-sm text-muted-foreground">Generando reportes...</span>
             </div>
         );
@@ -238,7 +238,7 @@ export default function ReportsPage() {
                 <Card className="shadow-sm">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-lg">
-                            <TrendingUp className="h-5 w-5 text-blue-500" />
+                            <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-500" />
                             Tendencias de Actividad
                         </CardTitle>
                         <CardDescription>Registros diarios por tipo en los últimos {period} días</CardDescription>
@@ -323,16 +323,16 @@ export default function ReportsPage() {
                                                 <TableCell className="text-center">
                                                     <Badge variant="outline" className={cn(
                                                         "text-[10px] font-semibold px-2",
-                                                        s.role === "ADMIN" ? "bg-violet-500/10 text-violet-400 border-violet-500/20" : "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                                                        s.role === "ADMIN" ? "bg-violet-500/10 text-violet-400 border-violet-500/20" : "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20"
                                                     )}>
                                                         {s.role}
                                                     </Badge>
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    <span className="font-semibold text-blue-400">{s.logsCount}</span>
+                                                    <span className="font-semibold text-blue-600 dark:text-blue-400">{s.logsCount}</span>
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    <span className="font-semibold text-emerald-400">{s.tasksCompleted}</span>
+                                                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">{s.tasksCompleted}</span>
                                                 </TableCell>
                                             </SlideInRow>
                                         ))}
@@ -376,7 +376,7 @@ export default function ReportsPage() {
                                                     variant="outline"
                                                     className={cn(
                                                         "text-[10px] px-1.5 py-0 border-0",
-                                                        room.status === "Estable" ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"
+                                                        room.status === "Estable" ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" : "bg-red-500/15 text-red-600 dark:text-red-400"
                                                     )}
                                                 >
                                                     {room.status}
@@ -437,7 +437,7 @@ export default function ReportsPage() {
                         <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 text-[10px] bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-400 gap-1.5"
+                            className="h-8 text-[10px] bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 gap-1.5"
                             onClick={async () => {
                                 const id = toast.loading("IA verificando cumplimiento normativo...");
                                 const result = await executePremiumAgent('efficiency-audit');
@@ -464,7 +464,7 @@ export default function ReportsPage() {
                         <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-400 gap-1.5"
+                            className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 gap-1.5"
                             onClick={async () => {
                                 const id = toast.loading("Preparando documento PDF...");
                                 const result = await executePremiumAgent('pdf-export');

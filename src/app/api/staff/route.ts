@@ -3,8 +3,9 @@ import { db } from "@/lib/db";
 import { getLatestTodayAttendance } from "@/actions/attendance";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
-import bcrypt from "bcryptjs";
 import { auth } from "@/auth";
+import { randomBytes } from "crypto";
+import { sendInviteEmail } from "@/lib/mail";
 
 export async function GET(request: Request) {
     try {
@@ -70,12 +71,12 @@ export async function POST(req: Request) {
         const session = await auth();
         const facilityId = (session?.user as any)?.facilityId ?? null;
 
-        const { name, email, role, password, patientId } = await req.json();
+        const { name, email, role, patientId } = await req.json();
 
-        // Validate required fields
-        if (!name || !email || !role || !password) {
+        // Validate required fields (password no longer required — magic link!)
+        if (!name || !email || !role) {
             return NextResponse.json(
-                { error: 'Todos los campos son requeridos' },
+                { error: 'Nombre, correo y rol son requeridos' },
                 { status: 400 }
             );
         }
@@ -100,32 +101,52 @@ export async function POST(req: Request) {
             );
         }
 
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // Check if there's already a pending invite for this email
+        const existingInvite = await db.inviteToken.findFirst({
+            where: { email }
+        });
 
-        // Create user linked to admin's facility
-        const user = await db.user.create({
+        if (existingInvite) {
+            // Delete old invite and create a fresh one
+            await db.inviteToken.delete({ where: { id: existingInvite.id } });
+        }
+
+        // Generate a secure random token
+        const token = randomBytes(32).toString("hex");
+
+        // Create the invite token (expires in 72 hours)
+        await db.inviteToken.create({
             data: {
-                name,
                 email,
-                password: hashedPassword,
+                name,
+                token,
                 role,
                 facilityId,
-                ...(patientId ? { patientId } : {})
+                patientId: patientId || null,
+                expires: new Date(Date.now() + 72 * 60 * 60 * 1000), // 72h
             }
         });
+
+        // Get facility name for the email
+        const facility = await db.facility.findUnique({
+            where: { id: facilityId },
+            select: { name: true }
+        });
+
+        // Send the invitation email
+        try {
+            await sendInviteEmail(email, name, token, facility?.name || "Retiro BlueJax");
+        } catch (mailError) {
+            console.error("[STAFF_INVITE] Email send failed:", mailError);
+            // Still return success — the invite is saved, admin can resend later
+        }
 
         return NextResponse.json({
             success: true,
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role
-            }
+            message: `Invitación enviada a ${email}`,
         });
     } catch (error) {
-        console.error('Error creating staff:', error);
-        return NextResponse.json({ error: 'Error al crear personal' }, { status: 500 });
+        console.error('Error creating staff invite:', error);
+        return NextResponse.json({ error: 'Error al enviar invitación' }, { status: 500 });
     }
 }

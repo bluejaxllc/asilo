@@ -201,7 +201,8 @@ export const LoginForm = () => {
                 const session = await sessionRes.json();
 
                 let redirectPath = "/staff";
-                if (session?.user?.role === "ADMIN") redirectPath = "/admin";
+                if (session?.user?.role === "SUPER_ADMIN") redirectPath = "/super-admin";
+                else if (session?.user?.role === "ADMIN") redirectPath = "/admin";
                 else if (session?.user?.role === "FAMILY") redirectPath = "/family";
 
                 window.location.replace(`${origin}${redirectPath}`);

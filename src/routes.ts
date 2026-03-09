@@ -21,6 +21,8 @@ export const authRoutes = [
     "/auth/login",
     "/auth/register",
     "/auth/verify",
+    "/auth/accept-invite",
+    "/auth/reset-password",
 ];
 
 /**
@@ -35,3 +37,9 @@ export const apiAuthPrefix = "/api/auth";
  * @type {string}
  */
 export const DEFAULT_LOGIN_REDIRECT = "/staff";
+
+/**
+ * The prefix for super admin routes
+ * @type {string}
+ */
+export const superAdminPrefix = "/super-admin";

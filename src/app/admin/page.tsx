@@ -35,7 +35,9 @@ export default async function AdminDashboardPage() {
         where: { status: { not: "COMPLETED" } }
     });
 
-    const lowStockItems = 0; // inventoryItem model not yet in schema
+    // Count medications where current stock is at or below the minimum threshold
+    const allMedications = await db.medication.findMany({ select: { stock: true, minStock: true } });
+    const lowStockItems = allMedications.filter(m => m.stock <= m.minStock).length;
 
     const totalStaff = await db.user.count({
         where: { role: { in: ["STAFF", "DOCTOR", "NURSE", "KITCHEN"] } }

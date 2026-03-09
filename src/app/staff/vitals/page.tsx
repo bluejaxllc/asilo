@@ -26,7 +26,7 @@ import { AdministerMedButton } from "@/components/patients/administer-med-button
 
 export default function NurseVitalsPage() {
     return (
-        <Suspense fallback={<div className="p-8 flex justify-center"><Loader2 className="h-8 w-8 animate-spin text-pink-500" /></div>}>
+        <Suspense fallback={<div className="p-8 flex justify-center"><Loader2 className="h-8 w-8 animate-spin text-pink-600 dark:text-pink-500" /></div>}>
             <NurseVitalsContent />
         </Suspense>
     );
@@ -93,7 +93,7 @@ function NurseVitalsContent() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight text-foreground">
-                        <span className="text-pink-400">♥</span> Panel de Enfermería
+                        <span className="text-pink-600 dark:text-pink-400">♥</span> Panel de Enfermería
                     </h2>
                     <p className="text-muted-foreground mt-1">Registro de signos vitales y administración de medicamentos</p>
                 </div>
@@ -156,8 +156,8 @@ function NurseVitalsContent() {
             {/* Patient Cards */}
             {loading ? (
                 <div className="flex justify-center items-center py-16">
-                    <Loader2 className="h-8 w-8 animate-spin text-pink-500" />
-                    <span className="ml-3 text-pink-500 font-medium">Cargando residentes...</span>
+                    <Loader2 className="h-8 w-8 animate-spin text-pink-600 dark:text-pink-500" />
+                    <span className="ml-3 text-pink-600 dark:text-pink-500 font-medium">Cargando residentes...</span>
                 </div>
             ) : patients.length === 0 ? (
                 <div className="text-center py-16 text-muted-foreground bg-card/[0.02] rounded-2xl border border-dashed border-border">
@@ -181,7 +181,7 @@ function NurseVitalsContent() {
                                                 <CardTitle className="text-lg font-bold text-foreground truncate">{p.name}</CardTitle>
                                                 <span className="text-xs text-muted-foreground font-mono">Hab. {p.room || "N/A"}</span>
                                             </div>
-                                            <Badge className={`text-xs font-semibold px-2 py-0.5 rounded-lg ${p.status === 'Estable' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' : 'bg-red-500/15 text-red-400 border-red-500/20'}`} variant="outline">
+                                            <Badge className={`text-xs font-semibold px-2 py-0.5 rounded-lg ${p.status === 'Estable' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' : 'bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/20'}`} variant="outline">
                                                 {p.status}
                                             </Badge>
                                         </div>
@@ -191,13 +191,13 @@ function NurseVitalsContent() {
                                     <CardContent className="py-3 flex-grow space-y-3">
                                         <div className="grid grid-cols-2 gap-2">
                                             <div className="bg-blue-500/10 p-2.5 rounded-xl text-center border border-blue-500/20">
-                                                <span className="block text-[10px] font-bold text-blue-400 uppercase tracking-wider">Último Vital</span>
-                                                <span className="block text-sm font-bold text-blue-400 mt-0.5 truncate">{p.lastVitalValue}</span>
-                                                <span className="block text-[10px] text-blue-400/70">{p.lastVitalTime}</span>
+                                                <span className="block text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Último Vital</span>
+                                                <span className="block text-sm font-bold text-blue-600 dark:text-blue-400 mt-0.5 truncate">{p.lastVitalValue}</span>
+                                                <span className="block text-[10px] text-blue-600 dark:text-blue-400/70">{p.lastVitalTime}</span>
                                             </div>
                                             <div className="bg-emerald-500/10 p-2.5 rounded-xl text-center border border-emerald-500/20">
-                                                <span className="block text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Última Med</span>
-                                                <span className="block text-sm font-bold text-emerald-400 mt-0.5">
+                                                <span className="block text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Última Med</span>
+                                                <span className="block text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
                                                     <Clock className="h-3 w-3 inline mr-1" />
                                                     {p.lastMedTime}
                                                 </span>
@@ -211,7 +211,7 @@ function NurseVitalsContent() {
                                                 {p.medications.slice(0, 3).map((pm: any, i: number) => (
                                                     <div key={i} className="flex items-center justify-between bg-muted/50 rounded-lg p-2 border border-border">
                                                         <div className="flex items-center gap-2 min-w-0">
-                                                            <Pill className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />
+                                                            <Pill className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                                                             <div className="min-w-0">
                                                                 <span className="text-xs font-semibold text-foreground block truncate">{pm.medication.name}</span>
                                                                 <span className="text-[10px] text-muted-foreground">{pm.dosage} · {pm.schedule}</span>
@@ -236,7 +236,7 @@ function NurseVitalsContent() {
                                         <Dialog>
                                             <DialogTrigger asChild>
                                                 <Button variant="outline" className="flex items-center gap-2 h-11 border-2 border-border hover:border-pink-400 hover:bg-pink-500/10 active:scale-95 transition-all rounded-xl">
-                                                    <Activity className="h-4 w-4 text-pink-400" />
+                                                    <Activity className="h-4 w-4 text-pink-600 dark:text-pink-400" />
                                                     <span className="text-xs font-bold">Registrar Vitales</span>
                                                 </Button>
                                             </DialogTrigger>
@@ -252,7 +252,7 @@ function NurseVitalsContent() {
                                         <Dialog>
                                             <DialogTrigger asChild>
                                                 <Button variant="outline" className="flex items-center gap-2 h-11 border-2 border-border hover:border-blue-400 hover:bg-blue-500/10 active:scale-95 transition-all rounded-xl">
-                                                    <Pill className="h-4 w-4 text-blue-400" />
+                                                    <Pill className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                                                     <span className="text-xs font-bold">Registrar Meds</span>
                                                 </Button>
                                             </DialogTrigger>

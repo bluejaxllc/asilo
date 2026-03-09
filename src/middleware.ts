@@ -28,7 +28,8 @@ export default auth((req) => {
     if (isAuthRoute) {
         if (isLoggedIn) {
             let redirectUrl = DEFAULT_LOGIN_REDIRECT;
-            if (role === "ADMIN") redirectUrl = "/admin";
+            if (role === "SUPER_ADMIN") redirectUrl = "/super-admin";
+            else if (role === "ADMIN") redirectUrl = "/admin";
             else if (role === "FAMILY") redirectUrl = "/family";
             console.log(`[MW] Auth route, logged in, redirecting to ${redirectUrl}`);
             return Response.redirect(new URL(redirectUrl, nextUrl));
@@ -50,17 +51,35 @@ export default auth((req) => {
     if (isLoggedIn) {
         const path = nextUrl.pathname;
 
+        // SUPER_ADMIN Isolation
+        if (role === "SUPER_ADMIN" && !path.startsWith("/super-admin") && !path.startsWith("/api")) {
+            return Response.redirect(new URL("/super-admin", nextUrl));
+        }
+        if (role !== "SUPER_ADMIN" && path.startsWith("/super-admin")) {
+            let fallback = "/staff";
+            if (role === "ADMIN") fallback = "/admin";
+            else if (role === "FAMILY") fallback = "/family";
+            return Response.redirect(new URL(fallback, nextUrl));
+        }
+
         if (role === "FAMILY" && (path.startsWith("/admin") || path.startsWith("/staff"))) {
             return Response.redirect(new URL("/family", nextUrl));
         }
 
-        if (role !== "ADMIN" && role !== "FAMILY" && path.startsWith("/admin")) {
+        if (role !== "ADMIN" && role !== "FAMILY" && role !== "SUPER_ADMIN" && path.startsWith("/admin")) {
             return Response.redirect(new URL("/staff", nextUrl));
         }
 
-        if (role !== "FAMILY" && path.startsWith("/family")) {
+        if (role !== "FAMILY" && role !== "SUPER_ADMIN" && path.startsWith("/family")) {
             const fallback = role === "ADMIN" ? "/admin" : "/staff";
             return Response.redirect(new URL(fallback, nextUrl));
+        }
+
+        // Enforce Password Reset
+        const mustChangePassword = (req.auth?.user as any)?.mustChangePassword;
+        if (mustChangePassword && !path.startsWith("/auth/reset-password") && !path.startsWith("/api")) {
+            console.log(`[MW] Forcing password reset for ${req.auth?.user?.email}`);
+            return Response.redirect(new URL("/auth/reset-password", nextUrl));
         }
     }
 

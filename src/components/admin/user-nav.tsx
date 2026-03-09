@@ -58,7 +58,7 @@ export function UserNav() {
                                 {isClockedIn ? "TURNO ACTIVO" : "FUERA DE TURNO"}
                             </span>
                             {isClockedIn && (
-                                <span className="text-xs font-mono font-medium text-emerald-400">
+                                <span className="text-xs font-mono font-medium text-emerald-600 dark:text-emerald-400">
                                     {duration}
                                 </span>
                             )}

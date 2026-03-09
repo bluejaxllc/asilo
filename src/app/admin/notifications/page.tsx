@@ -321,7 +321,7 @@ export default function NotificationsPage() {
             <div className="space-y-3">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-16 gap-3">
-                        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-500" />
                         <span className="text-sm text-muted-foreground">Cargando notificaciones...</span>
                     </div>
                 ) : notifications.length === 0 ? (
@@ -377,7 +377,7 @@ export default function NotificationsPage() {
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        className="h-8 w-8 hover:text-emerald-400 hover:bg-emerald-500/10"
+                                                        className="h-8 w-8 hover:text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10"
                                                         onClick={() => handleMarkRead(n.id)}
                                                         title="Marcar como leída"
                                                     >
@@ -387,7 +387,7 @@ export default function NotificationsPage() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-8 w-8 hover:text-red-400 hover:bg-red-500/10"
+                                                    className="h-8 w-8 hover:text-red-600 dark:text-red-400 hover:bg-red-500/10"
                                                     onClick={() => handleDelete(n.id)}
                                                     title="Eliminar"
                                                 >

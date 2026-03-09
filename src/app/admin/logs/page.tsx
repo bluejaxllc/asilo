@@ -25,19 +25,19 @@ import { toast } from "sonner";
 
 const LOG_TYPES = [
     { key: "ALL", label: "Todos", icon: Filter, color: "text-muted-foreground", bg: "bg-muted/60", activeBg: "bg-zinc-700 text-white" },
-    { key: "VITALS", label: "Vitales", icon: Activity, color: "text-blue-400", bg: "bg-blue-500/10", activeBg: "bg-blue-600 text-white" },
-    { key: "FOOD", label: "Alimentos", icon: Utensils, color: "text-orange-400", bg: "bg-orange-500/10", activeBg: "bg-orange-500/100 text-white" },
-    { key: "MEDS", label: "Meds", icon: Pill, color: "text-emerald-400", bg: "bg-emerald-500/10", activeBg: "bg-green-600 text-white" },
+    { key: "VITALS", label: "Vitales", icon: Activity, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-500/10", activeBg: "bg-blue-600 text-white" },
+    { key: "FOOD", label: "Alimentos", icon: Utensils, color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-500/10", activeBg: "bg-orange-500/100 text-white" },
+    { key: "MEDS", label: "Meds", icon: Pill, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10", activeBg: "bg-green-600 text-white" },
     { key: "NOTE", label: "Notas", icon: FileText, color: "text-violet-400", bg: "bg-violet-500/10", activeBg: "bg-purple-600 text-white" },
-    { key: "INCIDENT", label: "Incidentes", icon: AlertTriangle, color: "text-red-400", bg: "bg-red-500/10", activeBg: "bg-red-600 text-white" },
+    { key: "INCIDENT", label: "Incidentes", icon: AlertTriangle, color: "text-red-600 dark:text-red-400", bg: "bg-red-500/10", activeBg: "bg-red-600 text-white" },
 ];
 
 const typeConfig: Record<string, { label: string; badgeClass: string; dotColor: string }> = {
-    VITALS: { label: "VITALES", badgeClass: "bg-blue-500/15 text-blue-400 border-blue-500/20", dotColor: "bg-blue-500/100" },
-    FOOD: { label: "ALIMENTOS", badgeClass: "bg-orange-500/15 text-orange-400 border-orange-500/20", dotColor: "bg-orange-500/100" },
-    MEDS: { label: "MEDS", badgeClass: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20", dotColor: "bg-emerald-500/100" },
+    VITALS: { label: "VITALES", badgeClass: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/20", dotColor: "bg-blue-500/100" },
+    FOOD: { label: "ALIMENTOS", badgeClass: "bg-orange-500/15 text-orange-600 dark:text-orange-400 border-orange-500/20", dotColor: "bg-orange-500/100" },
+    MEDS: { label: "MEDS", badgeClass: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20", dotColor: "bg-emerald-500/100" },
     NOTE: { label: "NOTA", badgeClass: "bg-violet-500/15 text-violet-400 border-violet-500/20", dotColor: "bg-violet-500/100" },
-    INCIDENT: { label: "INCIDENTE", badgeClass: "bg-red-500/15 text-red-400 border-red-500/20", dotColor: "bg-red-500/100" },
+    INCIDENT: { label: "INCIDENTE", badgeClass: "bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/20", dotColor: "bg-red-500/100" },
 };
 
 export default function LogsPage() {
@@ -243,7 +243,7 @@ function LogsPageContent() {
                         <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 text-[10px] bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20 text-rose-400 gap-1.5"
+                            className="h-8 text-[10px] bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 gap-1.5"
                             onClick={async () => {
                                 const id = toast.loading("Buscando anomalías de documentación...");
                                 const result = await executePremiumAgent('log-analysis');
@@ -270,7 +270,7 @@ function LogsPageContent() {
                         <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 text-[10px] bg-cyan-500/10 border-cyan-500/20 hover:bg-cyan-500/20 text-cyan-400 gap-1.5"
+                            className="h-8 text-[10px] bg-cyan-500/10 border-cyan-500/20 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 gap-1.5"
                             onClick={async () => {
                                 const id = toast.loading("Escuchando micrófono...");
                                 const result = await executePremiumAgent('voice-to-task');

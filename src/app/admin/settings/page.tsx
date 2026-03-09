@@ -95,7 +95,7 @@ export default function SettingsPage() {
                         Parámetros generales del sistema y preferencias.
                     </p>
                 </div>
-                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 gap-1.5">
+                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 gap-1.5">
                     <div className="h-1.5 w-1.5 rounded-full bg-emerald-500/100 animate-pulse" />
                     Sistema Operativo
                 </Badge>
@@ -123,7 +123,7 @@ export default function SettingsPage() {
                             <CardHeader className="border-b bg-card">
                                 <div className="flex items-center gap-3">
                                     <div className="h-10 w-10 rounded-lg bg-blue-500/15 flex items-center justify-center">
-                                        <Building2 className="h-5 w-5 text-blue-400" />
+                                        <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                                     </div>
                                     <div>
                                         <CardTitle className="text-lg">Información del Retiro</CardTitle>
@@ -163,7 +163,7 @@ export default function SettingsPage() {
                             <CardHeader className="border-b bg-card">
                                 <div className="flex items-center gap-3">
                                     <div className="h-10 w-10 rounded-lg bg-amber-500/15 flex items-center justify-center">
-                                        <Bell className="h-5 w-5 text-amber-400" />
+                                        <Bell className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                                     </div>
                                     <div>
                                         <CardTitle className="text-lg">Preferencias de Alertas</CardTitle>
@@ -205,7 +205,7 @@ export default function SettingsPage() {
                             <CardHeader className="border-b bg-card">
                                 <div className="flex items-center gap-3">
                                     <div className="h-10 w-10 rounded-lg bg-emerald-500/15 flex items-center justify-center">
-                                        <Database className="h-5 w-5 text-emerald-400" />
+                                        <Database className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                                     </div>
                                     <div>
                                         <CardTitle className="text-lg">Copia de Seguridad</CardTitle>
@@ -237,7 +237,7 @@ export default function SettingsPage() {
                             <CardHeader className="border-b bg-card">
                                 <div className="flex items-center gap-3">
                                     <div className="h-10 w-10 rounded-lg bg-red-500/15 flex items-center justify-center">
-                                        <Shield className="h-5 w-5 text-red-400" />
+                                        <Shield className="h-5 w-5 text-red-600 dark:text-red-400" />
                                     </div>
                                     <div>
                                         <CardTitle className="text-lg">Seguridad del Sistema</CardTitle>
@@ -252,18 +252,18 @@ export default function SettingsPage() {
                                     <div className="flex items-center gap-3 p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
                                         <div className="h-2 w-2 rounded-full bg-emerald-500/100 animate-pulse" />
                                         <div className="flex-1">
-                                            <p className="text-sm font-medium text-emerald-400">Autenticación Activa</p>
-                                            <p className="text-xs text-emerald-400">NextAuth.js con control de roles (ADMIN, STAFF, FAMILY)</p>
+                                            <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Autenticación Activa</p>
+                                            <p className="text-xs text-emerald-600 dark:text-emerald-400">NextAuth.js con control de roles (ADMIN, STAFF, FAMILY)</p>
                                         </div>
-                                        <Badge variant="outline" className="bg-emerald-500/15 text-emerald-400 border-emerald-500/20">Activo</Badge>
+                                        <Badge variant="outline" className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20">Activo</Badge>
                                     </div>
                                     <div className="flex items-center gap-3 p-4 bg-blue-500/10 rounded-xl border border-blue-500/20">
-                                        <Info className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                                        <Info className="h-4 w-4 text-blue-600 dark:text-blue-500 flex-shrink-0" />
                                         <div className="flex-1">
-                                            <p className="text-sm font-medium text-blue-400">Middleware de Rutas</p>
-                                            <p className="text-xs text-blue-400">Protección por rol en todas las rutas protegidas</p>
+                                            <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Middleware de Rutas</p>
+                                            <p className="text-xs text-blue-600 dark:text-blue-400">Protección por rol en todas las rutas protegidas</p>
                                         </div>
-                                        <Badge variant="outline" className="bg-blue-500/15 text-blue-400 border-blue-500/20">Activo</Badge>
+                                        <Badge variant="outline" className="bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/20">Activo</Badge>
                                     </div>
                                 </div>
                             </CardContent>

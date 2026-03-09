@@ -137,7 +137,7 @@ export default function AdminMessagesPage() {
     if (loading) {
         return (
             <div className="flex items-center justify-center h-[60vh]">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-500" />
             </div>
         );
     }
@@ -171,7 +171,7 @@ export default function AdminMessagesPage() {
                             <div className="text-center p-4 rounded-xl bg-card/5 border border-border min-w-[100px]">
                                 <p className={cn(
                                     "text-2xl font-bold",
-                                    unanswered > 0 ? "text-amber-400" : "text-emerald-400"
+                                    unanswered > 0 ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400"
                                 )}>{unanswered}</p>
                                 <p className="text-xs text-indigo-300/50 mt-1">Sin Responder</p>
                             </div>
@@ -222,7 +222,7 @@ export default function AdminMessagesPage() {
                                                             </Badge>
                                                         )}
                                                         {isUnanswered && (
-                                                            <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/20 text-[10px] px-1.5 py-0">
+                                                            <Badge className="bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/20 text-[10px] px-1.5 py-0">
                                                                 <AlertCircle className="h-2.5 w-2.5 mr-1" /> Pendiente
                                                             </Badge>
                                                         )}
@@ -230,9 +230,9 @@ export default function AdminMessagesPage() {
                                                     {convo.lastMessage && (
                                                         <p className="text-sm text-muted-foreground truncate mt-0.5">
                                                             {convo.lastMessage.isFromFamily ? (
-                                                                <Heart className="h-3 w-3 inline mr-1 text-orange-400" />
+                                                                <Heart className="h-3 w-3 inline mr-1 text-orange-600 dark:text-orange-400" />
                                                             ) : (
-                                                                <User className="h-3 w-3 inline mr-1 text-blue-400" />
+                                                                <User className="h-3 w-3 inline mr-1 text-blue-600 dark:text-blue-400" />
                                                             )}
                                                             {convo.lastMessage.content}
                                                         </p>
@@ -312,7 +312,7 @@ export default function AdminMessagesPage() {
                                                     <p className="text-sm">{msg.content}</p>
                                                     <p className={cn(
                                                         "text-[10px] mt-1",
-                                                        msg.isFromFamily ? "text-muted-foreground" : "text-blue-200"
+                                                        msg.isFromFamily ? "text-muted-foreground" : "text-blue-600 dark:text-blue-200"
                                                     )}>
                                                         {new Date(msg.createdAt).toLocaleString("es-MX", {
                                                             day: "numeric", month: "short",
@@ -420,7 +420,7 @@ export default function AdminMessagesPage() {
                         <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-400 gap-1.5"
+                            className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 gap-1.5"
                             onClick={async () => {
                                 const id = toast.loading("Analizando clima emocional...");
                                 const result = await executePremiumAgent('message-audit');
@@ -447,7 +447,7 @@ export default function AdminMessagesPage() {
                         <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-400 gap-1.5"
+                            className="h-8 text-[10px] bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 gap-1.5"
                             onClick={async () => {
                                 const id = toast.loading("Iniciando panel de difusión...");
                                 const result = await executePremiumAgent('campaign-generator');
@@ -474,7 +474,7 @@ export default function AdminMessagesPage() {
                         <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 text-[10px] bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-400 gap-1.5"
+                            className="h-8 text-[10px] bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 gap-1.5"
                             onClick={async () => {
                                 const id = toast.loading("Conectando con WhatsApp Business API...");
                                 const result = await executePremiumAgent('whatsapp-integration');

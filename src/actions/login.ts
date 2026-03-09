@@ -25,7 +25,9 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
 
     let redirectUrl = DEFAULT_LOGIN_REDIRECT;
 
-    if (existingUser && existingUser.role === "ADMIN") {
+    if (existingUser && existingUser.role === "SUPER_ADMIN") {
+        redirectUrl = "/super-admin";
+    } else if (existingUser && existingUser.role === "ADMIN") {
         redirectUrl = "/admin";
     } else if (existingUser && existingUser.role === "FAMILY") {
         redirectUrl = "/family";

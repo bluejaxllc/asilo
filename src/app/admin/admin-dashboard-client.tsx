@@ -36,17 +36,17 @@ interface DashboardData {
 }
 
 const logTypeColors: Record<string, string> = {
-    VITALS: "bg-blue-500/15 text-blue-400 border-blue-500/20",
-    FOOD: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
+    VITALS: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/20",
+    FOOD: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
     MEDS: "bg-violet-500/15 text-violet-400 border-violet-500/20",
-    ACTIVITY: "bg-amber-500/15 text-amber-400 border-amber-500/20",
+    ACTIVITY: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/20",
     NOTE: "bg-zinc-500/15 text-muted-foreground border-zinc-500/20",
 };
 
 const priorityColors: Record<string, string> = {
-    HIGH: "bg-red-500/15 text-red-400 border-red-500/20",
-    MEDIUM: "bg-amber-500/15 text-amber-400 border-amber-500/20",
-    LOW: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
+    HIGH: "bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/20",
+    MEDIUM: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/20",
+    LOW: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
 };
 
 export function AdminDashboardClient({ data }: { data: DashboardData }) {
@@ -66,7 +66,7 @@ export function AdminDashboardClient({ data }: { data: DashboardData }) {
             icon: Users,
             accentBorder: "border-l-blue-500",
             iconBg: "bg-blue-500/10",
-            iconColor: "text-blue-400",
+            iconColor: "text-blue-600 dark:text-blue-400",
         },
         {
             label: "Personal Activo",
@@ -76,7 +76,7 @@ export function AdminDashboardClient({ data }: { data: DashboardData }) {
             icon: UserCheck,
             accentBorder: "border-l-emerald-500",
             iconBg: "bg-emerald-500/10",
-            iconColor: "text-emerald-400",
+            iconColor: "text-emerald-600 dark:text-emerald-400",
         },
         {
             label: "Tareas Pendientes",
@@ -86,7 +86,7 @@ export function AdminDashboardClient({ data }: { data: DashboardData }) {
             icon: AlertCircle,
             accentBorder: "border-l-amber-500",
             iconBg: "bg-amber-500/10",
-            iconColor: "text-amber-400",
+            iconColor: "text-amber-600 dark:text-amber-400",
         },
         {
             label: "Alertas Inventario",
@@ -96,7 +96,7 @@ export function AdminDashboardClient({ data }: { data: DashboardData }) {
             icon: Package,
             accentBorder: lowStockItems > 0 ? "border-l-red-500" : "border-l-zinc-700",
             iconBg: lowStockItems > 0 ? "bg-red-500/10" : "bg-zinc-500/10",
-            iconColor: lowStockItems > 0 ? "text-red-400" : "text-muted-foreground",
+            iconColor: lowStockItems > 0 ? "text-red-600 dark:text-red-400" : "text-muted-foreground",
         },
     ];
 
@@ -144,7 +144,7 @@ export function AdminDashboardClient({ data }: { data: DashboardData }) {
                                     <Button
                                         size="sm"
                                         variant="ghost"
-                                        className="h-7 w-7 p-0 rounded-full hover:bg-red-500/20 text-red-400"
+                                        className="h-7 w-7 p-0 rounded-full hover:bg-red-500/20 text-red-600 dark:text-red-400"
                                         onClick={async (e) => {
                                             e.preventDefault();
                                             e.stopPropagation();
@@ -175,9 +175,9 @@ export function AdminDashboardClient({ data }: { data: DashboardData }) {
             {/* Quick Stats Row */}
             <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
                 {[
-                    { icon: Heart, label: "Cuentas Familiares", value: familyAccounts, color: "text-orange-400", bg: "bg-orange-500/10" },
-                    { icon: Activity, label: "Registros Recientes", value: recentLogs.length, color: "text-blue-400", bg: "bg-blue-500/10" },
-                    { icon: TrendingUp, label: "Total Personal", value: totalStaff, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+                    { icon: Heart, label: "Cuentas Familiares", value: familyAccounts, color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-500/10" },
+                    { icon: Activity, label: "Registros Recientes", value: recentLogs.length, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-500/10" },
+                    { icon: TrendingUp, label: "Total Personal", value: totalStaff, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10" },
                     { icon: Clock, label: "Monitoreo Activo", value: "24/7", color: "text-violet-400", bg: "bg-violet-500/10" },
                 ].map((stat, i) => (
                     <SlideIn key={stat.label} direction="left" delay={0.3 + i * 0.08}>
@@ -205,7 +205,7 @@ export function AdminDashboardClient({ data }: { data: DashboardData }) {
                                 <CardTitle className="text-base text-foreground">Actividad Reciente</CardTitle>
                                 <CardDescription className="text-muted-foreground text-xs">Últimos registros del equipo</CardDescription>
                             </div>
-                            <Link href="/admin/logs" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors">
+                            <Link href="/admin/logs" className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-600 dark:text-blue-300 flex items-center gap-1 transition-colors">
                                 Ver todo <ArrowRight className="h-3 w-3" />
                             </Link>
                         </div>
@@ -252,7 +252,7 @@ export function AdminDashboardClient({ data }: { data: DashboardData }) {
                                 <CardTitle className="text-base text-foreground">Tareas Pendientes</CardTitle>
                                 <CardDescription className="text-muted-foreground text-xs">{pendingTasks} sin completar</CardDescription>
                             </div>
-                            <Link href="/admin/tasks" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors">
+                            <Link href="/admin/tasks" className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-600 dark:text-blue-300 flex items-center gap-1 transition-colors">
                                 Ver todo <ArrowRight className="h-3 w-3" />
                             </Link>
                         </div>
@@ -263,7 +263,7 @@ export function AdminDashboardClient({ data }: { data: DashboardData }) {
                                 <div className="text-center py-8">
                                     <AlertCircle className="h-8 w-8 text-secondary-foreground mx-auto mb-2" />
                                     <p className="text-sm text-muted-foreground">No hay tareas pendientes.</p>
-                                    <p className="text-xs text-emerald-500 font-medium mt-1">¡Todo al día! 🎉</p>
+                                    <p className="text-xs text-emerald-600 dark:text-emerald-500 font-medium mt-1">¡Todo al día! 🎉</p>
                                 </div>
                             ) : (
                                 upcomingTasks.map((task) => (
@@ -341,7 +341,7 @@ export function AdminDashboardClient({ data }: { data: DashboardData }) {
                             <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-400 gap-1.5"
+                                className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 gap-1.5"
                                 onClick={async () => {
                                     const { toast } = await import("sonner");
                                     const { runTrendAudit } = await import("@/actions/reports");
@@ -373,7 +373,7 @@ export function AdminDashboardClient({ data }: { data: DashboardData }) {
                             <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-8 text-[10px] bg-cyan-500/10 border-cyan-500/20 hover:bg-cyan-500/20 text-cyan-400 gap-1.5"
+                                className="h-8 text-[10px] bg-cyan-500/10 border-cyan-500/20 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 gap-1.5"
                                 onClick={async () => {
                                     const { toast } = await import("sonner");
                                     const { runEfficiencyAudit } = await import("@/actions/reports");
@@ -405,7 +405,7 @@ export function AdminDashboardClient({ data }: { data: DashboardData }) {
                             <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-400 gap-1.5"
+                                className="h-8 text-[10px] bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 gap-1.5"
                                 onClick={async () => {
                                     const { toast } = await import("sonner");
                                     const { runReputationAudit } = await import("@/actions/reports");
@@ -437,7 +437,7 @@ export function AdminDashboardClient({ data }: { data: DashboardData }) {
                             <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-8 text-[10px] bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20 text-rose-400 gap-1.5"
+                                className="h-8 text-[10px] bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 gap-1.5"
                                 onClick={async () => {
                                     const { toast } = await import("sonner");
                                     const { runMarketingAudit } = await import("@/actions/reports");

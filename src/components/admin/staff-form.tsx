@@ -6,30 +6,19 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner";
 import { getPatients } from "@/actions/patients";
-import { Heart, RefreshCw, Eye, EyeOff } from "lucide-react";
+import { Heart, Mail, Loader2 } from "lucide-react";
 
 interface StaffFormProps {
     onSuccess?: () => void;
 }
 
-function generatePassword(length = 8): string {
-    const chars = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$";
-    let password = "";
-    for (let i = 0; i < length; i++) {
-        password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return password;
-}
-
 export const StaffForm = ({ onSuccess }: StaffFormProps) => {
     const [loading, setLoading] = useState(false);
     const [patients, setPatients] = useState<any[]>([]);
-    const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         role: "",
-        password: "",
         patientId: ""
     });
 
@@ -45,11 +34,6 @@ export const StaffForm = ({ onSuccess }: StaffFormProps) => {
 
         if (!formData.name || !formData.email || !formData.role) {
             toast.error("Por favor complete todos los campos");
-            return;
-        }
-
-        if (!formData.password || formData.password.length < 6) {
-            toast.error("La contraseña debe tener al menos 6 caracteres");
             return;
         }
 
@@ -71,14 +55,14 @@ export const StaffForm = ({ onSuccess }: StaffFormProps) => {
             const data = await response.json();
 
             if (response.ok) {
-                toast.success(formData.role === "FAMILY"
-                    ? "Familiar registrado exitosamente"
-                    : "Personal registrado exitosamente"
+                toast.success(
+                    `Invitación enviada a ${formData.email}`,
+                    { description: "El usuario recibirá un correo para crear su contraseña.", duration: 6000 }
                 );
-                setFormData({ name: "", email: "", role: "", password: "", patientId: "" });
+                setFormData({ name: "", email: "", role: "", patientId: "" });
                 onSuccess?.();
             } else {
-                toast.error(data.error || "Error al registrar");
+                toast.error(data.error || "Error al enviar invitación");
             }
         } catch (error) {
             console.error('Error:', error);
@@ -116,7 +100,7 @@ export const StaffForm = ({ onSuccess }: StaffFormProps) => {
                     <SelectItem value="KITCHEN">Cocina</SelectItem>
                     <SelectItem value="FAMILY">
                         <span className="flex items-center gap-2">
-                            <Heart className="h-3 w-3 text-orange-500" /> Familiar
+                            <Heart className="h-3 w-3 text-orange-600 dark:text-orange-500" /> Familiar
                         </span>
                     </SelectItem>
                 </SelectContent>
@@ -134,59 +118,38 @@ export const StaffForm = ({ onSuccess }: StaffFormProps) => {
                         <SelectTrigger className="bg-card">
                             <SelectValue placeholder="Seleccionar Residente" />
                         </SelectTrigger>
-                        <SelectContent>
-                            {patients.map((patient) => (
-                                <SelectItem key={patient.id} value={patient.id}>
-                                    {patient.name} — Hab. {patient.room || "S/N"}
-                                </SelectItem>
-                            ))}
+                        <SelectContent className="z-[9999]">
+                            {patients.length > 0 ? (
+                                patients.map((patient) => (
+                                    <SelectItem key={patient.id} value={patient.id}>
+                                        {patient.name} — Hab. {patient.room || "S/N"}
+                                    </SelectItem>
+                                ))
+                            ) : (
+                                <div className="p-3 text-sm text-center text-muted-foreground">
+                                    No hay residentes registrados
+                                </div>
+                            )}
                         </SelectContent>
                     </Select>
                 </div>
             )}
 
-            <div className="space-y-1.5">
-                <label className="text-sm font-medium">Contraseña</label>
-                <div className="flex gap-2">
-                    <div className="relative flex-1">
-                        <Input
-                            placeholder="Mínimo 6 caracteres"
-                            type={showPassword ? "text" : "password"}
-                            value={formData.password}
-                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                            className="pr-10"
-                        />
-                        <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
-                    </div>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                            const pwd = generatePassword();
-                            setFormData({ ...formData, password: pwd });
-                            setShowPassword(true);
-                            toast.info(`Contraseña generada: ${pwd}`, { duration: 8000 });
-                        }}
-                        title="Generar contraseña aleatoria"
-                        className="flex-shrink-0"
-                    >
-                        <RefreshCw className="h-4 w-4" />
-                    </Button>
-                </div>
-                <p className="text-[11px] text-muted-foreground">
-                    Escriba una contraseña o presione el botón para generar una aleatoria.
+            {/* Info box explaining the magic link flow */}
+            <div className="flex items-start gap-2.5 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                <Mail className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                    Se enviará un <strong className="text-foreground">enlace de invitación</strong> por correo electrónico.
+                    El usuario creará su propia contraseña al aceptar la invitación.
                 </p>
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Registrando..." : formData.role === "FAMILY" ? "Registrar Familiar" : "Registrar Personal"}
+                {loading ? (
+                    <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Enviando invitación...</>
+                ) : (
+                    <><Mail className="h-4 w-4 mr-2" /> {formData.role === "FAMILY" ? "Invitar Familiar" : "Invitar Personal"}</>
+                )}
             </Button>
         </form>
     )

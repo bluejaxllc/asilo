@@ -17,6 +17,7 @@ import {
     MessageCircle,
     Sparkles,
     Megaphone,
+    Gift,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -26,7 +27,7 @@ const routes = [
         label: "Inicio",
         icon: LayoutDashboard,
         href: "/admin",
-        color: "text-blue-400",
+        color: "text-blue-600 dark:text-blue-400",
     },
     {
         label: "Residentes",
@@ -38,37 +39,43 @@ const routes = [
         label: "Personal",
         icon: Users,
         href: "/admin/staff",
-        color: "text-pink-400",
+        color: "text-pink-600 dark:text-pink-400",
     },
     {
         label: "Tareas",
         icon: CalendarCheck,
         href: "/admin/tasks",
-        color: "text-amber-400",
+        color: "text-amber-600 dark:text-amber-400",
     },
     {
         label: "Inventario Medico",
         icon: Pill,
         href: "/admin/inventory",
-        color: "text-emerald-400",
+        color: "text-emerald-600 dark:text-emerald-400",
     },
     {
         label: "Bitácora",
         icon: ClipboardList,
         href: "/admin/logs",
-        color: "text-green-400",
+        color: "text-green-600 dark:text-green-400",
+    },
+    {
+        label: "Paquetes VIP",
+        icon: Gift,
+        href: "/admin/experiences",
+        color: "text-rose-500 dark:text-rose-400",
     },
     {
         label: "Notificaciones",
         icon: Bell,
         href: "/admin/notifications",
-        color: "text-yellow-400",
+        color: "text-yellow-600 dark:text-yellow-400",
     },
     {
         label: "Reportes",
         icon: BarChart3,
         href: "/admin/reports",
-        color: "text-cyan-400",
+        color: "text-cyan-600 dark:text-cyan-400",
         pro: true,
     },
     {
@@ -89,7 +96,7 @@ const routes = [
         label: "Marketing",
         icon: Megaphone,
         href: "/admin/marketing",
-        color: "text-rose-400",
+        color: "text-rose-600 dark:text-rose-400",
         pro: true,
     },
     {
@@ -142,7 +149,7 @@ export const Sidebar = () => {
                             )} />
                             {route.label}
                             {(route as any).pro && (
-                                <Sparkles className="h-3 w-3 text-blue-400 ml-auto flex-shrink-0 opacity-60" />
+                                <Sparkles className="h-3 w-3 text-blue-600 dark:text-blue-400 ml-auto flex-shrink-0 opacity-60" />
                             )}
                             {isActive && !(route as any).pro && (
                                 <div className="ml-auto h-1.5 w-1.5 rounded-full bg-blue-500/100 animate-pulse" />
@@ -159,7 +166,7 @@ export const Sidebar = () => {
                     className="block p-3 rounded-lg bg-gradient-to-r from-blue-600/10 to-indigo-600/10 border border-blue-500/20 hover:border-blue-500/40 transition-all group"
                 >
                     <div className="flex items-center gap-2 mb-1">
-                        <Sparkles className="h-3.5 w-3.5 text-blue-400" />
+                        <Sparkles className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
                         <span className="text-xs font-bold text-foreground">BlueJax Pro</span>
                     </div>
                     <p className="text-[10px] text-muted-foreground leading-relaxed">

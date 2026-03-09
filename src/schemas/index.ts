@@ -35,3 +35,16 @@ export const PatientSchema = z.object({
     emergencyContactName: z.string().optional(),
     emergencyContactPhone: z.string().optional(),
 });
+
+export const OnboardingSchema = z.object({
+    facilityName: z.string().min(1, { message: "El nombre de la residencia es requerido" }),
+    staffEmails: z.array(z.string().email({ message: "Correo inválido" })).optional(),
+});
+
+export const ResetPasswordSchema = z.object({
+    password: z.string().min(6, { message: "Mínimo 6 caracteres requeridos" }),
+    confirmPassword: z.string().min(6, { message: "Mínimo 6 caracteres requeridos" }),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"]
+});

@@ -6,12 +6,14 @@ import { PatientSchema } from "@/schemas";
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/role-guard";
 import { getCurrentFacilityId } from "@/lib/facility";
+import { logAction } from "@/lib/audit";
 
 export const createPatient = async (values: z.infer<typeof PatientSchema>) => {
     const check = await requireRole("ADMIN");
-    if ("error" in check) return { error: check.error };
 
     const validatedFields = PatientSchema.safeParse(values);
+
+    const userId = check.session?.user?.id;
 
     if (!validatedFields.success) {
         return { error: "Campos inválidos!" };
@@ -56,7 +58,7 @@ export const createPatient = async (values: z.infer<typeof PatientSchema>) => {
 
     try {
         const facilityId = await getCurrentFacilityId();
-        await db.patient.create({
+        const newPatient = await db.patient.create({
             data: {
                 name: fullName,
                 room: roomNumber,
@@ -68,6 +70,17 @@ export const createPatient = async (values: z.infer<typeof PatientSchema>) => {
                 facilityId,
             }
         });
+
+        if (facilityId && userId) {
+            await logAction({
+                userId,
+                facilityId,
+                action: "CREATE",
+                entity: "Patient",
+                entityId: newPatient.id,
+                details: { name: fullName, room: roomNumber }
+            });
+        }
 
         revalidatePath("/admin/patients");
         return { success: "Residente creado exitosamente!" };
@@ -93,7 +106,7 @@ export const getPatientById = async (id: string) => {
                         medication: true
                     }
                 },
-                notifications: {
+                summaries: {
                     orderBy: { createdAt: 'desc' },
                     take: 5
                 }
@@ -118,9 +131,11 @@ export const updatePatient = async (
 ) => {
     const check = await requireRole("ADMIN", "DOCTOR", "NURSE");
     if ("error" in check) return { error: check.error };
+    const userId = check.session?.user?.id;
 
     try {
-        await db.patient.update({
+        const facilityId = await getCurrentFacilityId();
+        const updatedPatient = await db.patient.update({
             where: { id },
             data: {
                 ...(data.name !== undefined && { name: data.name }),
@@ -131,6 +146,17 @@ export const updatePatient = async (
                 ...(data.dietaryNeeds !== undefined && { dietaryNeeds: data.dietaryNeeds }),
             }
         });
+
+        if (facilityId && userId) {
+            await logAction({
+                userId,
+                facilityId,
+                action: "UPDATE",
+                entity: "Patient",
+                entityId: updatedPatient.id,
+                details: { updatedFields: Object.keys(data), newValues: data }
+            });
+        }
 
         revalidatePath(`/admin/patients/${id}`);
         revalidatePath("/admin/patients");

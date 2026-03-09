@@ -125,7 +125,7 @@ function TypingLine({ text, delay = 0, prefix }: { text: string; delay?: number;
     <div ref={ref} className="text-muted-foreground min-h-[1.4em]">
       {showCursor && prefix}
       {displayed}
-      {showCursor && !done && <span className="animate-pulse text-blue-400 ml-0.5">▊</span>}
+      {showCursor && !done && <span className="animate-pulse text-blue-600 dark:text-blue-400 ml-0.5">▊</span>}
     </div>
   )
 }
@@ -150,7 +150,7 @@ function BootCheckItem({ label, delay = 0 }: { label: string; delay?: number }) 
         <motion.span
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 0.6, ease: "linear" }}
-          className="text-blue-400 w-3 inline-block"
+          className="text-blue-600 dark:text-blue-400 w-3 inline-block"
         >◐</motion.span>
       )}
       {phase === "done" && (
@@ -158,7 +158,7 @@ function BootCheckItem({ label, delay = 0 }: { label: string; delay?: number }) 
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 500, damping: 15 }}
-          className="text-emerald-400 w-3"
+          className="text-emerald-600 dark:text-emerald-400 w-3"
         >✓</motion.span>
       )}
       <span className={phase === "done" ? "text-muted-foreground" : phase === "loading" ? "text-secondary-foreground" : "text-muted-foreground"}>
@@ -298,7 +298,7 @@ function TerminalResultLine({ text, delay = 0 }: { text: string; delay?: number 
         initial={{ scale: 0 }}
         animate={visible ? { scale: 1 } : {}}
         transition={{ delay: 0.2, type: "spring", stiffness: 500 }}
-        className="text-emerald-400"
+        className="text-emerald-600 dark:text-emerald-400"
       >✓</motion.span>{" "}
       {text}
     </motion.div>
@@ -453,7 +453,7 @@ export default function Home() {
               {/* Copy */}
               <div>
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
-                  className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono uppercase tracking-widest mb-8">
+                  className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-mono uppercase tracking-widest mb-8">
                   <Terminal className="h-3 w-3" /> sistema operativo v1.0
                 </motion.div>
 
@@ -536,10 +536,10 @@ export default function Home() {
                     <div className="bg-background/30 border border-border/50 rounded-lg p-3">
                       <div className="text-[9px] font-mono text-muted-foreground uppercase tracking-wider mb-2">LOG DE EVENTOS</div>
                       <div className="space-y-1 font-mono text-[11px]">
-                        <TypingLine delay={6.3} prefix={<><span className="text-muted-foreground">14:32</span>{" "}<span className="text-blue-400">INFO</span>{" "}</>} text="Signos vitales registrados — Hab 204" />
-                        <TypingLine delay={7.5} prefix={<><span className="text-muted-foreground">14:28</span>{" "}<span className="text-amber-400">WARN</span>{" "}</>} text="Stock bajo: Omeprazol (3 uds)" />
-                        <TypingLine delay={8.7} prefix={<><span className="text-muted-foreground">14:15</span>{" "}<span className="text-emerald-400">OK  </span>{" "}</>} text="Tarea completada — Med. Hab 107" />
-                        <TypingLine delay={9.9} prefix={<><span className="text-muted-foreground">13:58</span>{" "}<span className="text-blue-400">INFO</span>{" "}</>} text="Check-in: Enf. Martínez" />
+                        <TypingLine delay={6.3} prefix={<><span className="text-muted-foreground">14:32</span>{" "}<span className="text-blue-600 dark:text-blue-400">INFO</span>{" "}</>} text="Signos vitales registrados — Hab 204" />
+                        <TypingLine delay={7.5} prefix={<><span className="text-muted-foreground">14:28</span>{" "}<span className="text-amber-600 dark:text-amber-400">WARN</span>{" "}</>} text="Stock bajo: Omeprazol (3 uds)" />
+                        <TypingLine delay={8.7} prefix={<><span className="text-muted-foreground">14:15</span>{" "}<span className="text-emerald-600 dark:text-emerald-400">OK  </span>{" "}</>} text="Tarea completada — Med. Hab 107" />
+                        <TypingLine delay={9.9} prefix={<><span className="text-muted-foreground">13:58</span>{" "}<span className="text-blue-600 dark:text-blue-400">INFO</span>{" "}</>} text="Check-in: Enf. Martínez" />
                       </div>
                     </div>
                   </div>
@@ -562,7 +562,7 @@ export default function Home() {
                 <div className="flex items-center gap-4 group cursor-default">
                   <motion.div whileHover={{ rotate: 5, scale: 1.1 }}
                     className="h-10 w-10 rounded-lg bg-background border border-border flex items-center justify-center group-hover:border-blue-800 group-hover:bg-blue-900/20 transition-all duration-300">
-                    <stat.icon className="h-4 w-4 text-blue-500" />
+                    <stat.icon className="h-4 w-4 text-blue-600 dark:text-blue-500" />
                   </motion.div>
                   <div>
                     <div className="text-xl font-bold font-mono text-foreground">{stat.value}</div>
@@ -584,7 +584,7 @@ export default function Home() {
             <RevealSection>
               <div className="mb-16">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-background border border-border text-muted-foreground text-xs font-mono uppercase tracking-widest mb-4">
-                  <Workflow className="h-3 w-3 text-blue-500" /> motor de automatización
+                  <Workflow className="h-3 w-3 text-blue-600 dark:text-blue-500" /> motor de automatización
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">
                   Lógica impulsada por{" "}
@@ -605,10 +605,10 @@ export default function Home() {
                     <div className="bg-card border border-red-500/20 rounded-xl p-5 hover:border-red-500/30 transition-colors">
                       <div className="flex items-start gap-4">
                         <div className="h-10 w-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center flex-shrink-0">
-                          <Activity className="h-5 w-5 text-red-400" />
+                          <Activity className="h-5 w-5 text-red-600 dark:text-red-400" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-[9px] font-mono text-red-400 uppercase tracking-wider mb-1">01 — EVENTO DETECTADO</div>
+                          <div className="text-[9px] font-mono text-red-600 dark:text-red-400 uppercase tracking-wider mb-1">01 — EVENTO DETECTADO</div>
                           <div className="text-sm font-semibold text-foreground">Signo Vital Crítico Registrado</div>
                           <div className="text-xs font-mono text-muted-foreground mt-1">BP: 180/110 mmHg — Residente #204, Hab 204</div>
                         </div>
@@ -635,13 +635,13 @@ export default function Home() {
                     <div className="bg-card border border-blue-500/20 rounded-xl p-5 hover:border-blue-500/30 transition-colors">
                       <div className="flex items-start gap-4">
                         <div className="h-10 w-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center flex-shrink-0">
-                          <Cpu className="h-5 w-5 text-blue-400" />
+                          <Cpu className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-[9px] font-mono text-blue-400 uppercase tracking-wider mb-1">02 — EVALUACIÓN DE REGLAS</div>
+                          <div className="text-[9px] font-mono text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-1">02 — EVALUACIÓN DE REGLAS</div>
                           <div className="text-sm font-semibold text-foreground">Motor de Reglas Ejecutado</div>
                           <div className="text-xs font-mono text-muted-foreground mt-1">
-                            <span className="text-blue-400/70">if</span> (BP {">"} 160/100) → <span className="text-emerald-400/70">DISPATCH_ALL</span>
+                            <span className="text-blue-600 dark:text-blue-400/70">if</span> (BP {">"} 160/100) → <span className="text-emerald-600 dark:text-emerald-400/70">DISPATCH_ALL</span>
                           </div>
                         </div>
                       </div>
@@ -670,8 +670,8 @@ export default function Home() {
                       { step: "05", label: "REGISTRO EN BITÁCORA", title: "Audit Log → Entrada #4821", detail: "encrypted: AES-256, immutable: true", color: "violet", icon: Database, delay: 2.6 },
                     ].map((action) => {
                       const colorMap: Record<string, { bg: string; border: string; text: string; borderHover: string }> = {
-                        emerald: { bg: "bg-emerald-500/10", border: "border-emerald-500/20", text: "text-emerald-400", borderHover: "hover:border-emerald-500/30" },
-                        amber: { bg: "bg-amber-500/10", border: "border-amber-500/20", text: "text-amber-400", borderHover: "hover:border-amber-500/30" },
+                        emerald: { bg: "bg-emerald-500/10", border: "border-emerald-500/20", text: "text-emerald-600 dark:text-emerald-400", borderHover: "hover:border-emerald-500/30" },
+                        amber: { bg: "bg-amber-500/10", border: "border-amber-500/20", text: "text-amber-600 dark:text-amber-400", borderHover: "hover:border-amber-500/30" },
                         violet: { bg: "bg-violet-500/10", border: "border-violet-500/20", text: "text-violet-400", borderHover: "hover:border-violet-500/30" },
                       }
                       const c = colorMap[action.color]
@@ -712,7 +712,7 @@ export default function Home() {
 
                   <div className="p-5 font-mono text-[11px] space-y-2 flex-1">
                     <TypingLine delay={0.5}
-                      prefix={<><span className="text-muted-foreground">$</span>{" "}<span className="text-blue-400">bjx</span>{" "}</>}
+                      prefix={<><span className="text-muted-foreground">$</span>{" "}<span className="text-blue-600 dark:text-blue-400">bjx</span>{" "}</>}
                       text="agent run --event VITAL_CRITICAL --patient 204"
                     />
 
@@ -740,9 +740,9 @@ export default function Home() {
                             viewport={{ once: true }}
                             transition={{ delay: 5.4, type: "spring", stiffness: 400 }}
                           >
-                            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                            <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                           </motion.div>
-                          <span className="text-emerald-400 font-semibold">Pipeline completado</span>
+                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Pipeline completado</span>
                           <span className="text-muted-foreground ml-auto">288ms total</span>
                         </div>
                         <div className="text-muted-foreground text-[10px] mt-1">3 acciones ejecutadas, 0 errores, 0 reintentos</div>
@@ -760,7 +760,7 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-6">
             <RevealSection className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-background border border-border text-muted-foreground text-xs font-mono uppercase tracking-widest mb-4">
-                <Cpu className="h-3 w-3 text-blue-500" /> módulos del sistema
+                <Cpu className="h-3 w-3 text-blue-600 dark:text-blue-500" /> módulos del sistema
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
                 Infraestructura <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">completa</span>
@@ -780,12 +780,12 @@ export default function Home() {
                 { icon: Lock, title: "Cifrado de Datos", desc: "AES-256 en reposo y tránsito. Copias automatizadas. Datos clínicos protegidos por diseño.", accent: "red" },
               ].map((mod) => {
                 const a: Record<string, { bg: string; text: string; border: string }> = {
-                  blue: { bg: "bg-blue-500/10", text: "text-blue-500", border: "border-blue-500/20" },
-                  emerald: { bg: "bg-emerald-500/10", text: "text-emerald-500", border: "border-emerald-500/20" },
+                  blue: { bg: "bg-blue-500/10", text: "text-blue-600 dark:text-blue-500", border: "border-blue-500/20" },
+                  emerald: { bg: "bg-emerald-500/10", text: "text-emerald-600 dark:text-emerald-500", border: "border-emerald-500/20" },
                   violet: { bg: "bg-violet-500/10", text: "text-violet-500", border: "border-violet-500/20" },
-                  amber: { bg: "bg-amber-500/10", text: "text-amber-500", border: "border-amber-500/20" },
-                  cyan: { bg: "bg-cyan-500/10", text: "text-cyan-500", border: "border-cyan-500/20" },
-                  red: { bg: "bg-red-500/10", text: "text-red-500", border: "border-red-500/20" },
+                  amber: { bg: "bg-amber-500/10", text: "text-amber-600 dark:text-amber-500", border: "border-amber-500/20" },
+                  cyan: { bg: "bg-cyan-500/10", text: "text-cyan-600 dark:text-cyan-500", border: "border-cyan-500/20" },
+                  red: { bg: "bg-red-500/10", text: "text-red-600 dark:text-red-500", border: "border-red-500/20" },
                 }
                 const c = a[mod.accent]
                 return (
@@ -815,7 +815,7 @@ export default function Home() {
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <RevealSection>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-background border border-border text-muted-foreground text-xs font-mono uppercase tracking-widest mb-4">
-                  <ShieldAlert className="h-3 w-3 text-blue-500" /> gobierno de acceso
+                  <ShieldAlert className="h-3 w-3 text-blue-600 dark:text-blue-500" /> gobierno de acceso
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold mb-6">
                   Control granular de{" "}
@@ -835,7 +835,7 @@ export default function Home() {
                     <StaggerItem key={item}>
                       <div className="flex items-center gap-3 group">
                         <motion.div whileHover={{ scale: 1.2, rotate: 10 }}>
-                          <CheckCircle2 className="h-4 w-4 text-blue-500 flex-shrink-0 group-hover:text-blue-400 transition-colors" />
+                          <CheckCircle2 className="h-4 w-4 text-blue-600 dark:text-blue-500 flex-shrink-0 group-hover:text-blue-600 dark:text-blue-400 transition-colors" />
                         </motion.div>
                         <span className="text-sm text-secondary-foreground group-hover:text-foreground transition-colors">{item}</span>
                       </div>
@@ -869,7 +869,7 @@ export default function Home() {
                         className="flex items-center justify-between py-2 px-3 rounded-lg bg-background/40 transition-all cursor-default"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="h-7 w-7 rounded-md bg-card flex items-center justify-center text-[10px] font-mono text-blue-400 font-bold border border-border">
+                          <div className="h-7 w-7 rounded-md bg-card flex items-center justify-center text-[10px] font-mono text-blue-600 dark:text-blue-400 font-bold border border-border">
                             {u.role.substring(0, 2)}
                           </div>
                           <div>
@@ -879,7 +879,7 @@ export default function Home() {
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="text-[9px] font-mono text-muted-foreground hidden sm:block">{u.perms}</span>
-                          <div className={`flex items-center gap-1 text-[10px] font-mono ${u.status === 'active' ? 'text-emerald-400' : 'text-blue-400'}`}>
+                          <div className={`flex items-center gap-1 text-[10px] font-mono ${u.status === 'active' ? 'text-emerald-600 dark:text-emerald-400' : 'text-blue-600 dark:text-blue-400'}`}>
                             <CircleDot className="h-2.5 w-2.5" />
                             {u.status}
                           </div>
@@ -902,7 +902,7 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-6">
             <RevealSection className="text-center mb-14">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-background border border-border text-muted-foreground text-xs font-mono uppercase tracking-widest mb-4">
-                <KeyRound className="h-3 w-3 text-blue-500" /> acceso por rol
+                <KeyRound className="h-3 w-3 text-blue-600 dark:text-blue-500" /> acceso por rol
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
                 Ingrese según su{" "}
@@ -915,12 +915,12 @@ export default function Home() {
 
             <StaggerContainer className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {[
-                { role: "admin", icon: ShieldCheck, title: "Administrador", desc: "Control total del sistema", gradient: "from-blue-600 to-indigo-600", border: "border-blue-500/20 hover:border-blue-500/50", iconBg: "bg-blue-500/15", iconColor: "text-blue-400", shadow: "hover:shadow-blue-500/20" },
-                { role: "doctor", icon: Stethoscope, title: "Médico", desc: "Expedientes y diagnósticos", gradient: "from-emerald-600 to-green-600", border: "border-emerald-500/20 hover:border-emerald-500/50", iconBg: "bg-emerald-500/15", iconColor: "text-emerald-400", shadow: "hover:shadow-emerald-500/20" },
-                { role: "nurse", icon: Users, title: "Enfermería", desc: "Medicamentos y signos vitales", gradient: "from-pink-600 to-rose-600", border: "border-pink-500/20 hover:border-pink-500/50", iconBg: "bg-pink-500/15", iconColor: "text-pink-400", shadow: "hover:shadow-pink-500/20" },
-                { role: "staff", icon: ClipboardList, title: "Personal", desc: "Tareas y asistencia diaria", gradient: "from-teal-600 to-cyan-600", border: "border-teal-500/20 hover:border-teal-500/50", iconBg: "bg-teal-500/15", iconColor: "text-teal-400", shadow: "hover:shadow-teal-500/20" },
-                { role: "kitchen", icon: UtensilsCrossed, title: "Cocina", desc: "Menús y dietas especiales", gradient: "from-yellow-600 to-orange-500", border: "border-yellow-500/20 hover:border-yellow-500/50", iconBg: "bg-yellow-500/15", iconColor: "text-yellow-400", shadow: "hover:shadow-yellow-500/20" },
-                { role: "family", icon: Heart, title: "Familiar", desc: "Seguimiento de su ser querido", gradient: "from-orange-500 to-amber-500", border: "border-orange-500/20 hover:border-orange-500/50", iconBg: "bg-orange-500/15", iconColor: "text-orange-400", shadow: "hover:shadow-orange-500/20" },
+                { role: "admin", icon: ShieldCheck, title: "Administrador", desc: "Control total del sistema", gradient: "from-blue-600 to-indigo-600", border: "border-blue-500/20 hover:border-blue-500/50", iconBg: "bg-blue-500/15", iconColor: "text-blue-600 dark:text-blue-400", shadow: "hover:shadow-blue-500/20" },
+                { role: "doctor", icon: Stethoscope, title: "Médico", desc: "Expedientes y diagnósticos", gradient: "from-emerald-600 to-green-600", border: "border-emerald-500/20 hover:border-emerald-500/50", iconBg: "bg-emerald-500/15", iconColor: "text-emerald-600 dark:text-emerald-400", shadow: "hover:shadow-emerald-500/20" },
+                { role: "nurse", icon: Users, title: "Enfermería", desc: "Medicamentos y signos vitales", gradient: "from-pink-600 to-rose-600", border: "border-pink-500/20 hover:border-pink-500/50", iconBg: "bg-pink-500/15", iconColor: "text-pink-600 dark:text-pink-400", shadow: "hover:shadow-pink-500/20" },
+                { role: "staff", icon: ClipboardList, title: "Personal", desc: "Tareas y asistencia diaria", gradient: "from-teal-600 to-cyan-600", border: "border-teal-500/20 hover:border-teal-500/50", iconBg: "bg-teal-500/15", iconColor: "text-teal-600 dark:text-teal-400", shadow: "hover:shadow-teal-500/20" },
+                { role: "kitchen", icon: UtensilsCrossed, title: "Cocina", desc: "Menús y dietas especiales", gradient: "from-yellow-600 to-orange-500", border: "border-yellow-500/20 hover:border-yellow-500/50", iconBg: "bg-yellow-500/15", iconColor: "text-yellow-600 dark:text-yellow-400", shadow: "hover:shadow-yellow-500/20" },
+                { role: "family", icon: Heart, title: "Familiar", desc: "Seguimiento de su ser querido", gradient: "from-orange-500 to-amber-500", border: "border-orange-500/20 hover:border-orange-500/50", iconBg: "bg-orange-500/15", iconColor: "text-orange-600 dark:text-orange-400", shadow: "hover:shadow-orange-500/20" },
               ].map((r) => (
                 <StaggerItem key={r.role}>
                   <Link href={`/auth/login?role=${r.role}`}>
