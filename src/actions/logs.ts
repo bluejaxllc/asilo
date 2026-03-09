@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { sendGhlWebhook } from "@/lib/whatsapp";
+import { getCurrentFacilityId } from "@/lib/facility";
 import { auth } from "@/auth"; // Depending on how auth is setup, or just use email from args if verified in component, but better safe. 
 // Actually I used session in component and passed email, let's stick to passing email for simplicity if auth() helper isn't ready.
 // Better: get user by email inside action.
@@ -60,14 +61,20 @@ export const createLog = async (data: {
 
 export const getAllLogs = async (limit: number = 50, query?: string) => {
     try {
-        const whereClause = query ? {
-            OR: [
-                { patient: { name: { contains: query, mode: 'insensitive' as const } } },
-                { author: { name: { contains: query, mode: 'insensitive' as const } } },
-                { value: { contains: query, mode: 'insensitive' as const } },
-                { notes: { contains: query, mode: 'insensitive' as const } }
-            ]
-        } : {};
+        const facilityId = await getCurrentFacilityId();
+        const facilityFilter = facilityId ? { author: { facilityId } } : {};
+
+        const whereClause = {
+            ...facilityFilter,
+            ...(query ? {
+                OR: [
+                    { patient: { name: { contains: query, mode: 'insensitive' as const } } },
+                    { author: { name: { contains: query, mode: 'insensitive' as const } } },
+                    { value: { contains: query, mode: 'insensitive' as const } },
+                    { notes: { contains: query, mode: 'insensitive' as const } }
+                ]
+            } : {})
+        };
 
         const logs = await db.dailyLog.findMany({
             where: whereClause,
@@ -95,3 +102,4 @@ export const getAllLogs = async (limit: number = 50, query?: string) => {
         return [];
     }
 };
+

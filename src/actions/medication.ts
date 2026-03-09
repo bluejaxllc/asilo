@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { requireRole } from "@/lib/role-guard";
+import { getCurrentFacilityId } from "@/lib/facility";
 
 export const addMedication = async (data: {
     name: string;
@@ -16,13 +17,15 @@ export const addMedication = async (data: {
     if ("error" in check) return { error: check.error };
 
     try {
+        const facilityId = await getCurrentFacilityId();
         await db.medication.create({
             data: {
                 name: data.name,
                 stock: data.stockLevel,
                 minStock: data.minStock,
                 unit: data.unit,
-                expiryDate: data.expiryDate ? new Date(data.expiryDate) : null
+                expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
+                facilityId,
             }
         });
 
@@ -36,10 +39,13 @@ export const addMedication = async (data: {
 
 export const getAllMedications = async (query?: string) => {
     try {
+        const facilityId = await getCurrentFacilityId();
+        const facilityFilter = facilityId ? { facilityId } : {};
         const medications = await db.medication.findMany({
-            where: query ? {
-                name: { contains: query, mode: 'insensitive' }
-            } : undefined,
+            where: {
+                ...facilityFilter,
+                ...(query ? { name: { contains: query, mode: 'insensitive' as const } } : {})
+            },
             orderBy: { name: 'asc' }
         });
 

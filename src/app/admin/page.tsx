@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { auth } from "@/auth";
 import { AdminDashboardClient } from "./admin-dashboard-client";
 
 export const dynamic = 'force-dynamic';
@@ -20,34 +21,47 @@ const formatDate = () => {
 };
 
 export default async function AdminDashboardPage() {
-    const totalResidents = await db.patient.count();
+    const session = await auth();
+    const facilityId = (session?.user as any)?.facilityId as string | undefined;
+
+    // All queries scoped to the current user's facility
+    const facilityFilter = facilityId ? { facilityId } : { facilityId: "__none__" };
+
+    const totalResidents = await db.patient.count({
+        where: facilityFilter
+    });
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const activeStaff = await db.attendance.count({
         where: {
             checkIn: { gte: today },
-            checkOut: null
+            checkOut: null,
+            user: facilityFilter,
         }
     });
 
     const pendingTasks = await db.task.count({
-        where: { status: { not: "COMPLETED" } }
+        where: { status: { not: "COMPLETED" }, ...facilityFilter }
     });
 
     // Count medications where current stock is at or below the minimum threshold
-    const allMedications = await db.medication.findMany({ select: { stock: true, minStock: true } });
+    const allMedications = await db.medication.findMany({
+        where: facilityFilter,
+        select: { stock: true, minStock: true }
+    });
     const lowStockItems = allMedications.filter(m => m.stock <= m.minStock).length;
 
     const totalStaff = await db.user.count({
-        where: { role: { in: ["STAFF", "DOCTOR", "NURSE", "KITCHEN"] } }
+        where: { role: { in: ["STAFF", "DOCTOR", "NURSE", "KITCHEN"] }, ...facilityFilter }
     });
 
     const familyAccounts = await db.user.count({
-        where: { role: "FAMILY" }
+        where: { role: "FAMILY", ...facilityFilter }
     });
 
     const recentLogs = await db.dailyLog.findMany({
+        where: { author: facilityFilter },
         take: 6,
         orderBy: { createdAt: 'desc' },
         include: { author: true, patient: true }
@@ -55,7 +69,8 @@ export default async function AdminDashboardPage() {
 
     const upcomingTasks = await db.task.findMany({
         where: {
-            status: { not: "COMPLETED" }
+            status: { not: "COMPLETED" },
+            ...facilityFilter,
         },
         orderBy: {
             dueDate: 'asc'
