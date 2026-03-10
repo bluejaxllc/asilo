@@ -68,7 +68,7 @@ export async function getReportStats(daysBack: number = 7) {
     const dateFrom = new Date();
     dateFrom.setDate(dateFrom.getDate() - daysBack);
     const facilityId = await getCurrentFacilityId();
-    const fFilter = facilityId ? { facilityId } : {};
+    const fFilter = facilityId ? { facilityId } : { facilityId: "__none__" };
 
     const [totalLogs, completedTasks, totalPatients, medsAdministered, totalStaff] = await Promise.all([
         db.dailyLog.count({
@@ -93,7 +93,7 @@ export async function getActivityTrends(daysBack: number = 30) {
     const dateFrom = new Date();
     dateFrom.setDate(dateFrom.getDate() - daysBack);
     const facilityId = await getCurrentFacilityId();
-    const fFilter = facilityId ? { facilityId } : {};
+    const fFilter = facilityId ? { facilityId } : { facilityId: "__none__" };
 
     const logs = await db.dailyLog.findMany({
         where: { createdAt: { gte: dateFrom }, patient: fFilter },
@@ -138,7 +138,7 @@ export async function getStaffPerformance() {
     const facilityId = await getCurrentFacilityId();
 
     const staff = await db.user.findMany({
-        where: { role: { in: ["ADMIN", "STAFF"] }, ...(facilityId ? { facilityId } : {}) },
+        where: { role: { in: ["ADMIN", "STAFF"] }, ...(facilityId ? { facilityId } : { facilityId: "__none__" }) },
         include: {
             logs: { where: { createdAt: { gte: dateFrom } }, select: { id: true } },
             assignedTasks: { where: { status: "COMPLETED", updatedAt: { gte: dateFrom } }, select: { id: true } },
@@ -158,7 +158,7 @@ export async function getStaffPerformance() {
 export async function getOccupancyData() {
     const facilityId = await getCurrentFacilityId();
     const patients = await db.patient.findMany({
-        where: facilityId ? { facilityId } : {},
+        where: facilityId ? { facilityId } : { facilityId: "__none__" },
         select: { room: true, name: true, status: true },
         orderBy: { room: "asc" },
     });

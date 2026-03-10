@@ -75,7 +75,7 @@ export async function sendVerificationEmail(email: string, code: string) {
             throw new Error(`Failed to send verification email: ${error.message}`);
         }
 
-        console.log("[MAIL] Verification email sent to", email, "id:", data?.id);
+        // Email sent successfully
     } catch (err) {
         console.error("[MAIL] Failed to send email to", email, err);
         throw err;
@@ -161,7 +161,7 @@ export async function sendInviteEmail(
             throw new Error(`Failed to send invite email: ${error.message}`);
         }
 
-        console.log("[MAIL] Invite email sent to", email, "id:", data?.id);
+        // Invite email sent successfully
     } catch (err) {
         console.error("[MAIL] Failed to send invite email to", email, err);
         throw err;

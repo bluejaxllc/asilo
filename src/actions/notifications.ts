@@ -39,6 +39,11 @@ export async function getUnreadCount() {
 
 export async function markAsRead(id: string) {
     try {
+        const facilityId = await getCurrentFacilityId();
+        const notification = await db.notification.findUnique({ where: { id } });
+        if (!notification || notification.facilityId !== facilityId) {
+            return { error: "Notificación no encontrada" };
+        }
         await db.notification.update({
             where: { id },
             data: { read: true },
@@ -69,6 +74,11 @@ export async function markAllAsRead() {
 
 export async function deleteNotification(id: string) {
     try {
+        const facilityId = await getCurrentFacilityId();
+        const notification = await db.notification.findUnique({ where: { id } });
+        if (!notification || notification.facilityId !== facilityId) {
+            return { error: "Notificación no encontrada" };
+        }
         await db.notification.delete({
             where: { id },
         });

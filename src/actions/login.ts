@@ -16,7 +16,6 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     }
 
     const { email, password } = validatedFields.data;
-    console.log("Login Action: Attempting login for", email);
 
     // Fetch user to determine role for redirection
     const existingUser = await db.user.findUnique({
