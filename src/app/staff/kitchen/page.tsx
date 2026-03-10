@@ -34,7 +34,7 @@ export default async function KitchenPage({ searchParams }: KitchenPageProps) {
     const facilityId = await getCurrentFacilityId();
     const patients = await db.patient.findMany({
         where: {
-            ...(facilityId ? { facilityId } : {}),
+            ...(facilityId ? { facilityId } : { facilityId: "__none__" }),
             OR: [
                 { name: { contains: query, mode: 'insensitive' } },
                 { room: { contains: query, mode: 'insensitive' } }
