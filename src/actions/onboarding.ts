@@ -27,19 +27,22 @@ export const completeOnboarding = async (values: z.infer<typeof OnboardingSchema
             data: { name: facilityName }
         });
 
-        // 2. Create staff invitations (as actual users for now, password "123456")
+        // 2. Create staff accounts with random passwords (they'll use invite flow to set their own)
         if (staffEmails && staffEmails.length > 0) {
-            const hashedPassword = await bcrypt.hash("123456", 10);
+            const crypto = await import('crypto');
             for (const email of staffEmails) {
                 if (!email || email === userEmail) continue;
 
                 // Check if exists
                 const existing = await db.user.findUnique({ where: { email } });
                 if (!existing) {
+                    // Generate a cryptographically random password (user will never know this)
+                    const randomPassword = crypto.randomBytes(16).toString('hex');
+                    const hashedPassword = await bcrypt.hash(randomPassword, 10);
                     await db.user.create({
                         data: {
                             email,
-                            name: email.split("@")[0], // Default name from email
+                            name: email.split("@")[0],
                             role: "STAFF",
                             password: hashedPassword,
                             facilityId

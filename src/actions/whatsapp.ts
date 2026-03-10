@@ -1,7 +1,7 @@
 "use server";
 
 export async function sendWhatsAppAlert(to: string, message: string) {
-    console.log(`[WhatsApp Simulator] Sending to ${to}: ${message}`);
+    // WhatsApp simulator — no real messages sent
 
     // Simulate network latency
     await new Promise(resolve => setTimeout(resolve, 800));
