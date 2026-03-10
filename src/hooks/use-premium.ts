@@ -23,13 +23,6 @@ export function usePremium(): PremiumState {
             if (status === "loading") return;
 
             try {
-                // Hardcode logic for admin@asilo.com testing
-                if (session?.user?.email === "admin@asilo.com") {
-                    setTier("enterprise");
-                    setLoading(false);
-                    return;
-                }
-
                 const settings = await getSettings();
                 const sub = settings["subscription_tier"];
                 if (sub === "pro") setTier("pro");

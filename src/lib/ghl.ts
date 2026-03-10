@@ -226,7 +226,6 @@ export async function updateContactFields(
         throw new Error(`GHL API error: ${response.status}`);
     }
 
-    console.log(`[GHL] Updated ${customFields.length} fields on contact ${contactId}`);
 }
 
 // ─── Contact Notes (Audit Trail) ─────────────────────────────────────
@@ -256,7 +255,6 @@ export async function addContactNote(
     }
 
     const data = await response.json();
-    console.log(`[GHL] Added note to contact ${contactId}`);
     return data.note || data;
 }
 
