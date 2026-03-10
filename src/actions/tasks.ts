@@ -110,29 +110,39 @@ export const toggleTaskStatus = async (id: string, currentStatus: boolean) => {
 };
 
 export const startTask = async (taskId: string, userEmail: string) => {
-    const user = await db.user.findUnique({ where: { email: userEmail } });
-    if (!user) return { error: "Usuario no encontrado" };
+    try {
+        const user = await db.user.findUnique({ where: { email: userEmail } });
+        if (!user) return { error: "Usuario no encontrado" };
 
-    await db.task.update({
-        where: { id: taskId },
-        data: {
-            status: "IN_PROGRESS",
-            assignedToId: user.id
-        }
-    });
+        await db.task.update({
+            where: { id: taskId },
+            data: {
+                status: "IN_PROGRESS",
+                assignedToId: user.id
+            }
+        });
 
-    revalidatePath("/staff");
-    return { success: "Tarea iniciada" };
+        revalidatePath("/staff");
+        return { success: "Tarea iniciada" };
+    } catch (error) {
+        console.error("Error starting task:", error);
+        return { error: "Error al iniciar la tarea" };
+    }
 };
 
 export const completeTask = async (taskId: string) => {
-    await db.task.update({
-        where: { id: taskId },
-        data: {
-            status: "COMPLETED"
-        }
-    });
+    try {
+        await db.task.update({
+            where: { id: taskId },
+            data: {
+                status: "COMPLETED"
+            }
+        });
 
-    revalidatePath("/staff");
-    return { success: "Tarea completada" };
+        revalidatePath("/staff");
+        return { success: "Tarea completada" };
+    } catch (error) {
+        console.error("Error completing task:", error);
+        return { error: "Error al completar la tarea" };
+    }
 };

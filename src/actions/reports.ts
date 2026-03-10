@@ -30,9 +30,12 @@ export async function runTrendAudit() {
 }
 
 export async function getIAInsights() {
-    // Fetch the 5 most recent AI-generated notifications
+    const facilityId = await getCurrentFacilityId();
+    const fFilter = facilityId ? { facilityId } : { facilityId: "__none__" };
+
     const insights = await db.notification.findMany({
         where: {
+            ...fFilter,
             OR: [
                 { title: { contains: 'IA' } },
                 { title: { contains: '🚨' } },
@@ -77,9 +80,11 @@ export async function getReportStats(daysBack: number = 7) {
 export async function getActivityTrends(daysBack: number = 30) {
     const dateFrom = new Date();
     dateFrom.setDate(dateFrom.getDate() - daysBack);
+    const facilityId = await getCurrentFacilityId();
+    const fFilter = facilityId ? { facilityId } : {};
 
     const logs = await db.dailyLog.findMany({
-        where: { createdAt: { gte: dateFrom } },
+        where: { createdAt: { gte: dateFrom }, patient: fFilter },
         select: { type: true, createdAt: true },
         orderBy: { createdAt: "asc" },
     });
