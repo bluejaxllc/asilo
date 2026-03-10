@@ -11,9 +11,9 @@ export async function GET(request: NextRequest) {
 
     const facilityId = searchParams.get('facility');
 
-    // Basic security check
+    // Strict security check (Fail-Closed)
     const envSecret = process.env.ANTIGRAVITY_SECRET;
-    if (envSecret && secret !== envSecret) {
+    if (!envSecret || secret !== envSecret) {
         return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
@@ -43,9 +43,9 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { agentId, secret, facilityId } = body;
 
-        // Security check
+        // Strict security check (Fail-Closed)
         const envSecret = process.env.ANTIGRAVITY_SECRET;
-        if (envSecret && secret !== envSecret) {
+        if (!envSecret || secret !== envSecret) {
             return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
         }
 

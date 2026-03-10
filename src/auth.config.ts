@@ -19,7 +19,6 @@ export default {
             return token;
         },
         async session({ session, token }) {
-            console.log("AuthConfig Session Callback Token:", JSON.stringify(token, null, 2));
             if (token.sub && session.user) {
                 session.user.id = token.sub;
             }

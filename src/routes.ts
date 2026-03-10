@@ -9,6 +9,8 @@ export const publicRoutes = [
     "/api/antigravity/run",
     "/api/webhook/nurse-voice",
     "/api/webhook/family-whatsapp",
+    "/api/webhooks/bluejax-payment",
+    "/api/cron/birthday",
 ];
 
 /**
