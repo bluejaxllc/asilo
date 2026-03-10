@@ -29,7 +29,7 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
         const fetchStatus = async () => {
             if (session?.user?.email) {
                 try {
-                    const status = await getAttendanceStatus(session.user.email);
+                    const status = await getAttendanceStatus();
 
                     if (status?.isClockedIn && status.startTime) {
                         setIsClockedIn(true);
@@ -81,7 +81,7 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
         }
 
         try {
-            const result = await checkIn(session.user.email);
+            const result = await checkIn();
 
             if (result.error) {
                 toast.error(result.error);
@@ -108,7 +108,7 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
         }
 
         try {
-            const result = await checkOut(session.user.email);
+            const result = await checkOut();
             if (result.error) {
                 // Check for various error messages that imply we are already out
                 if (result.error === "No has registrado ninguna entrada hoy" ||

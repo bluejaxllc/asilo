@@ -28,7 +28,8 @@ Genera un mensaje de alerta amistoso (máximo 2 oraciones) indicando que el mode
                 title: `🎯 Prospectos Calificados`,
                 message: message,
                 type: 'INFO',
-                recipientRole: 'ADMIN'
+                recipientRole: 'ADMIN',
+                facilityId: context.facilityId
             }
         });
 

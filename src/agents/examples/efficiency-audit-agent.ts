@@ -16,7 +16,8 @@ export class EfficiencyAuditAgent implements Agent {
         // Fetch tasks from the last 24h
         const tasks = await db.task.findMany({
             where: {
-                createdAt: { gte: twentyFourHoursAgo }
+                createdAt: { gte: twentyFourHoursAgo },
+                patient: { facilityId: context.facilityId }
             }
         });
 
@@ -60,7 +61,8 @@ Si el score es bueno (>85%), da un mensaje positivo resaltando el buen rendimien
                 title: `📊 Reporte de Eficiencia: ${score}%`,
                 message: message,
                 type: aiStatus,
-                recipientRole: 'ADMIN'
+                recipientRole: 'ADMIN',
+                facilityId: context.facilityId
             }
         });
 

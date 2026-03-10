@@ -14,21 +14,23 @@ export class PdfExportAgent implements Agent {
 
         const [patients, logs, tasks, medications, staff] = await Promise.all([
             db.patient.findMany({
+                where: { facilityId: context.facilityId },
                 select: { name: true, room: true, status: true },
                 orderBy: { room: 'asc' },
             }),
             db.dailyLog.findMany({
-                where: { createdAt: { gte: weekAgo } },
+                where: { createdAt: { gte: weekAgo }, patient: { facilityId: context.facilityId } },
                 select: { type: true },
             }),
             db.task.findMany({
-                where: { updatedAt: { gte: weekAgo } },
+                where: { updatedAt: { gte: weekAgo }, patient: { facilityId: context.facilityId } },
                 select: { status: true },
             }),
             db.medication.findMany({
+                where: { facilityId: context.facilityId },
                 select: { name: true, stock: true, minStock: true, unit: true },
             }),
-            db.user.count({ where: { role: { in: ['STAFF', 'DOCTOR', 'NURSE', 'KITCHEN'] } } }),
+            db.user.count({ where: { role: { in: ['STAFF', 'DOCTOR', 'NURSE', 'KITCHEN'] }, facilityId: context.facilityId } }),
         ]);
 
         // Aggregate log types
@@ -102,6 +104,7 @@ Genera un resumen ejecutivo de 3-4 oraciones para el director del asilo. Formal 
                 message: executiveSummary,
                 type: 'INFO',
                 recipientRole: 'ADMIN',
+                facilityId: context.facilityId,
             },
         });
 

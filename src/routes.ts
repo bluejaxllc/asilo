@@ -7,7 +7,6 @@ export const publicRoutes = [
     "/",
     "/upgrade",
     "/api/antigravity/run",
-    "/api/debug-auth",
     "/api/webhook/nurse-voice",
     "/api/webhook/family-whatsapp",
 ];

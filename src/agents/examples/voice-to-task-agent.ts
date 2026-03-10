@@ -19,6 +19,7 @@ export class VoiceToTaskAgent implements Agent {
                 type: 'NOTE',
                 createdAt: { gte: since },
                 notes: { not: null },
+                patient: { facilityId: context.facilityId },
             },
             include: {
                 patient: { select: { id: true, name: true } },
@@ -108,6 +109,7 @@ Si no hay tareas accionables, responde: []`;
                     message,
                     type: 'INFO',
                     recipientRole: 'STAFF',
+                    facilityId: context.facilityId,
                 },
             });
         }

@@ -58,7 +58,8 @@ Escribe un "Insight de IA" (máximo 2 oraciones) indicando el estado del embudo 
                 title: '📊 Insight de Marketing',
                 message: message,
                 type: status,
-                recipientRole: 'ADMIN'
+                recipientRole: 'ADMIN',
+                facilityId: context.facilityId
             }
         });
 

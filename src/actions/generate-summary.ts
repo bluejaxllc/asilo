@@ -7,14 +7,18 @@ import { generateObject } from "ai";
 import { google } from "@ai-sdk/google";
 import { z } from "zod";
 import { sendGhlWebhook } from "@/lib/whatsapp";
+import { getCurrentFacilityId } from "@/lib/facility";
 
 export const generatePatientSummary = async (patientId: string) => {
     const roleCheck = await requireRole("ADMIN", "DOCTOR", "NURSE");
     if ("error" in roleCheck) return { error: roleCheck.error };
 
     try {
+        const facilityId = await getCurrentFacilityId();
+        if (!facilityId) return { error: "No autorizado." };
+
         const patient = await db.patient.findUnique({
-            where: { id: patientId },
+            where: { id: patientId, facilityId },
             include: {
                 logs: {
                     where: {

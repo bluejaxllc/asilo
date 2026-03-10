@@ -16,9 +16,9 @@ export class LogAnalysisAgent implements Agent {
         const weekStart = new Date(todayStart); weekStart.setDate(weekStart.getDate() - 7);
 
         const [logsToday, logsYesterday, logsWeek] = await Promise.all([
-            db.dailyLog.count({ where: { createdAt: { gte: todayStart } } }),
-            db.dailyLog.count({ where: { createdAt: { gte: yesterdayStart, lt: todayStart } } }),
-            db.dailyLog.count({ where: { createdAt: { gte: weekStart } } }),
+            db.dailyLog.count({ where: { createdAt: { gte: todayStart }, patient: { facilityId: context.facilityId } } }),
+            db.dailyLog.count({ where: { createdAt: { gte: yesterdayStart, lt: todayStart }, patient: { facilityId: context.facilityId } } }),
+            db.dailyLog.count({ where: { createdAt: { gte: weekStart }, patient: { facilityId: context.facilityId } } }),
         ]);
 
         const weeklyAvg = Math.round(logsWeek / 7);
@@ -28,7 +28,7 @@ export class LogAnalysisAgent implements Agent {
 
         // Classify log types for today
         const todayLogs = await db.dailyLog.findMany({
-            where: { createdAt: { gte: todayStart } },
+            where: { createdAt: { gte: todayStart }, patient: { facilityId: context.facilityId } },
             select: { type: true },
         });
         const typeCounts: Record<string, number> = {};
@@ -70,6 +70,7 @@ Genera un resumen ejecutivo de máximo 3 oraciones para el administrador.`;
                 message,
                 type: hasAnomaly ? 'WARNING' : 'INFO',
                 recipientRole: 'ADMIN',
+                facilityId: context.facilityId,
             },
         });
 

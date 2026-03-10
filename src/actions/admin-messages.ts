@@ -4,17 +4,22 @@ import { db } from "@/lib/db";
 import { getCurrentFacilityId } from "@/lib/facility";
 
 export async function getIASuggestion(patientId: string) {
+    const facilityId = await getCurrentFacilityId();
+    if (!facilityId) return { success: false, suggestion: "Error: No autorizado." };
+
     // In a real scenario, this would send the message history to a LLM provider.
     // We'll mock it based on the patient's context.
 
     const [patient, lastMessages] = await Promise.all([
-        db.patient.findUnique({ where: { id: patientId } }),
+        db.patient.findUnique({ where: { id: patientId, facilityId } }),
         db.familyMessage.findMany({
-            where: { patientId },
+            where: { patientId, patient: { facilityId } },
             orderBy: { createdAt: "desc" },
             take: 3
         })
     ]);
+
+    if (!patient) return { success: false, suggestion: "Error: Residente no encontrado." };
 
     const lastMsg = lastMessages[0]?.content.toLowerCase() || "";
     let suggestion = "";
@@ -37,9 +42,11 @@ export async function getIASuggestion(patientId: string) {
 
 export async function getAllConversations() {
     const facilityId = await getCurrentFacilityId();
+    if (!facilityId) return [];
+
     const patients = await db.patient.findMany({
         where: {
-            ...(facilityId ? { facilityId } : {}),
+            facilityId,
             familyMessages: { some: {} }
         },
         include: {
@@ -73,9 +80,11 @@ export async function getAllConversations() {
 
 export async function getUnansweredCount() {
     const facilityId = await getCurrentFacilityId();
+    if (!facilityId) return 0;
+
     const patients = await db.patient.findMany({
         where: {
-            ...(facilityId ? { facilityId } : {}),
+            facilityId,
             familyMessages: { some: {} }
         },
         include: {

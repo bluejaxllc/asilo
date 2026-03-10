@@ -11,10 +11,10 @@ export class ScheduleOptimizerAgent implements Agent {
         console.log(`[ScheduleOptimizerAgent] Analyzing historical schedule and task load...`);
 
         // Get an overview of all staff
-        const staff = await db.user.count({ where: { role: { in: ['STAFF', 'ADMIN', 'DOCTOR', 'NURSE'] } } });
+        const staff = await db.user.count({ where: { role: { in: ['STAFF', 'ADMIN', 'DOCTOR', 'NURSE'] }, facilityId: context.facilityId } });
 
         // Get count of open tasks
-        const pendingTasks = await db.task.count({ where: { status: 'PENDING' } });
+        const pendingTasks = await db.task.count({ where: { status: 'PENDING', patient: { facilityId: context.facilityId } } });
 
         // Calculate a dummy "optimization ratio" based on staff to tasks
         let ratio = 0;
@@ -44,7 +44,8 @@ Si el ratio es > 5, sugiere reasignación urgente. Si es bajo, sugiere optimizac
                 title: `⚡ Turnos Optimizados`,
                 message: message,
                 type: 'INFO',
-                recipientRole: 'ADMIN'
+                recipientRole: 'ADMIN',
+                facilityId: context.facilityId
             }
         });
 

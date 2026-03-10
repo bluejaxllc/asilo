@@ -62,7 +62,7 @@ export default function StaffPage() {
     const fetchTasks = async () => {
         if (session?.user?.email) {
             setLoading(true);
-            const userTasks = await getMyTasks(session.user.email);
+            const userTasks = await getMyTasks();
 
             const mappedTasks: UITask[] = userTasks.map((t: any) => {
                 let priorityLabel: "ALTA" | "MEDIA" | "BAJA" = "MEDIA";

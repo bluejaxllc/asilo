@@ -91,8 +91,11 @@ export const createPatient = async (values: z.infer<typeof PatientSchema>) => {
 
 export const getPatientById = async (id: string) => {
     try {
+        const facilityId = await getCurrentFacilityId();
+        if (!facilityId) return null;
+
         const patient = await db.patient.findUnique({
-            where: { id },
+            where: { id, facilityId },
             include: {
                 logs: {
                     orderBy: { createdAt: 'desc' },
@@ -135,8 +138,10 @@ export const updatePatient = async (
 
     try {
         const facilityId = await getCurrentFacilityId();
+        if (!facilityId) return { error: "No autorizado" };
+
         const updatedPatient = await db.patient.update({
-            where: { id },
+            where: { id, facilityId },
             data: {
                 ...(data.name !== undefined && { name: data.name }),
                 ...(data.room !== undefined && { room: data.room }),

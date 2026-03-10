@@ -11,13 +11,14 @@ export class ClinicalNotesAgent implements Agent {
         console.log(`[ClinicalNotesAgent] Synthesizing recent clinical logs...`);
 
         // Find the most recently active admin to author the simulated note if needed
-        const admin = await db.user.findFirst({ where: { role: 'ADMIN' } });
+        const admin = await db.user.findFirst({ where: { role: 'ADMIN', facilityId: context.facilityId } });
 
         // Find recent vitals and incident logs
         const recentLogs = await db.dailyLog.findMany({
             where: {
                 type: { in: ['VITALS', 'INCIDENT', 'MEDS'] },
-                createdAt: { gte: new Date(Date.now() - 48 * 60 * 60 * 1000) } // last 48 hours
+                createdAt: { gte: new Date(Date.now() - 48 * 60 * 60 * 1000) }, // last 48 hours
+                patient: { facilityId: context.facilityId }
             },
             include: { patient: true }
         });
@@ -73,7 +74,8 @@ Registros en formato JSON: ${JSON.stringify(data.records)}`;
                         message: `Se ha sintetizado automáticamente un resumen clínico basado en sus registros de las últimas 48h.`,
                         type: 'INFO',
                         recipientRole: 'ADMIN',
-                        patientId: patientId
+                        patientId: patientId,
+                        facilityId: context.facilityId
                     }
                 });
             }

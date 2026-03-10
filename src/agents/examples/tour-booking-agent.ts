@@ -12,6 +12,7 @@ export class TourBookingAgent implements Agent {
 
         // Get occupancy data
         const patients = await db.patient.findMany({
+            where: { facilityId: context.facilityId },
             select: { room: true, status: true },
         });
 
@@ -24,6 +25,7 @@ export class TourBookingAgent implements Agent {
             where: {
                 createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
                 title: { contains: 'tour', mode: 'insensitive' as any },
+                facilityId: context.facilityId,
             },
         });
 
@@ -57,6 +59,7 @@ Máximo 4 oraciones.`;
                 message: recommendations,
                 type: 'INFO',
                 recipientRole: 'ADMIN',
+                facilityId: context.facilityId,
             },
         });
 

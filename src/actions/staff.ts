@@ -8,10 +8,14 @@ export const getStaffAttendanceHistory = async (userId: string, limit: number = 
         const session = await auth();
         if (!session?.user?.id) return [];
 
-        // Currently allowing a user to see their own history, or an ADMIN to see anyone's history
-        // Real-world might need facilityId matching here too for admins
+        // Admins can see others' history, but strictly only within their own facility.
         const reqUser = session.user as any;
         if (reqUser.id !== userId && reqUser.role !== "ADMIN") return [];
+
+        if (reqUser.role === "ADMIN" && reqUser.id !== userId) {
+            const targetUser = await db.user.findUnique({ where: { id: userId, facilityId: reqUser.facilityId } });
+            if (!targetUser) return []; // Target is from another facility
+        }
 
         const history = await db.attendance.findMany({
             where: {

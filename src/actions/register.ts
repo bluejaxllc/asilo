@@ -28,8 +28,9 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Public signups are always ADMIN (facility owner); internal staff use role param
-    const userRole = role || "ADMIN";
+    // Public signups are always ADMIN (facility owner) unless explicitly STAFF. 
+    // We strictly block SUPER_ADMIN escalation from the public endpoint.
+    const userRole = (role === "STAFF") ? "STAFF" : "ADMIN";
 
     // Upsert into PendingRegistration (replaces any previous unverified attempt)
     await db.pendingRegistration.upsert({

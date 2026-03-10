@@ -15,12 +15,23 @@ export const createLog = async (data: {
     patientId: string;
     userEmail: string;
 }) => {
+    const facilityId = await getCurrentFacilityId();
+    if (!facilityId) return { error: "No autorizado" };
+
     const user = await db.user.findUnique({
-        where: { email: data.userEmail }
+        where: { email: data.userEmail, facilityId }
     });
 
     if (!user) {
-        return { error: "Usuario no encontrado" };
+        return { error: "Usuario no encontrado en la instalación" };
+    }
+
+    const patient = await db.patient.findUnique({
+        where: { id: data.patientId }
+    });
+
+    if (!patient || patient.facilityId !== facilityId) {
+        return { error: "Residente no pertenece a esta instalación" };
     }
 
     try {
@@ -35,7 +46,6 @@ export const createLog = async (data: {
         });
 
         if (data.type === "INCIDENT") {
-            const patient = await db.patient.findUnique({ where: { id: data.patientId } });
             if (patient) {
                 await sendGhlWebhook({
                     type: "INCIDENT",

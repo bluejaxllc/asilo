@@ -17,7 +17,8 @@ export class TrendAnalysisAgent implements Agent {
         const logs = await db.dailyLog.findMany({
             where: {
                 type: 'VITALS',
-                createdAt: { gte: sevenDaysAgo }
+                createdAt: { gte: sevenDaysAgo },
+                patient: { facilityId: context.facilityId }
             },
             include: { patient: true },
             orderBy: { createdAt: 'asc' }
@@ -54,7 +55,8 @@ Datos JSON: ${JSON.stringify(trend.data)}`;
                                 message: aiAnalysis.trim(),
                                 type: 'WARNING',
                                 recipientRole: 'ADMIN',
-                                patientId: id
+                                patientId: id,
+                                facilityId: context.facilityId
                             }
                         });
                     }

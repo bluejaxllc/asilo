@@ -40,6 +40,13 @@ export const getPatientActivity = async (patientId: string) => {
         return []; // Unauthorized
     }
 
+    if (dbUser?.role !== 'FAMILY') {
+        const patientCheck = await db.patient.findUnique({
+            where: { id: patientId, facilityId: dbUser?.facilityId || 'NO_FACILITY' }
+        });
+        if (!patientCheck) return []; // Unauthorized: Patient belongs to another facility
+    }
+
     const logs = await db.dailyLog.findMany({
         where: {
             patientId: patientId,

@@ -13,7 +13,7 @@ export class SmartReplyAgent implements Agent {
         // Find family messages without a staff reply
         // Strategy: get unique patient conversations, check if the latest message is from family
         const recentFamilyMessages = await db.familyMessage.findMany({
-            where: { isFromFamily: true },
+            where: { isFromFamily: true, patient: { facilityId: context.facilityId } },
             orderBy: { createdAt: 'desc' },
             take: 30,
             include: {
@@ -90,6 +90,7 @@ Genera una respuesta amable, profesional y breve (máximo 2 oraciones). Solo usa
                 message: `Se generaron ${suggestions.length} sugerencias de respuesta para mensajes familiares pendientes.`,
                 type: unanswered.length >= 5 ? 'WARNING' : 'INFO',
                 recipientRole: 'STAFF',
+                facilityId: context.facilityId,
             },
         });
 

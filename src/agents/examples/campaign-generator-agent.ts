@@ -12,12 +12,13 @@ export class CampaignGeneratorAgent implements Agent {
 
         // Gather facility stats for content generation
         const [patientCount, staffCount, familyCount, recentLogs] = await Promise.all([
-            db.patient.count(),
-            db.user.count({ where: { role: { in: ['STAFF', 'DOCTOR', 'NURSE'] } } }),
-            db.user.count({ where: { role: 'FAMILY' } }),
+            db.patient.count({ where: { facilityId: context.facilityId } }),
+            db.user.count({ where: { role: { in: ['STAFF', 'DOCTOR', 'NURSE'] }, facilityId: context.facilityId } }),
+            db.user.count({ where: { role: 'FAMILY', facilityId: context.facilityId } }),
             db.dailyLog.count({
                 where: {
                     createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+                    patient: { facilityId: context.facilityId }
                 },
             }),
         ]);
@@ -46,6 +47,7 @@ Formato: Texto plano con secciones marcadas. Máximo 200 palabras total. Escribe
                 message: `Borrador de newsletter listo. ${draft.length} caracteres generados con estadísticas actualizadas.`,
                 type: 'INFO',
                 recipientRole: 'ADMIN',
+                facilityId: context.facilityId,
             },
         });
 

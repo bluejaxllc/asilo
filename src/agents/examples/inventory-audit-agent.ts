@@ -10,7 +10,7 @@ export class InventoryAuditAgent implements Agent {
         console.log(`[InventoryAuditAgent] Analyzing inventory levels...`);
 
         // Find items that are low or out of stock
-        const medications = await db.medication.findMany();
+        const medications = await db.medication.findMany({ where: { facilityId: context.facilityId } });
         const lowStockItems = medications.filter(m => m.stock <= m.minStock);
 
         const count = lowStockItems.length;
@@ -21,7 +21,8 @@ export class InventoryAuditAgent implements Agent {
                     title: `📦 Análisis de Inventario`,
                     message: `Se identificaron ${count} medicamentos con stock bajo/agotado. Sugerencia de reorden en los próximos 4 días generada.`,
                     type: 'WARNING',
-                    recipientRole: 'ADMIN'
+                    recipientRole: 'ADMIN',
+                    facilityId: context.facilityId
                 }
             });
 

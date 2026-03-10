@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
 
 // Get latest attendance for today
 export const getLatestTodayAttendance = async (userId: string) => {
@@ -24,7 +25,14 @@ export const getLatestTodayAttendance = async (userId: string) => {
 };
 
 // Check In
-export const checkIn = async (email: string) => {
+export const checkIn = async () => {
+    const session = await auth();
+    const email = session?.user?.email;
+
+    if (!email) {
+        return { error: "No autorizado. Inicie sesión para continuar." };
+    }
+
     console.log("ServerAction: checkIn called for", email);
     const user = await db.user.findUnique({
         where: { email }
@@ -54,7 +62,13 @@ export const checkIn = async (email: string) => {
 };
 
 // Check Out
-export const checkOut = async (email: string) => {
+export const checkOut = async () => {
+    const session = await auth();
+    const email = session?.user?.email;
+
+    if (!email) {
+        return { error: "No autorizado. Inicie sesión para continuar." };
+    }
     const user = await db.user.findUnique({
         where: { email }
     });
@@ -88,7 +102,12 @@ export const checkOut = async (email: string) => {
     return { success: "Salida registrada correctamente" };
 };
 
-export const getAttendanceStatus = async (email: string) => {
+export const getAttendanceStatus = async () => {
+    const session = await auth();
+    const email = session?.user?.email;
+
+    if (!email) return null;
+
     const user = await db.user.findUnique({
         where: { email }
     });

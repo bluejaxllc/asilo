@@ -16,6 +16,7 @@ export class MessageAlertAgent implements Agent {
         // Get all patients with messages
         const patients = await db.patient.findMany({
             where: {
+                facilityId: context.facilityId,
                 familyMessages: { some: {} }
             },
             include: {
@@ -64,6 +65,7 @@ Genera una alerta amistosa (máximo 2 oraciones) indicando al personal administr
                     title: `💬 Mensaje sin respuesta: ${patient.name}`,
                     message: aiMessage,
                     type: 'WARNING',
+                    facilityId: context.facilityId
                 }
             });
         }

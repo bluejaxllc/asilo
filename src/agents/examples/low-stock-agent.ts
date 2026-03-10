@@ -13,7 +13,7 @@ export class LowStockAgent implements Agent {
         console.log(`[LowStockAgent] Starting inventory audit...`);
 
         // Fetch all medications and filter in JS (Prisma doesn't support column-to-column comparison)
-        const allMedications = await db.medication.findMany();
+        const allMedications = await db.medication.findMany({ where: { facilityId: context.facilityId } });
         const lowStockItems = allMedications.filter(med => med.stock <= med.minStock);
 
         if (lowStockItems.length === 0) {
@@ -50,6 +50,7 @@ Genera un mensaje de alerta de inventario (máximo 3 oraciones) para el administ
                 title: `📦 Alerta de Inventario IA`,
                 message: message,
                 type: lowStockItems.some(i => i.stock === 0) ? 'CRITICAL' : 'WARNING',
+                facilityId: context.facilityId,
             }
         });
 

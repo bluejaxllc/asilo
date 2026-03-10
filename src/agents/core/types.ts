@@ -8,6 +8,8 @@ export interface AgentResult {
 export interface AgentContext {
     // useful for passing specialized loggers or scoped prismas later
     runId: string;
+    // required for multi-tenant data isolation
+    facilityId: string;
 }
 
 export interface Agent {

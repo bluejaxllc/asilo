@@ -43,7 +43,8 @@ Escribe un borrador de respuesta (máximo 2-3 oraciones) que sea empático, prof
                     title: `⭐ Reseña de ${review.author} (${review.rating}/5)`,
                     message: `IA Sugiere respuesta: "${draft}"`,
                     type: review.rating < 3 ? 'WARNING' : 'INFO',
-                    recipientRole: 'ADMIN'
+                    recipientRole: 'ADMIN',
+                    facilityId: context.facilityId
                 }
             });
         }

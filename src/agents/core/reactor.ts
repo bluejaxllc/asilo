@@ -32,9 +32,9 @@ export class AgentReactor {
     }
 
     /**
-     * Runs a specific agent by ID
+     * Runs a specific agent by ID, strictly scoped to a facility
      */
-    async run(agentId: string): Promise<AgentResult> {
+    async run(agentId: string, facilityId: string): Promise<AgentResult> {
         const agent = this.get(agentId);
         if (!agent) {
             return { success: false, message: `Agent ${agentId} not found.` };
@@ -48,7 +48,8 @@ export class AgentReactor {
         this.isRunning.set(agentId, true);
 
         const context: AgentContext = {
-            runId: crypto.randomUUID()
+            runId: crypto.randomUUID(),
+            facilityId
         };
 
         try {

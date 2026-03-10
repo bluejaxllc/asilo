@@ -37,12 +37,12 @@ function validateWebhookSecret(request: Request): boolean {
     const secret = request.headers.get('x-webhook-secret');
     const expectedSecret = process.env.WEBHOOK_SECRET;
 
-    if (!expectedSecret) {
-        console.warn('[Nurse Webhook] WEBHOOK_SECRET not configured — accepting all requests');
-        return true;
+    if (!expectedSecret || secret !== expectedSecret) {
+        console.error('[Nurse Webhook] Unauthorized — invalid or missing webhook secret');
+        return false;
     }
 
-    return secret === expectedSecret;
+    return true;
 }
 
 // ─── Main Handler ────────────────────────────────────────────────────

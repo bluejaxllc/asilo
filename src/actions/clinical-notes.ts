@@ -15,6 +15,12 @@ export const addClinicalNote = async (patientId: string, content: string) => {
     }
 
     try {
+        const user = await db.user.findUnique({ where: { id: session.user.id! } });
+        const facilityId = user?.facilityId;
+
+        const patient = await db.patient.findUnique({ where: { id: patientId, facilityId } });
+        if (!patient) return { error: "El paciente no pertenece a tu instalación" };
+
         await db.dailyLog.create({
             data: {
                 type: "NOTE",

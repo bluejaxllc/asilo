@@ -14,7 +14,7 @@ export class MessageAuditAgent implements Agent {
         since.setDate(since.getDate() - 7);
 
         const messages = await db.familyMessage.findMany({
-            where: { createdAt: { gte: since }, isFromFamily: true },
+            where: { createdAt: { gte: since }, isFromFamily: true, patient: { facilityId: context.facilityId } },
             select: { content: true, createdAt: true, patient: { select: { name: true } } },
             orderBy: { createdAt: 'desc' },
             take: 50,
@@ -55,6 +55,7 @@ ${messageList}`;
                 message: analysis,
                 type: hasUrgent ? 'WARNING' : 'INFO',
                 recipientRole: 'ADMIN',
+                facilityId: context.facilityId,
             },
         });
 

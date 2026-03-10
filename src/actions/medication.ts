@@ -82,6 +82,9 @@ export const logMedicationAdministration = async (patientId: string, medicationN
     const session = check.session;
 
     try {
+        const facilityId = await getCurrentFacilityId();
+        const patient = await db.patient.findUnique({ where: { id: patientId, facilityId } });
+        if (!patient) return { error: "Paciente no pertenece a la instalación" };
 
         await db.dailyLog.create({
             data: {
@@ -103,6 +106,12 @@ export const logMedicationAdministration = async (patientId: string, medicationN
 
 export const updateMedicationStock = async (id: string, newStock: number) => {
     try {
+        const facilityId = await getCurrentFacilityId();
+        if (!facilityId) return { error: "No autorizado" };
+
+        const med = await db.medication.findUnique({ where: { id, facilityId } });
+        if (!med) return { error: "Medicamento no encontrado en la instalación" };
+
         await db.medication.update({
             where: { id },
             data: { stock: newStock }
@@ -118,6 +127,12 @@ export const updateMedicationStock = async (id: string, newStock: number) => {
 
 export const deleteMedication = async (id: string) => {
     try {
+        const facilityId = await getCurrentFacilityId();
+        if (!facilityId) return { error: "No autorizado" };
+
+        const med = await db.medication.findUnique({ where: { id, facilityId } });
+        if (!med) return { error: "Medicamento no encontrado en la instalación" };
+
         await db.medication.delete({
             where: { id }
         });
@@ -132,6 +147,14 @@ export const deleteMedication = async (id: string) => {
 
 export const assignMedication = async (patientId: string, medicationId: string, dosage: string, schedule: string) => {
     try {
+        const facilityId = await getCurrentFacilityId();
+        if (!facilityId) return { error: "No autorizado" };
+
+        const patient = await db.patient.findUnique({ where: { id: patientId, facilityId } });
+        const med = await db.medication.findUnique({ where: { id: medicationId, facilityId } });
+
+        if (!patient || !med) return { error: "Validación fallida: El recurso no pertenece a la instalación" };
+
         await db.patientMedication.create({
             data: {
                 patientId,

@@ -19,6 +19,7 @@ export class AttendanceAuditAgent implements Agent {
             where: {
                 createdAt: { gte: today },
                 checkOut: null,
+                user: { facilityId: context.facilityId }
             },
             include: {
                 user: { select: { name: true, email: true, role: true } }
@@ -57,6 +58,7 @@ IMPORTANTE: Responde solo con el texto del mensaje, sin comillas ni markdown.`;
                     title: `🕐 Salida pendiente: ${record.user.name || record.user.email}`,
                     message: aiMessage,
                     type: 'WARNING',
+                    facilityId: context.facilityId,
                 }
             });
         }

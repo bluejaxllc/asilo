@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { getCurrentFacilityId } from "@/lib/facility";
+import { auth } from "@/auth";
 
 export const getStaffList = async () => {
     const facilityId = await getCurrentFacilityId();
@@ -16,8 +17,13 @@ export const getStaffList = async () => {
     });
 };
 
-export const getMyTasks = async (email: string) => {
+export const getMyTasks = async () => {
     try {
+        const session = await auth();
+        const email = session?.user?.email;
+
+        if (!email) return [];
+
         const user = await db.user.findUnique({
             where: { email }
         });
@@ -66,6 +72,18 @@ export const createTask = async (
 ) => {
     try {
         const facilityId = await getCurrentFacilityId();
+        if (!facilityId) return { error: "No autorizado" };
+
+        // Ownership checks before creating the task
+        if (patientId) {
+            const patient = await db.patient.findUnique({ where: { id: patientId, facilityId } });
+            if (!patient) return { error: "Paciente no pertenece a esta instalación" };
+        }
+        if (assignedToId) {
+            const assignee = await db.user.findUnique({ where: { id: assignedToId, facilityId } });
+            if (!assignee) return { error: "Usuario asignado no pertenece a esta instalación" };
+        }
+
         await db.task.create({
             data: {
                 title,
@@ -87,6 +105,12 @@ export const createTask = async (
 
 export const deleteTask = async (id: string) => {
     try {
+        const facilityId = await getCurrentFacilityId();
+        if (!facilityId) return { error: "No autorizado" };
+
+        const task = await db.task.findUnique({ where: { id } });
+        if (!task || task.facilityId !== facilityId) return { error: "Tarea no encontrada o no pertenece a la instalación" };
+
         await db.task.delete({ where: { id } });
         revalidatePath("/admin/tasks");
         revalidatePath("/staff");
@@ -98,6 +122,12 @@ export const deleteTask = async (id: string) => {
 
 export const toggleTaskStatus = async (id: string, currentStatus: boolean) => {
     try {
+        const facilityId = await getCurrentFacilityId();
+        if (!facilityId) return { error: "No autorizado" };
+
+        const task = await db.task.findUnique({ where: { id } });
+        if (!task || task.facilityId !== facilityId) return { error: "Tarea no encontrada o no pertenece a la instalación" };
+
         await db.task.update({
             where: { id },
             data: { status: currentStatus ? "PENDING" : "COMPLETED" }
@@ -111,8 +141,18 @@ export const toggleTaskStatus = async (id: string, currentStatus: boolean) => {
 
 export const startTask = async (taskId: string, userEmail: string) => {
     try {
-        const user = await db.user.findUnique({ where: { email: userEmail } });
-        if (!user) return { error: "Usuario no encontrado" };
+        const facilityId = await getCurrentFacilityId();
+        if (!facilityId) return { error: "No autorizado" };
+
+        const user = await db.user.findUnique({
+            where: { email: userEmail, facilityId }
+        });
+        if (!user) return { error: "Usuario no encontrado en la instalación" };
+
+        const task = await db.task.findUnique({ where: { id: taskId } });
+        if (!task || task.facilityId !== facilityId) {
+            return { error: "Tarea no encontrada o no pertenece a esta instalación" };
+        }
 
         await db.task.update({
             where: { id: taskId },
@@ -132,6 +172,14 @@ export const startTask = async (taskId: string, userEmail: string) => {
 
 export const completeTask = async (taskId: string) => {
     try {
+        const facilityId = await getCurrentFacilityId();
+        if (!facilityId) return { error: "No autorizado" };
+
+        const task = await db.task.findUnique({ where: { id: taskId } });
+        if (!task || task.facilityId !== facilityId) {
+            return { error: "Tarea no encontrada o no pertenece a esta instalación" };
+        }
+
         await db.task.update({
             where: { id: taskId },
             data: {

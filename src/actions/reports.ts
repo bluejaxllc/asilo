@@ -6,27 +6,39 @@ import "@/agents/core/registry";
 import { getCurrentFacilityId } from "@/lib/facility";
 
 export async function runRiskAudit() {
-    return await reactor.run('patient-risk-audit');
+    const facilityId = await getCurrentFacilityId();
+    if (!facilityId) throw new Error("Acceso denegado: facilityId requerido");
+    return await reactor.run('patient-risk-audit', facilityId);
 }
 
 export async function runInventoryAudit() {
-    return await reactor.run('low-stock-monitor');
+    const facilityId = await getCurrentFacilityId();
+    if (!facilityId) throw new Error("Acceso denegado: facilityId requerido");
+    return await reactor.run('low-stock-monitor', facilityId);
 }
 
 export async function runEfficiencyAudit() {
-    return await reactor.run('efficiency-audit');
+    const facilityId = await getCurrentFacilityId();
+    if (!facilityId) throw new Error("Acceso denegado: facilityId requerido");
+    return await reactor.run('efficiency-audit', facilityId);
 }
 
 export async function runReputationAudit() {
-    return await reactor.run('reputation-audit');
+    const facilityId = await getCurrentFacilityId();
+    if (!facilityId) throw new Error("Acceso denegado: facilityId requerido");
+    return await reactor.run('reputation-audit', facilityId);
 }
 
 export async function runMarketingAudit() {
-    return await reactor.run('marketing-audit');
+    const facilityId = await getCurrentFacilityId();
+    if (!facilityId) throw new Error("Acceso denegado: facilityId requerido");
+    return await reactor.run('marketing-audit', facilityId);
 }
 
 export async function runTrendAudit() {
-    return await reactor.run('trend-analysis');
+    const facilityId = await getCurrentFacilityId();
+    if (!facilityId) throw new Error("Acceso denegado: facilityId requerido");
+    return await reactor.run('trend-analysis', facilityId);
 }
 
 export async function getIAInsights() {

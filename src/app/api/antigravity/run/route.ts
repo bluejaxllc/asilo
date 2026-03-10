@@ -9,23 +9,25 @@ export async function GET(request: NextRequest) {
     const agentId = searchParams.get('agent');
     const secret = searchParams.get('secret');
 
+    const facilityId = searchParams.get('facility');
+
     // Basic security check
     const envSecret = process.env.ANTIGRAVITY_SECRET;
     if (envSecret && secret !== envSecret) {
         return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!agentId) {
+    if (!agentId || !facilityId) {
         return NextResponse.json({
             success: false,
-            message: 'Agent ID required',
+            message: 'Agent ID and Facility ID required',
             availableAgents: getRegistry().getAll().map(a => ({ id: a.id, name: a.name, schedule: a.scheduleDescription }))
         }, { status: 400 });
     }
 
     try {
         const registry = getRegistry();
-        const result = await registry.run(agentId);
+        const result = await registry.run(agentId, facilityId);
         return NextResponse.json(result, { status: result.success ? 200 : 500 });
     } catch (error: any) {
         return NextResponse.json({
@@ -39,7 +41,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { agentId, secret } = body;
+        const { agentId, secret, facilityId } = body;
 
         // Security check
         const envSecret = process.env.ANTIGRAVITY_SECRET;
@@ -47,15 +49,15 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
         }
 
-        if (!agentId) {
+        if (!agentId || !facilityId) {
             return NextResponse.json({
                 success: false,
-                message: 'agentId is required in request body'
+                message: 'agentId and facilityId are required in request body'
             }, { status: 400 });
         }
 
         const registry = getRegistry();
-        const result = await registry.run(agentId);
+        const result = await registry.run(agentId, facilityId);
         return NextResponse.json(result, { status: result.success ? 200 : 500 });
     } catch (error: any) {
         return NextResponse.json({

@@ -18,7 +18,8 @@ export class PatientRiskAuditAgent implements Agent {
         const recentLogs = await db.dailyLog.findMany({
             where: {
                 createdAt: { gte: twentyFourHoursAgo },
-                type: { in: ['VITALS', 'INCIDENT'] }
+                type: { in: ['VITALS', 'INCIDENT'] },
+                patient: { facilityId: context.facilityId }
             },
             include: {
                 patient: true
@@ -90,7 +91,8 @@ Datos JSON: ${JSON.stringify(data.logs)}`;
                     message: risk.description,
                     type: risk.type,
                     recipientRole: 'ADMIN',
-                    patientId: risk.patientId
+                    patientId: risk.patientId,
+                    facilityId: context.facilityId
                 }
             });
 

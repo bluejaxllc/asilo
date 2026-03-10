@@ -3,6 +3,7 @@
 import { requireRole } from "@/lib/role-guard";
 import { getRegistry } from "@/agents/core/registry";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
 
 /**
  * Server Action to execute a premium AI agent by ID.
@@ -16,8 +17,15 @@ export async function executePremiumAgent(agentId: string) {
     }
 
     try {
+        const session = await auth();
+        const facilityId = (session?.user as any)?.facilityId;
+
+        if (!facilityId) {
+            return { success: false, message: "No facility ID found for current user." };
+        }
+
         const registry = getRegistry();
-        const result = await registry.run(agentId);
+        const result = await registry.run(agentId, facilityId);
 
         // Revalidate admin paths where updates might show up
         revalidatePath("/admin/dashboard");

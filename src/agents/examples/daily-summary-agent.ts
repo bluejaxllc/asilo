@@ -20,7 +20,8 @@ export class DailySummaryAgent implements Agent {
         // Get today's logs grouped by type
         const logs = await db.dailyLog.findMany({
             where: {
-                createdAt: { gte: today, lt: tomorrow }
+                createdAt: { gte: today, lt: tomorrow },
+                patient: { facilityId: context.facilityId }
             },
             include: {
                 patient: { select: { name: true } },
@@ -38,16 +39,17 @@ export class DailySummaryAgent implements Agent {
         const completedTasks = await db.task.count({
             where: {
                 status: 'COMPLETED',
-                updatedAt: { gte: today, lt: tomorrow }
+                updatedAt: { gte: today, lt: tomorrow },
+                patient: { facilityId: context.facilityId }
             }
         });
 
         const pendingTasks = await db.task.count({
-            where: { status: 'PENDING' }
+            where: { status: 'PENDING', patient: { facilityId: context.facilityId } }
         });
 
         // Get patient count
-        const patientCount = await db.patient.count();
+        const patientCount = await db.patient.count({ where: { facilityId: context.facilityId } });
 
         const typeLabels: Record<string, string> = {
             VITALS: 'Signos Vitales',
@@ -83,6 +85,7 @@ Usa un tono profesional, alentador y conciso. No uses formato markdown.`;
                 title: '📊 Resumen Diario',
                 message: summaryMessage,
                 type: 'INFO',
+                facilityId: context.facilityId
             }
         });
 
