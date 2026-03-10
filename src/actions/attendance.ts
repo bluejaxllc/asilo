@@ -33,7 +33,6 @@ export const checkIn = async () => {
         return { error: "No autorizado. Inicie sesión para continuar." };
     }
 
-    console.log("ServerAction: checkIn called for", email);
     const user = await db.user.findUnique({
         where: { email }
     });
@@ -74,12 +73,10 @@ export const checkOut = async () => {
     });
 
     if (!user) {
-        console.log("CheckOut: User not found", email);
         return { error: "Usuario no encontrado" };
     }
 
     const latestAttendance = await getLatestTodayAttendance(user.id);
-    console.log("CheckOut: Latest attendance", latestAttendance);
 
     if (!latestAttendance) {
         return { error: "No has registrado ninguna entrada hoy" };

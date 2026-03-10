@@ -73,7 +73,7 @@ export async function POST(request: Request) {
 
         // ── Step 1: Parse transcription via AI ──
         const parsed = await parseNurseVoiceNote(transcription);
-        console.log(`[Nurse Webhook] Parsed data:`, JSON.stringify(parsed, null, 2));
+        // Parsed data logged at trace level only — no PHI in production logs
 
         // ── Step 2: Resolve the resident contact ──
         let resolvedContactId = contactId;
