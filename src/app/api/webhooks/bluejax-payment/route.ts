@@ -39,8 +39,6 @@ export async function POST(req: Request) {
             );
         }
 
-        console.log(`[BlueJax Payment] Received payment confirmation for facility ${facilityId}`);
-        console.log(`[BlueJax Payment] Plan: ${plan || "PRO"}, Amount: ${amount || "N/A"}`);
 
         // ── Verify facility exists ──
         const facility = await db.facility.findUnique({
@@ -69,7 +67,6 @@ export async function POST(req: Request) {
             },
         });
 
-        console.log(`[BlueJax Payment] ✅ Facility ${facilityId} upgraded to ${plan || "PRO"}`);
 
         return NextResponse.json({
             success: true,

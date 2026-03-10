@@ -26,7 +26,6 @@ export const sendGhlWebhook = async (payload: WebhookPayload) => {
     }
 
     try {
-        console.log(`[GHL] Dispatching webhook type: ${payload.type}`);
 
         const response = await fetch(webhookUrl, {
             method: "POST",
@@ -60,7 +59,6 @@ export const sendDirectorAlert = async (opts: {
     reason: string;
     statusFlag?: string;
 }) => {
-    console.log(`[GHL] 🚨 Sending director escalation alert for ${opts.residentName}`);
     return sendGhlWebhook({
         type: "ESCALATION_ALERT",
         patientName: opts.residentName,
@@ -77,7 +75,6 @@ export const incrementMonthlyExtras = async (opts: {
     residentId: string;
     services: string[];
 }) => {
-    console.log(`[GHL] 💰 Incrementing monthly extras for ${opts.residentName}:`, opts.services);
     return sendGhlWebhook({
         type: "BILLING_INCREMENT",
         patientName: opts.residentName,

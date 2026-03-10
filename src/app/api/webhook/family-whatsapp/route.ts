@@ -95,7 +95,6 @@ export async function POST(request: Request) {
             );
         }
 
-        console.log(`[Family Bot] Incoming message from ${senderPhone}: "${message.substring(0, 80)}..."`);
 
         // ══════════════════════════════════════════════════════════════
         // LAYER 1: THE HARDCODED BOUNCER (Authentication)
@@ -104,7 +103,6 @@ export async function POST(request: Request) {
         const contact = await searchContactByAuthorizedPhone(senderPhone);
 
         if (!contact) {
-            console.log(`[Family Bot] ❌ UNAUTHORIZED — ${senderPhone} not found in CRM`);
             return NextResponse.json({
                 reply: UNAUTHORIZED_MESSAGE,
                 intent: null,
@@ -113,7 +111,6 @@ export async function POST(request: Request) {
             });
         }
 
-        console.log(`[Family Bot] ✅ AUTHORIZED — matched to contact ${contact.id}`);
 
         // Get full contact details with custom fields
         const fullContact = await getContactById(contact.id);
@@ -136,10 +133,8 @@ export async function POST(request: Request) {
         // ══════════════════════════════════════════════════════════════
 
         if (statusFlag === STATUS_FLAGS.CRITICAL || statusFlag === STATUS_FLAGS.ATTENTION_NEEDED) {
-            console.log(`[Family Bot] 🚨 ESCALATION — ${residentId} has status: ${statusFlag}`);
 
             if (statusFlag === STATUS_FLAGS.CRITICAL) {
-                console.log(`[Family Bot] 📱 DIRECTOR ALERT: ${DIRECTOR_ALERT(residentId)}`);
                 await sendDirectorAlert({
                     residentName: residentId,
                     residentId: contact.id,
@@ -156,7 +151,6 @@ export async function POST(request: Request) {
                 });
             }
             // Attention Needed — continue but flag it
-            console.log(`[Family Bot] ⚠️ Attention Needed status — proceeding with caution`);
         }
 
         // ══════════════════════════════════════════════════════════════
@@ -164,7 +158,6 @@ export async function POST(request: Request) {
         // ══════════════════════════════════════════════════════════════
 
         const { intent, confidence } = await classifyFamilyIntent(message);
-        console.log(`[Family Bot] 🎯 Intent: ${intent} (confidence: ${confidence})`);
 
         // ══════════════════════════════════════════════════════════════
         // LAYER 3: RESPONSE GENERATION (The Straitjacket)

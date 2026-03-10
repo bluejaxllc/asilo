@@ -68,8 +68,6 @@ export async function POST(request: Request) {
             );
         }
 
-        console.log(`[Nurse Webhook] Received voice note from ${senderPhone || 'unknown'}`);
-        console.log(`[Nurse Webhook] Transcription: "${transcription.substring(0, 100)}..."`);
 
         // ── Step 1: Parse transcription via AI ──
         const parsed = await parseNurseVoiceNote(transcription);
@@ -82,7 +80,6 @@ export async function POST(request: Request) {
             const contact = await searchContactByName(parsed.residentName);
             if (contact) {
                 resolvedContactId = contact.id;
-                console.log(`[Nurse Webhook] Resolved "${parsed.residentName}" → contact ${resolvedContactId}`);
             } else {
                 console.warn(`[Nurse Webhook] Could not find resident "${parsed.residentName}" in CRM`);
                 return NextResponse.json({
@@ -141,11 +138,9 @@ export async function POST(request: Request) {
             addContactNote(resolvedContactId, noteBody),
         ]);
 
-        console.log(`[Nurse Webhook] ✅ DUAL WRITE complete for contact ${resolvedContactId}`);
 
         // ── Step 5: Handle Critical Status escalation ──
         if (parsed.statusFlag === STATUS_FLAGS.CRITICAL) {
-            console.log(`[Nurse Webhook] 🚨 CRITICAL STATUS — Triggering escalation for ${parsed.residentName}`);
             await sendDirectorAlert({
                 residentName: parsed.residentName,
                 residentId: resolvedContactId,
@@ -156,7 +151,6 @@ export async function POST(request: Request) {
 
         // ── Step 6: Handle extra services (billing increment) ──
         if (parsed.extraServices.length > 0) {
-            console.log(`[Nurse Webhook] 💰 Extra services detected:`, parsed.extraServices);
             await incrementMonthlyExtras({
                 residentName: parsed.residentName,
                 residentId: resolvedContactId,
