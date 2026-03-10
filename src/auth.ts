@@ -39,7 +39,7 @@ export const {
         async jwt({ token, user }) {
             // On initial sign in, user is available. Set role directly.
             if (user) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                 
                 token.sub = user.id;
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 token.role = (user as any).role;
