@@ -59,7 +59,34 @@ export async function GET(request: Request) {
             };
         }));
 
-        return NextResponse.json(staffWithStatus);
+        // Also fetch pending invitations for this facility
+        const pendingInvites = await db.inviteToken.findMany({
+            where: {
+                facilityId,
+                expires: { gt: new Date() }, // not expired
+                ...(query ? {
+                    OR: [
+                        { name: { contains: query, mode: 'insensitive' as const } },
+                        { role: { contains: query, mode: 'insensitive' as const } },
+                        { email: { contains: query, mode: 'insensitive' as const } },
+                    ]
+                } : {})
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        const pendingStaff = pendingInvites.map(invite => ({
+            id: `invite-${invite.id}`,
+            name: invite.name,
+            email: invite.email,
+            role: invite.role,
+            status: "Invitación Pendiente",
+            statusColor: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
+            lastActive: "Invitado — esperando aceptación",
+            isPending: true,
+        }));
+
+        return NextResponse.json([...staffWithStatus, ...pendingStaff]);
     } catch (error) {
         console.error('Error fetching staff:', error);
         return NextResponse.json({ error: 'Error fetching staff' }, { status: 500 });

@@ -40,9 +40,9 @@ export default function SettingsPage() {
             const data = await getSettings();
             setSettings(data);
 
-            setName(data.institutionName || ".blue_jax");
-            setAddress(data.institutionAddress || "Av. Reforma 123, Col. Centro");
-            setPhone(data.institutionPhone || "(55) 5555-5555");
+            setName(data.institutionName || "");
+            setAddress(data.institutionAddress || "");
+            setPhone(data.institutionPhone || "");
             setStockAlerts(data.stockAlerts !== "false");
             setIncidentAlerts(data.incidentAlerts !== "false");
 
