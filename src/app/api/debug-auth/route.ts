@@ -3,6 +3,12 @@ import { auth } from "@/auth";
 
 export async function GET() {
     const session = await auth();
+    const role = (session?.user as any)?.role;
+
+    // Only SUPER_ADMIN can access debug info
+    if (role !== "SUPER_ADMIN") {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     return NextResponse.json({
         timestamp: new Date().toISOString(),
@@ -29,3 +35,4 @@ export async function GET() {
         message: "If AUTH_URL is set to localhost, that's the problem. Remove it from Vercel env vars."
     });
 }
+
