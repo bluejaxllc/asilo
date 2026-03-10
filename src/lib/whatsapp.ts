@@ -21,7 +21,7 @@ export const sendGhlWebhook = async (payload: WebhookPayload) => {
     const webhookUrl = process.env.GHL_WEBHOOK_URL;
 
     if (!webhookUrl) {
-        console.warn("[GHL] GHL_WEBHOOK_URL is not set. Skipping webhook dispatch.", payload);
+        console.warn("[GHL] GHL_WEBHOOK_URL is not set. Skipping webhook dispatch.");
         return false;
     }
 

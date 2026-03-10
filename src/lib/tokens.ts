@@ -1,14 +1,15 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { randomInt } from "crypto";
 
 /**
  * Generate a 6-digit verification token for email verification.
  * Expires in 1 hour. Deletes any existing tokens for the same email.
  */
 export async function generateVerificationToken(email: string) {
-    // Generate 6-digit code
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate cryptographically secure 6-digit code
+    const code = randomInt(100000, 999999).toString();
     const expires = new Date(new Date().getTime() + 3600 * 1000); // 1 hour
 
     // Delete existing tokens for this email
