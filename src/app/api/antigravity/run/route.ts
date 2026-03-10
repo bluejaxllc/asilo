@@ -39,7 +39,13 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { agentId } = body;
+        const { agentId, secret } = body;
+
+        // Security check
+        const envSecret = process.env.ANTIGRAVITY_SECRET;
+        if (envSecret && secret !== envSecret) {
+            return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
+        }
 
         if (!agentId) {
             return NextResponse.json({

@@ -12,6 +12,10 @@ export async function GET(request: Request) {
         const session = await auth();
         const facilityId = (session?.user as any)?.facilityId ?? null;
 
+        if (!facilityId) {
+            return NextResponse.json([]);
+        }
+
         const { searchParams } = new URL(request.url);
         const query = searchParams.get('q');
 
@@ -93,8 +97,15 @@ export async function GET(request: Request) {
     }
 }
 
+import { requireRole } from "@/lib/role-guard";
+
 export async function POST(req: Request) {
     try {
+        const check = await requireRole("ADMIN");
+        if ("error" in check) {
+            return NextResponse.json({ error: check.error }, { status: 403 });
+        }
+
         const session = await auth();
         const facilityId = (session?.user as any)?.facilityId ?? null;
 
