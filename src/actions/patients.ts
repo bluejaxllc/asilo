@@ -172,7 +172,7 @@ export const getPatients = async (query?: string) => {
     try {
         const facilityId = await getCurrentFacilityId();
         const whereClause = {
-            ...(facilityId ? { facilityId } : {}),
+            ...(facilityId ? { facilityId } : { facilityId: "__none__" }),
             ...(query ? {
                 OR: [
                     { name: { contains: query, mode: 'insensitive' as const } },

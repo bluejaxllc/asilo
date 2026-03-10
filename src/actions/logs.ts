@@ -62,7 +62,7 @@ export const createLog = async (data: {
 export const getAllLogs = async (limit: number = 50, query?: string) => {
     try {
         const facilityId = await getCurrentFacilityId();
-        const facilityFilter = facilityId ? { author: { facilityId } } : {};
+        const facilityFilter = facilityId ? { author: { facilityId } } : { author: { facilityId: "__none__" } };
 
         const whereClause = {
             ...facilityFilter,

@@ -8,7 +8,7 @@ export const getStaffList = async () => {
     const facilityId = await getCurrentFacilityId();
     return await db.user.findMany({
         where: {
-            ...(facilityId ? { facilityId } : {}),
+            ...(facilityId ? { facilityId } : { facilityId: "__none__" }),
             role: { notIn: ["ADMIN", "FAMILY"] }
         },
         select: { id: true, name: true, role: true },
@@ -44,7 +44,7 @@ export const getMyTasks = async (email: string) => {
 export const getAllTasks = async () => {
     const facilityId = await getCurrentFacilityId();
     return await db.task.findMany({
-        where: facilityId ? { facilityId } : {},
+        where: facilityId ? { facilityId } : { facilityId: "__none__" },
         include: {
             patient: true,
             assignedTo: {

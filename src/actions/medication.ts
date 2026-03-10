@@ -40,7 +40,7 @@ export const addMedication = async (data: {
 export const getAllMedications = async (query?: string) => {
     try {
         const facilityId = await getCurrentFacilityId();
-        const facilityFilter = facilityId ? { facilityId } : {};
+        const facilityFilter = facilityId ? { facilityId } : { facilityId: "__none__" as string };
         const medications = await db.medication.findMany({
             where: {
                 ...facilityFilter,
