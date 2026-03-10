@@ -67,6 +67,8 @@ export default function FamilyPage() {
     const [newMessage, setNewMessage] = useState("");
     const [sendingMessage, setSendingMessage] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [confirmService, setConfirmService] = useState<any>(null);
+    const [purchasing, setPurchasing] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -116,16 +118,21 @@ export default function FamilyPage() {
         setSendingMessage(false);
     };
 
-    const handlePurchase = async (service: any) => {
+    const handlePurchase = (service: any) => {
+        setConfirmService(service);
+    };
+
+    const confirmPurchase = async () => {
+        if (!confirmService || purchasing) return;
+        setPurchasing(true);
+        const service = confirmService;
         const freq = selectedFrequencies[service.id] || "ONCE";
         const freqLabel = freq === "ONCE" ? "" : ` (${freq === "DAILY" ? "Diario" : freq === "WEEKLY" ? "Semanal" : "Quincenal"})`;
 
         try {
-            // Always record the purchase first
             toast.loading("Procesando solicitud...");
             await recordPremiumPurchase(service.id, `Compra${freqLabel} desde Portal de Familiares`, freq);
 
-            // Refresh purchases so timeline updates immediately
             const updatedPurchases = await getPurchaseHistory();
             setPurchases(updatedPurchases);
             toast.dismiss();
@@ -140,6 +147,8 @@ export default function FamilyPage() {
             toast.dismiss();
             toast.error("Error al procesar la solicitud.");
         }
+        setPurchasing(false);
+        setConfirmService(null);
     };
 
     const getFrequencyPrice = (service: any, freq: string) => {
@@ -825,6 +834,56 @@ export default function FamilyPage() {
                         </SlideIn>
                     )}
                 </FadeIn>
+            )}
+
+            {/* Purchase Confirmation Modal */}
+            {confirmService && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => !purchasing && setConfirmService(null)}>
+                    <div className="bg-card border border-border rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+                        <div className="text-center">
+                            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/20 flex items-center justify-center mx-auto mb-3">
+                                <ShoppingBag className="h-7 w-7 text-pink-500" />
+                            </div>
+                            <h3 className="text-lg font-bold text-foreground">Confirmar Solicitud</h3>
+                            <p className="text-sm text-muted-foreground mt-1">¿Desea solicitar este servicio?</p>
+                        </div>
+
+                        <div className="p-4 rounded-xl bg-card/[0.02] border border-border space-y-2">
+                            <p className="font-semibold text-foreground">{confirmService.name}</p>
+                            {confirmService.description && (
+                                <p className="text-xs text-muted-foreground line-clamp-2">{confirmService.description}</p>
+                            )}
+                            <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                                <span className="text-sm text-muted-foreground">Total</span>
+                                <span className="text-xl font-bold text-foreground">
+                                    ${(getFrequencyPrice(confirmService, selectedFrequencies[confirmService.id] || "ONCE") || confirmService.price)?.toLocaleString("es-MX")} <span className="text-xs font-normal text-muted-foreground">MXN</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <Button
+                                variant="outline"
+                                className="flex-1"
+                                onClick={() => setConfirmService(null)}
+                                disabled={purchasing}
+                            >
+                                Cancelar
+                            </Button>
+                            <Button
+                                className="flex-1 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white shadow-md"
+                                onClick={confirmPurchase}
+                                disabled={purchasing}
+                            >
+                                {purchasing ? (
+                                    <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Procesando...</>
+                                ) : (
+                                    <><CheckCircle2 className="h-4 w-4 mr-2" /> Confirmar</>
+                                )}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
             )}
         </FadeIn>
     );
