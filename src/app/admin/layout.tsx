@@ -27,11 +27,8 @@ export default async function AdminLayout({
         }
     });
 
-    console.log("[DEBUG AdminLayout] facilityId:", facilityId, "setting:", setting);
-
     // 4. Redirect if not completed
     if (!setting || setting.value !== "true") {
-        console.log("[DEBUG AdminLayout] REDIRECTING TO /ONBOARDING");
         redirect("/onboarding");
     }
 

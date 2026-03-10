@@ -157,8 +157,6 @@ export const {
                         where: { email }
                     });
 
-                    console.log("Auth Authorize: User found:", user ? user.email : "No user");
-
                     if (!user || !(user as any).password) return null;
 
                     const passwordsMatch = await bcrypt.compare(

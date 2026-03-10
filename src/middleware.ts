@@ -18,9 +18,6 @@ export default auth((req) => {
     const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
     const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
-    // Debug logging for Vercel function logs
-    console.log(`[MW] path=${nextUrl.pathname} loggedIn=${isLoggedIn} role=${role} isApiAuth=${isApiAuthRoute} isPublic=${isPublicRoute} isAuth=${isAuthRoute}`);
-
     if (isApiAuthRoute) {
         return undefined;
     }
@@ -31,7 +28,6 @@ export default auth((req) => {
             if (role === "SUPER_ADMIN") redirectUrl = "/super-admin";
             else if (role === "ADMIN") redirectUrl = "/admin";
             else if (role === "FAMILY") redirectUrl = "/family";
-            console.log(`[MW] Auth route, logged in, redirecting to ${redirectUrl}`);
             return Response.redirect(new URL(redirectUrl, nextUrl));
         }
         return undefined;
@@ -43,7 +39,6 @@ export default auth((req) => {
             callbackUrl += nextUrl.search;
         }
         const encodedCallbackUrl = encodeURIComponent(callbackUrl);
-        console.log(`[MW] Not logged in, not public. Redirecting to login. callback=${callbackUrl}`);
         return Response.redirect(new URL(`/auth/login?callbackUrl=${encodedCallbackUrl}`, nextUrl));
     }
 
@@ -78,7 +73,6 @@ export default auth((req) => {
         // Enforce Password Reset
         const mustChangePassword = (req.auth?.user as any)?.mustChangePassword;
         if (mustChangePassword && !path.startsWith("/auth/reset-password") && !path.startsWith("/api")) {
-            console.log(`[MW] Forcing password reset for ${req.auth?.user?.email}`);
             return Response.redirect(new URL("/auth/reset-password", nextUrl));
         }
     }
