@@ -183,7 +183,7 @@ model Task {
   assignedTo   User?   @relation(fields: [assignedToId], references: [id])
 
   patientId String?
-  patient   Patient? @relation(fields: [patientId], references: [id])
+  patient   Patient? @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
   // Facility link (tenant)
   facilityId String?
@@ -205,7 +205,7 @@ model DailyLog {
   value String? // e.g., "120/80" for BP, "All ate" for Food
 
   patientId String?
-  patient   Patient? @relation(fields: [patientId], references: [id])
+  patient   Patient? @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
   authorId String
   author   User   @relation(fields: [authorId], references: [id])
@@ -240,7 +240,7 @@ model Medication {
 model PatientMedication {
   id        String  @id @default(cuid())
   patientId String
-  patient   Patient @relation(fields: [patientId], references: [id])
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
   medicationId String
   medication   Medication @relation(fields: [medicationId], references: [id])
@@ -278,7 +278,7 @@ model Notification {
   recipientName String? // Optional specific person name
 
   patientId String?
-  patient   Patient? @relation(fields: [patientId], references: [id])
+  patient   Patient? @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
   // Facility link (tenant)
   facilityId String?
@@ -311,7 +311,7 @@ model FamilyMessage {
   fromUser   User   @relation("SentMessages", fields: [fromUserId], references: [id])
 
   patientId String
-  patient   Patient @relation(fields: [patientId], references: [id])
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
@@ -353,7 +353,7 @@ model PremiumPurchase {
   service   PremiumService @relation(fields: [serviceId], references: [id])
 
   patientId String
-  patient   Patient @relation(fields: [patientId], references: [id])
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
   familyMemberId String
   familyMember   User   @relation("FamilyPurchases", fields: [familyMemberId], references: [id])
@@ -377,7 +377,7 @@ model PatientSummary {
   generatedBy     String  @default("AI")
 
   patientId String
-  patient   Patient @relation(fields: [patientId], references: [id])
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 }
