@@ -63,12 +63,49 @@ export const getAllTasks = async () => {
     });
 };
 
+// Helper: write a TASK entry to the Bitácora (DailyLog)
+async function logTaskAction(
+    action: string,
+    taskTitle: string,
+    userId: string,
+    patientId?: string | null
+) {
+    try {
+        await db.dailyLog.create({
+            data: {
+                type: "TASK",
+                value: action,
+                notes: taskTitle,
+                patientId: patientId || null,
+                authorId: userId,
+            }
+        });
+    } catch (err) {
+        console.error("[logTaskAction] Error:", err);
+    }
+}
+
+// Helper: get the current user ID from session
+async function getCurrentUserId(): Promise<string | null> {
+    try {
+        const session = await auth();
+        const email = session?.user?.email;
+        if (!email) return null;
+        const user = await db.user.findUnique({ where: { email }, select: { id: true } });
+        return user?.id || null;
+    } catch {
+        return null;
+    }
+}
+
 export const createTask = async (
     title: string,
     priority: string,
     patientId?: string,
     assignedToId?: string,
-    dueDate?: string
+    dueDate?: string,
+    recurrence?: string,
+    recurrenceEnd?: string
 ) => {
     try {
         const facilityId = await getCurrentFacilityId();
@@ -91,11 +128,22 @@ export const createTask = async (
                 patientId: patientId || null,
                 assignedToId: assignedToId || null,
                 dueDate: dueDate ? new Date(dueDate) : null,
+                recurrence: recurrence || "NONE",
+                recurrenceEnd: recurrenceEnd ? new Date(recurrenceEnd) : null,
                 status: "PENDING",
                 facilityId,
             }
         });
+
+        // Log to Bitácora
+        const userId = await getCurrentUserId();
+        if (userId) {
+            const recLabel = recurrence && recurrence !== "NONE" ? ` (🔁 ${recurrence})` : "";
+            await logTaskAction(`Tarea creada${recLabel}`, title, userId, patientId);
+        }
+
         revalidatePath("/admin/tasks");
+        revalidatePath("/admin/logs");
         revalidatePath("/staff");
         return { success: "Tarea creada exitosamente" };
     } catch (error) {
@@ -112,7 +160,15 @@ export const deleteTask = async (id: string) => {
         if (!task || task.facilityId !== facilityId) return { error: "Tarea no encontrada o no pertenece a la instalación" };
 
         await db.task.delete({ where: { id } });
+
+        // Log to Bitácora
+        const userId = await getCurrentUserId();
+        if (userId) {
+            await logTaskAction("Tarea eliminada", task.title, userId, task.patientId);
+        }
+
         revalidatePath("/admin/tasks");
+        revalidatePath("/admin/logs");
         revalidatePath("/staff");
         return { success: "Tarea eliminada" };
     } catch (error) {
@@ -128,11 +184,21 @@ export const toggleTaskStatus = async (id: string, currentStatus: boolean) => {
         const task = await db.task.findUnique({ where: { id } });
         if (!task || task.facilityId !== facilityId) return { error: "Tarea no encontrada o no pertenece a la instalación" };
 
+        const newStatus = currentStatus ? "PENDING" : "COMPLETED";
         await db.task.update({
             where: { id },
-            data: { status: currentStatus ? "PENDING" : "COMPLETED" }
+            data: { status: newStatus }
         });
+
+        // Log to Bitácora
+        const userId = await getCurrentUserId();
+        if (userId) {
+            const action = newStatus === "COMPLETED" ? "Tarea completada ✅" : "Tarea reabierta";
+            await logTaskAction(action, task.title, userId, task.patientId);
+        }
+
         revalidatePath("/admin/tasks");
+        revalidatePath("/admin/logs");
         return { success: "Estado actualizado" };
     } catch (error) {
         return { error: "Error al actualizar estado" };
@@ -162,7 +228,11 @@ export const startTask = async (taskId: string, userEmail: string) => {
             }
         });
 
+        // Log to Bitácora
+        await logTaskAction("Tarea iniciada", task.title, user.id, task.patientId);
+
         revalidatePath("/staff");
+        revalidatePath("/admin/logs");
         return { success: "Tarea iniciada" };
     } catch (error) {
         console.error("Error starting task:", error);
@@ -187,7 +257,14 @@ export const completeTask = async (taskId: string) => {
             }
         });
 
+        // Log to Bitácora
+        const userId = await getCurrentUserId();
+        if (userId) {
+            await logTaskAction("Tarea completada ✅", task.title, userId, task.patientId);
+        }
+
         revalidatePath("/staff");
+        revalidatePath("/admin/logs");
         return { success: "Tarea completada" };
     } catch (error) {
         console.error("Error completing task:", error);

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar, ClipboardList, Plus, Trash2, User, Clock, CheckCircle2, Loader2, ListTodo, Cpu, Repeat2, Mic, Zap } from "lucide-react";
+import { Calendar, ClipboardList, Plus, Trash2, User, Clock, CheckCircle2, Loader2, ListTodo, Cpu, Repeat2, Mic, Zap, CalendarClock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { getAllTasks, createTask, deleteTask, toggleTaskStatus, getStaffList } from "@/actions/tasks";
@@ -43,6 +43,8 @@ export default function TasksPage() {
     const [selectedStaff, setSelectedStaff] = useState<string>("none");
     const [selectedPriority, setSelectedPriority] = useState<string>("NORMAL");
     const [dueDate, setDueDate] = useState<string>("");
+    const [recurrence, setRecurrence] = useState<string>("NONE");
+    const [recurrenceEnd, setRecurrenceEnd] = useState<string>("");
     const [loading, setLoading] = useState(false);
     const [activeFilter, setActiveFilter] = useState<StatusFilter>("ALL");
 
@@ -118,7 +120,9 @@ export default function TasksPage() {
         const patientId = selectedPatient === "general" ? undefined : selectedPatient;
         const assignedToId = selectedStaff === "none" ? undefined : selectedStaff;
         const due = dueDate || undefined;
-        const result = await createTask(newTaskText, selectedPriority, patientId, assignedToId, due);
+        const rec = recurrence !== "NONE" ? recurrence : undefined;
+        const recEnd = recurrenceEnd || undefined;
+        const result = await createTask(newTaskText, selectedPriority, patientId, assignedToId, due, rec, recEnd);
         setLoading(false);
 
         if (result.error) {
@@ -130,6 +134,8 @@ export default function TasksPage() {
             setSelectedStaff("none");
             setSelectedPriority("NORMAL");
             setDueDate("");
+            setRecurrence("NONE");
+            setRecurrenceEnd("");
             loadData();
         }
     };
@@ -284,7 +290,7 @@ export default function TasksPage() {
                                             {loading ? "Agregando..." : "Agregar Tarea"}
                                         </Button>
                                     </div>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                         <Select value={selectedStaff} onValueChange={setSelectedStaff}>
                                             <SelectTrigger className="bg-card border-border">
                                                 <SelectValue placeholder="Asignar a personal..." />
@@ -320,12 +326,37 @@ export default function TasksPage() {
                                                 <SelectItem value="LOW">🟢 Baja</SelectItem>
                                             </SelectContent>
                                         </Select>
+                                    </div>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                         <Input
                                             type="datetime-local"
                                             className="bg-card border-border"
                                             value={dueDate}
                                             onChange={(e) => setDueDate(e.target.value)}
+                                            placeholder="Fecha límite"
                                         />
+                                        <Select value={recurrence} onValueChange={setRecurrence}>
+                                            <SelectTrigger className="bg-card border-border">
+                                                <SelectValue placeholder="Recurrencia" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="NONE">🚫 Sin repetición</SelectItem>
+                                                <SelectItem value="DAILY">📅 Diario</SelectItem>
+                                                <SelectItem value="WEEKLY">📆 Semanal</SelectItem>
+                                                <SelectItem value="MONTHLY">🗓️ Mensual</SelectItem>
+                                                <SelectItem value="YEARLY">🎯 Anual</SelectItem>
+                                                <SelectItem value="BIRTHDAY">🎂 Cumpleaños</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        {recurrence !== "NONE" && (
+                                            <Input
+                                                type="date"
+                                                className="bg-card border-border"
+                                                value={recurrenceEnd}
+                                                onChange={(e) => setRecurrenceEnd(e.target.value)}
+                                                placeholder="Fin de recurrencia (opcional)"
+                                            />
+                                        )}
                                     </div>
                                 </div>
 
@@ -367,6 +398,16 @@ export default function TasksPage() {
                                                                 {isInProgress && (
                                                                     <Badge className="text-[10px] px-1.5 py-0 bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30">
                                                                         EN PROGRESO
+                                                                    </Badge>
+                                                                )}
+                                                                {task.recurrence && task.recurrence !== "NONE" && (
+                                                                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20 flex items-center gap-1">
+                                                                        <Repeat2 className="w-3 h-3" />
+                                                                        {task.recurrence === "DAILY" && "Diario"}
+                                                                        {task.recurrence === "WEEKLY" && "Semanal"}
+                                                                        {task.recurrence === "MONTHLY" && "Mensual"}
+                                                                        {task.recurrence === "YEARLY" && "Anual"}
+                                                                        {task.recurrence === "BIRTHDAY" && "🎂 Cumpleaños"}
                                                                     </Badge>
                                                                 )}
                                                                 {isCompleted && (

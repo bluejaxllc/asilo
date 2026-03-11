@@ -179,6 +179,11 @@ model Task {
   status      String    @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
   dueDate     DateTime?
 
+  // Recurrence
+  recurrence    String    @default("NONE") // NONE, DAILY, WEEKLY, MONTHLY, YEARLY, BIRTHDAY
+  recurrenceEnd DateTime? // Optional end date for recurring series
+  parentTaskId  String?   // Links spawned instances back to the template task
+
   assignedToId String?
   assignedTo   User?   @relation(fields: [assignedToId], references: [id])
 

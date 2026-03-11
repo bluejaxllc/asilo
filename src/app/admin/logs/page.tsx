@@ -10,7 +10,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Activity, Utensils, Pill, FileText, AlertTriangle, Filter, Download, Brain, Search, Mic, Zap } from "lucide-react";
+import { Activity, Utensils, Pill, FileText, AlertTriangle, Filter, Download, Brain, Search, Mic, Zap, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getAllLogs } from "@/actions/logs";
 import { format } from "date-fns";
@@ -30,6 +30,7 @@ const LOG_TYPES = [
     { key: "MEDS", label: "Meds", icon: Pill, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10", activeBg: "bg-green-600 text-white" },
     { key: "NOTE", label: "Notas", icon: FileText, color: "text-violet-400", bg: "bg-violet-500/10", activeBg: "bg-purple-600 text-white" },
     { key: "INCIDENT", label: "Incidentes", icon: AlertTriangle, color: "text-red-600 dark:text-red-400", bg: "bg-red-500/10", activeBg: "bg-red-600 text-white" },
+    { key: "TASK", label: "Tareas", icon: ClipboardList, color: "text-cyan-600 dark:text-cyan-400", bg: "bg-cyan-500/10", activeBg: "bg-cyan-600 text-white" },
 ];
 
 const typeConfig: Record<string, { label: string; badgeClass: string; dotColor: string }> = {
@@ -38,6 +39,7 @@ const typeConfig: Record<string, { label: string; badgeClass: string; dotColor: 
     MEDS: { label: "MEDS", badgeClass: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20", dotColor: "bg-emerald-500/100" },
     NOTE: { label: "NOTA", badgeClass: "bg-violet-500/15 text-violet-400 border-violet-500/20", dotColor: "bg-violet-500/100" },
     INCIDENT: { label: "INCIDENTE", badgeClass: "bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/20", dotColor: "bg-red-500/100" },
+    TASK: { label: "TAREA", badgeClass: "bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border-cyan-500/20", dotColor: "bg-cyan-500/100" },
 };
 
 export default function LogsPage() {
