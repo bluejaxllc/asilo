@@ -236,15 +236,23 @@ function PatientsPageContent() {
                                     </TableCell>
                                     <TableCell>
                                         <Badge
-                                            variant={patient.status === 'Estable' ? 'outline' : 'destructive'}
+                                            variant="outline"
                                             className={cn(
                                                 "text-[10px] font-semibold px-2 py-0.5",
-                                                patient.status === 'Estable' && "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/10"
+                                                patient.status === 'Estable' && "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/10",
+                                                patient.status === 'Delicado' && "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500/10",
+                                                patient.status === 'Recuperación' && "bg-sky-500/10 text-sky-700 dark:text-sky-400 border-sky-500/20 hover:bg-sky-500/10",
+                                                patient.status === 'Hospitalizado' && "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20 hover:bg-red-500/10",
+                                                patient.status === 'Agitada' && "bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20 hover:bg-orange-500/10",
                                             )}
                                         >
                                             <span className={cn(
                                                 "inline-block h-1.5 w-1.5 rounded-full mr-1.5",
-                                                patient.status === 'Estable' ? "bg-emerald-500/100" : "bg-red-500/100"
+                                                patient.status === 'Estable' && "bg-emerald-500",
+                                                patient.status === 'Delicado' && "bg-amber-500",
+                                                patient.status === 'Recuperación' && "bg-sky-500",
+                                                patient.status === 'Hospitalizado' && "bg-red-500",
+                                                patient.status === 'Agitada' && "bg-orange-500",
                                             )} />
                                             {patient.status}
                                         </Badge>

@@ -50,6 +50,21 @@ export async function GET(request: Request) {
                     statusColor = "bg-blue-500/15 text-blue-700 dark:text-blue-300";
                     lastActive = "Salida: " + formatDistanceToNow(attendance.checkOut, { addSuffix: true, locale: es });
                 }
+            } else {
+                // No attendance today — look for the most recent attendance ever
+                const lastAttendance = await db.attendance.findFirst({
+                    where: { userId: user.id },
+                    orderBy: { createdAt: 'desc' },
+                });
+
+                if (lastAttendance) {
+                    const refDate = lastAttendance.checkOut || lastAttendance.checkIn;
+                    lastActive = formatDistanceToNow(refDate, { addSuffix: true, locale: es });
+                } else {
+                    status = "Inactivo";
+                    statusColor = "bg-zinc-500/15 text-zinc-600 dark:text-zinc-400";
+                    lastActive = "Sin registros";
+                }
             }
 
             return {
