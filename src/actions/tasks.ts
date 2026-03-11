@@ -30,9 +30,17 @@ export const getMyTasks = async () => {
 
         if (!user) return [];
 
+        // Return tasks assigned to this user OR unassigned tasks in their facility
         return await db.task.findMany({
             where: {
-                assignedToId: user.id
+                OR: [
+                    { assignedToId: user.id },
+                    ...(user.facilityId ? [{
+                        facilityId: user.facilityId,
+                        assignedToId: null,
+                        status: { not: "COMPLETED" }
+                    }] : [])
+                ]
             },
             include: {
                 patient: true
@@ -207,17 +215,23 @@ export const toggleTaskStatus = async (id: string, currentStatus: boolean) => {
 
 export const startTask = async (taskId: string, userEmail: string) => {
     try {
-        const facilityId = await getCurrentFacilityId();
-        if (!facilityId) return { error: "No autorizado" };
-
+        // Find the user directly by email (no facility compound check)
         const user = await db.user.findUnique({
-            where: { email: userEmail, facilityId }
+            where: { email: userEmail }
         });
-        if (!user) return { error: "Usuario no encontrado en la instalación" };
+        if (!user || !user.facilityId) return { error: "Usuario no encontrado" };
 
         const task = await db.task.findUnique({ where: { id: taskId } });
-        if (!task || task.facilityId !== facilityId) {
-            return { error: "Tarea no encontrada o no pertenece a esta instalación" };
+        if (!task) return { error: "Tarea no encontrada" };
+
+        // If task has no facilityId (legacy data), auto-heal it
+        if (!task.facilityId) {
+            await db.task.update({
+                where: { id: taskId },
+                data: { facilityId: user.facilityId }
+            });
+        } else if (task.facilityId !== user.facilityId) {
+            return { error: "Tarea no pertenece a esta instalación" };
         }
 
         await db.task.update({
@@ -242,12 +256,26 @@ export const startTask = async (taskId: string, userEmail: string) => {
 
 export const completeTask = async (taskId: string) => {
     try {
-        const facilityId = await getCurrentFacilityId();
-        if (!facilityId) return { error: "No autorizado" };
+        const session = await auth();
+        const email = session?.user?.email;
+        if (!email) return { error: "No autorizado" };
+
+        const user = await db.user.findUnique({
+            where: { email }
+        });
+        if (!user) return { error: "Usuario no encontrado" };
 
         const task = await db.task.findUnique({ where: { id: taskId } });
-        if (!task || task.facilityId !== facilityId) {
-            return { error: "Tarea no encontrada o no pertenece a esta instalación" };
+        if (!task) return { error: "Tarea no encontrada" };
+
+        // If task has no facilityId (legacy data), auto-heal it
+        if (!task.facilityId && user.facilityId) {
+            await db.task.update({
+                where: { id: taskId },
+                data: { facilityId: user.facilityId }
+            });
+        } else if (task.facilityId && user.facilityId && task.facilityId !== user.facilityId) {
+            return { error: "Tarea no pertenece a esta instalación" };
         }
 
         await db.task.update({
@@ -258,10 +286,7 @@ export const completeTask = async (taskId: string) => {
         });
 
         // Log to Bitácora
-        const userId = await getCurrentUserId();
-        if (userId) {
-            await logTaskAction("Tarea completada ✅", task.title, userId, task.patientId);
-        }
+        await logTaskAction("Tarea completada ✅", task.title, user.id, task.patientId);
 
         revalidatePath("/staff");
         revalidatePath("/admin/logs");
