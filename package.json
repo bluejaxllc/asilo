@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "smoke-test": "node scripts/smoke-test.js",
+    "db-check": "node scripts/db-check.js",
+    "db-fix": "node scripts/db-check.js --fix",
+    "pre-deploy": "node scripts/smoke-test.js && node scripts/db-check.js"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
