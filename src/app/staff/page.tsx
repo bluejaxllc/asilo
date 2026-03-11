@@ -58,6 +58,7 @@ export default function StaffPage() {
     const { data: session } = useSession();
     const [tasks, setTasks] = useState<UITask[]>([]);
     const [loading, setLoading] = useState(false);
+    const [actionLoading, setActionLoading] = useState<string | null>(null);
 
     const fetchTasks = async () => {
         if (session?.user?.email) {
@@ -98,6 +99,7 @@ export default function StaffPage() {
             return;
         }
 
+        setActionLoading(taskId);
         setTasks(prev => prev.map(t =>
             t.id === taskId ? { ...t, status: "EN PROGRESO" } : t
         ));
@@ -106,16 +108,19 @@ export default function StaffPage() {
             const result = await startTask(taskId, session.user.email);
             if ((result as any).error) {
                 toast.error((result as any).error as string);
-                fetchTasks();
             } else {
                 toast.success((result as any).success as string);
             }
         } catch (e) {
             toast.error("Error de red al iniciar tarea");
+        } finally {
+            setActionLoading(null);
+            fetchTasks();
         }
     };
 
     const handleCompleteTask = async (taskId: string) => {
+        setActionLoading(taskId);
         setTasks(prev => prev.map(t =>
             t.id === taskId ? { ...t, status: "COMPLETADO" } : t
         ));
@@ -125,12 +130,13 @@ export default function StaffPage() {
 
             if ((result as any).error) {
                 toast.error("Error al completar tarea");
-                fetchTasks();
             } else {
                 toast.success((result as any).success as string);
             }
         } catch (e) {
             toast.error("Error de red al completar tarea");
+        } finally {
+            setActionLoading(null);
             fetchTasks();
         }
     };
@@ -305,17 +311,22 @@ export default function StaffPage() {
                                             <Button
                                                 className="flex-1 h-14 text-lg font-bold shadow-sm rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
                                                 onClick={() => handleStartTask(task.id)}
+                                                disabled={actionLoading === task.id}
                                             >
-                                                <PlayCircle className="mr-2 h-5 w-5" /> Iniciar
+                                                {actionLoading === task.id ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <PlayCircle className="mr-2 h-5 w-5" />}
+                                                {actionLoading === task.id ? "Iniciando..." : "Iniciar"}
                                             </Button>
                                         )}
-                                        <Button
-                                            variant={isInProgress ? "default" : "outline"}
-                                            className={`flex-1 h-14 text-lg font-bold shadow-sm rounded-xl ${isInProgress ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white' : 'border-2 hover:border-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-600 dark:text-emerald-400'}`}
-                                            onClick={() => handleCompleteTask(task.id)}
-                                        >
-                                            <CheckCircle className="mr-2 h-5 w-5" /> Listo
-                                        </Button>
+                                        {isInProgress && (
+                                            <Button
+                                                className="flex-1 h-14 text-lg font-bold shadow-sm rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white"
+                                                onClick={() => handleCompleteTask(task.id)}
+                                                disabled={actionLoading === task.id}
+                                            >
+                                                {actionLoading === task.id ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <CheckCircle className="mr-2 h-5 w-5" />}
+                                                {actionLoading === task.id ? "Completando..." : "Listo"}
+                                            </Button>
+                                        )}
                                     </CardFooter>
                                 </Card>
                             </SlideIn>
