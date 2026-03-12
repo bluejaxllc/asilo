@@ -34,6 +34,19 @@ import { toast } from "sonner";
 
 type FormValues = z.infer<typeof OnboardingSchema>;
 
+interface StaffEntry {
+    email: string;
+    role: "STAFF" | "DOCTOR" | "NURSE" | "KITCHEN" | "FAMILY";
+}
+
+const ROLE_OPTIONS: { value: StaffEntry["role"]; label: string }[] = [
+    { value: "STAFF", label: "Cuidador" },
+    { value: "DOCTOR", label: "Doctor" },
+    { value: "NURSE", label: "Enfermera" },
+    { value: "KITCHEN", label: "Cocina" },
+    { value: "FAMILY", label: "Familiar" },
+];
+
 interface OnboardingClientProps {
     initialFacilityName: string;
 }
@@ -45,29 +58,38 @@ export const OnboardingClient = ({ initialFacilityName }: OnboardingClientProps)
     const [error, setError] = useState<string | undefined>();
     const [success, setSuccess] = useState<string | undefined>();
 
-    // Manual array for emails instead of useFieldArray for simplicity
-    const [staffEmailsList, setStaffEmailsList] = useState<string[]>([""]);
+    // Staff entries with email + role
+    const [staffEntries, setStaffEntries] = useState<StaffEntry[]>([
+        { email: "", role: "STAFF" }
+    ]);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(OnboardingSchema),
         defaultValues: {
             facilityName: initialFacilityName || "",
             staffEmails: [],
+            staffMembers: [],
         },
     });
 
-    const addEmailField = () => setStaffEmailsList([...staffEmailsList, ""]);
+    const addEntry = () => setStaffEntries([...staffEntries, { email: "", role: "STAFF" }]);
 
     const updateEmail = (index: number, value: string) => {
-        const newEmails = [...staffEmailsList];
-        newEmails[index] = value;
-        setStaffEmailsList(newEmails);
+        const newEntries = [...staffEntries];
+        newEntries[index].email = value;
+        setStaffEntries(newEntries);
     };
 
-    const removeEmail = (index: number) => {
-        const newEmails = [...staffEmailsList];
-        newEmails.splice(index, 1);
-        setStaffEmailsList(newEmails);
+    const updateRole = (index: number, value: StaffEntry["role"]) => {
+        const newEntries = [...staffEntries];
+        newEntries[index].role = value;
+        setStaffEntries(newEntries);
+    };
+
+    const removeEntry = (index: number) => {
+        const newEntries = [...staffEntries];
+        newEntries.splice(index, 1);
+        setStaffEntries(newEntries);
     };
 
     const handleNext = async () => {
@@ -85,17 +107,18 @@ export const OnboardingClient = ({ initialFacilityName }: OnboardingClientProps)
         setError(undefined);
         setSuccess(undefined);
 
-        // Filter out empty emails before submitting
-        const cleanEmails = staffEmailsList.filter(email => email.trim() !== "");
-        // Basic naive validation for email strings before sending
-        const invalidEmails = cleanEmails.filter(e => !e.includes("@"));
+        // Filter out empty emails
+        const cleanMembers = staffEntries.filter(e => e.email.trim() !== "");
+        const invalidEmails = cleanMembers.filter(e => !e.email.includes("@"));
 
         if (invalidEmails.length > 0) {
             setError("Uno o más correos no tienen formato válido.");
             return;
         }
 
-        values.staffEmails = cleanEmails;
+        // Set both for backwards compatibility
+        values.staffEmails = cleanMembers.map(m => m.email);
+        values.staffMembers = cleanMembers;
 
         startTransition(() => {
             completeOnboarding(values)
@@ -105,7 +128,7 @@ export const OnboardingClient = ({ initialFacilityName }: OnboardingClientProps)
                     }
                     if (data?.success) {
                         setSuccess(data.success);
-                        toast.success(data.success);
+                        toast.success("¡Configuración completada!");
                         // Brief delay for UX before redirecting so they see the success state
                         setTimeout(() => {
                             router.push("/admin");
@@ -141,7 +164,7 @@ export const OnboardingClient = ({ initialFacilityName }: OnboardingClientProps)
                 <CardDescription className="text-base mt-2">
                     {step === 1
                         ? "Vamos a configurar los detalles básicos de tu residencia."
-                        : "Agrega a tus doctores, enfermeras o cuidadores (opcional)."}
+                        : "Agrega a tu equipo — doctores, enfermeras, cuidadores o familiares."}
                 </CardDescription>
             </CardHeader>
 
@@ -202,29 +225,39 @@ export const OnboardingClient = ({ initialFacilityName }: OnboardingClientProps)
                             <SlideIn direction="right">
                                 <div className="space-y-6">
                                     <div className="space-y-4">
-                                        <FormLabel className="text-base block">Correos del Personal</FormLabel>
+                                        <FormLabel className="text-base block">Miembros del Equipo</FormLabel>
                                         <FormDescription className="mb-4">
-                                            Enviaremos invitaciones a estos correos. Por ahora, se crearán temporalmente con rol "STAFF" y contraseña "123456" para que puedan acceder. Podrás ajustar sus roles y contraseñas después en el dashboard.
+                                            Enviaremos invitaciones por correo electrónico. Cada persona recibirá un enlace para crear su contraseña y acceder al sistema.
                                         </FormDescription>
 
-                                        {staffEmailsList.map((email, index) => (
+                                        {staffEntries.map((entry, index) => (
                                             <div key={index} className="flex items-center gap-2">
                                                 <Input
                                                     type="email"
-                                                    placeholder="doctor@ejemplo.com"
-                                                    value={email}
+                                                    placeholder="correo@ejemplo.com"
+                                                    value={entry.email}
                                                     onChange={(e) => updateEmail(index, e.target.value)}
                                                     disabled={isPending}
-                                                    className="h-11"
+                                                    className="h-11 flex-1"
                                                 />
-                                                {staffEmailsList.length > 1 && (
+                                                <select
+                                                    value={entry.role}
+                                                    onChange={(e) => updateRole(index, e.target.value as StaffEntry["role"])}
+                                                    disabled={isPending}
+                                                    className="h-11 rounded-md border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                                                >
+                                                    {ROLE_OPTIONS.map(opt => (
+                                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                                    ))}
+                                                </select>
+                                                {staffEntries.length > 1 && (
                                                     <Button
                                                         type="button"
                                                         variant="ghost"
                                                         size="icon"
-                                                        onClick={() => removeEmail(index)}
+                                                        onClick={() => removeEntry(index)}
                                                         disabled={isPending}
-                                                        className="text-red-600 dark:text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+                                                        className="text-red-600 dark:text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950 shrink-0"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
@@ -235,11 +268,11 @@ export const OnboardingClient = ({ initialFacilityName }: OnboardingClientProps)
                                         <Button
                                             type="button"
                                             variant="outline"
-                                            onClick={addEmailField}
-                                            disabled={isPending || staffEmailsList.length >= 10}
+                                            onClick={addEntry}
+                                            disabled={isPending || staffEntries.length >= 10}
                                             className="w-full mt-2 border-dashed"
                                         >
-                                            <Plus className="mr-2 h-4 w-4" /> Agregar otro correo
+                                            <Plus className="mr-2 h-4 w-4" /> Agregar otro miembro
                                         </Button>
                                     </div>
 
@@ -276,7 +309,7 @@ export const OnboardingClient = ({ initialFacilityName }: OnboardingClientProps)
                                             variant="ghost"
                                             className="w-full text-muted-foreground mt-2"
                                             onClick={() => {
-                                                setStaffEmailsList([""]);
+                                                setStaffEntries([{ email: "", role: "STAFF" }]);
                                             }}
                                         >
                                             Saltar este paso por ahora

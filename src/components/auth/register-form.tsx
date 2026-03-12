@@ -53,6 +53,8 @@ export const RegisterForm = () => {
                     }
                     if (data?.success) {
                         setSuccess(data.success);
+                        // Store password temporarily for auto-login after verification
+                        try { sessionStorage.setItem("_al", values.password); } catch {}
                         // Redirect to verification page
                         setTimeout(() => {
                             router.push(`/auth/verify?email=${encodeURIComponent(values.email)}`);

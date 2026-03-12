@@ -3,6 +3,7 @@
 import { useState, useTransition, useRef, useEffect } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { ShieldCheck, Loader2, CheckCircle, Mail, RefreshCw } from "lucide-react"
+import { signIn } from "next-auth/react"
 
 import { Button } from "@/components/ui/button"
 import { FormError } from "@/components/form-error"
@@ -81,8 +82,40 @@ export default function VerifyPage() {
                 setError(result.error)
             }
             if (result?.success) {
-                setSuccess(result.success)
-                // Redirect to login after 2 seconds
+                setSuccess("¡Cuenta verificada! Iniciando sesión...")
+
+                // Try auto-login with stored password
+                let storedPw: string | null = null;
+                try { storedPw = sessionStorage.getItem("_al"); } catch {}
+
+                if (storedPw) {
+                    try {
+                        sessionStorage.removeItem("_al"); // Clear immediately
+                        const origin = window.location.origin;
+                        const loginResult = await signIn("credentials", {
+                            email,
+                            password: storedPw,
+                            redirect: false,
+                            callbackUrl: origin,
+                        });
+
+                        if (loginResult?.ok) {
+                            // Fetch session to determine redirect path
+                            const sessionRes = await fetch(`${origin}/api/auth/session`);
+                            const session = await sessionRes.json();
+                            let redirectPath = "/admin";
+                            if (session?.user?.role === "STAFF") redirectPath = "/staff";
+                            else if (session?.user?.role === "FAMILY") redirectPath = "/family";
+
+                            window.location.replace(`${origin}${redirectPath}`);
+                            return;
+                        }
+                    } catch (e) {
+                        console.error("[VERIFY] Auto-login failed:", e);
+                    }
+                }
+
+                // Fallback: redirect to login page
                 setTimeout(() => {
                     router.push("/auth/login")
                 }, 2000)

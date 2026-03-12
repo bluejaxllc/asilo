@@ -41,7 +41,7 @@ async function runOnboarding(values: z.infer<typeof OnboardingSchema>, facilityI
     const validatedFields = OnboardingSchema.safeParse(values);
     if (!validatedFields.success) return { error: "Campos inválidos." };
 
-    const { facilityName, staffEmails } = validatedFields.data;
+    const { facilityName, staffEmails, staffMembers } = validatedFields.data;
 
     // 1. Update facility name
     await db.facility.update({
@@ -51,7 +51,13 @@ async function runOnboarding(values: z.infer<typeof OnboardingSchema>, facilityI
 
     // 2. Send invite emails to staff (same flow as /api/staff)
     const emailResults: string[] = [];
-    if (staffEmails && staffEmails.length > 0) {
+
+    // Prefer staffMembers (has roles), fall back to staffEmails
+    const members: { email: string; role: string }[] = staffMembers && staffMembers.length > 0
+        ? staffMembers
+        : (staffEmails || []).map(email => ({ email, role: "STAFF" }));
+
+    if (members.length > 0) {
         // Get facility name for the email template
         const facility = await db.facility.findUnique({
             where: { id: facilityId },
@@ -59,30 +65,30 @@ async function runOnboarding(values: z.infer<typeof OnboardingSchema>, facilityI
         });
         const fName = facility?.name || facilityName || "Retiro BlueJax";
 
-        for (const email of staffEmails) {
-            if (!email || email === userEmail) continue;
+        for (const member of members) {
+            if (!member.email || member.email === userEmail) continue;
 
             // Check if user already exists
-            const existing = await db.user.findUnique({ where: { email } });
+            const existing = await db.user.findUnique({ where: { email: member.email } });
             if (existing) {
-                emailResults.push(`${email}: ya registrado`);
+                emailResults.push(`${member.email}: ya registrado`);
                 continue;
             }
 
             // Delete any old invite for this email
-            await db.inviteToken.deleteMany({ where: { email } });
+            await db.inviteToken.deleteMany({ where: { email: member.email } });
 
             // Generate a secure invite token
             const token = randomBytes(32).toString("hex");
-            const name = email.split("@")[0];
+            const name = member.email.split("@")[0];
 
             // Create the invite token (expires in 72 hours)
             await db.inviteToken.create({
                 data: {
-                    email,
+                    email: member.email,
                     name,
                     token,
-                    role: "STAFF",
+                    role: member.role,
                     facilityId,
                     expires: new Date(Date.now() + 72 * 60 * 60 * 1000),
                 }
@@ -90,12 +96,11 @@ async function runOnboarding(values: z.infer<typeof OnboardingSchema>, facilityI
 
             // Send the invitation email
             try {
-                await sendInviteEmail(email, name, token, fName);
-                emailResults.push(`${email}: invitación enviada ✓`);
+                await sendInviteEmail(member.email, name, token, fName);
+                emailResults.push(`${member.email}: invitación enviada ✓`);
             } catch (mailError) {
-                console.error("[ONBOARDING] Email send failed for", email, mailError);
-                emailResults.push(`${email}: guardado (email fallido)`);
-                // Still continue — the invite token is saved, can be resent later
+                console.error("[ONBOARDING] Email send failed for", member.email, mailError);
+                emailResults.push(`${member.email}: guardado (email fallido)`);
             }
         }
     }

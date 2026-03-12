@@ -39,6 +39,10 @@ export const PatientSchema = z.object({
 export const OnboardingSchema = z.object({
     facilityName: z.string().min(1, { message: "El nombre de la residencia es requerido" }),
     staffEmails: z.array(z.string().email({ message: "Correo inválido" })).optional(),
+    staffMembers: z.array(z.object({
+        email: z.string().email({ message: "Correo inválido" }),
+        role: z.enum(["STAFF", "DOCTOR", "NURSE", "KITCHEN", "FAMILY"]),
+    })).optional(),
 });
 
 export const ResetPasswordSchema = z.object({
