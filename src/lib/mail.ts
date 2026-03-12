@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize conditionally so it doesn't crash the entire API route if missing
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 const FROM_EMAIL = "Retiro BlueJax <onboarding@bluejax.ai>";
 
@@ -8,6 +9,11 @@ const FROM_EMAIL = "Retiro BlueJax <onboarding@bluejax.ai>";
  * Send a verification email with a 6-digit code.
  */
 export async function sendVerificationEmail(email: string, code: string) {
+    if (!resend) {
+        console.warn("[MAIL] RESEND_API_KEY is missing. Skipping verification email to:", email);
+        return;
+    }
+
     try {
         const { data, error } = await resend.emails.send({
             from: FROM_EMAIL,
@@ -93,6 +99,11 @@ export async function sendInviteEmail(
     token: string,
     facilityName: string
 ) {
+    if (!resend) {
+        console.warn("[MAIL] RESEND_API_KEY is missing. Skipping invite email to:", email);
+        return;
+    }
+
     const inviteUrl = `${APP_URL}/auth/accept-invite?token=${token}`;
 
     try {
