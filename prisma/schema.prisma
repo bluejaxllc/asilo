@@ -26,6 +26,7 @@ model Facility {
   medications   Medication[]
   notifications Notification[]
   settings      FacilitySetting[]
+  stations      Station[]
 
   // Phase 3 Relations
   premiumServices  PremiumService[]
@@ -34,6 +35,19 @@ model Facility {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Station / Kiosk device for shared-screen environments
+model Station {
+  id         String   @id @default(cuid())
+  name       String   // "Estación Enfermería P1"
+  code       String   @unique // 6-digit pairing code
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id])
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  @@index([facilityId])
 }
 
 // Invitation tokens for staff magic-link flow
@@ -57,6 +71,7 @@ model User {
   emailVerified DateTime?
   role          String    @default("STAFF") // ADMIN, DOCTOR, NURSE, KITCHEN, FAMILY
   password      String?
+  pin           String?   // 4-digit PIN for station/kiosk mode
   image         String?
 
   // Facility link (tenant)

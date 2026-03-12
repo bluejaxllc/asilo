@@ -6,6 +6,12 @@
 export const publicRoutes = [
     "/",
     "/upgrade",
+    "/station",
+    "/station/home",
+    "/station/dashboard",
+    "/api/station/validate",
+    "/api/station/pin-login",
+    "/api/station/log",
     "/api/antigravity/run",
     "/api/webhook/nurse-voice",
     "/api/webhook/family-whatsapp",

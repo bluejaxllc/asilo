@@ -18,6 +18,7 @@ import {
     Sparkles,
     Megaphone,
     Gift,
+    Monitor,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -98,6 +99,12 @@ const routes = [
         href: "/admin/marketing",
         color: "text-rose-600 dark:text-rose-400",
         pro: true,
+    },
+    {
+        label: "Estaciones",
+        icon: Monitor,
+        href: "/admin/settings/stations",
+        color: "text-emerald-600 dark:text-emerald-400",
     },
     {
         label: "Configuración",
