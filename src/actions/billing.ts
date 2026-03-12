@@ -4,7 +4,14 @@ import { db } from "@/lib/db";
 import { auth } from "@/auth";
 import { getPaymentLink, type BillingPlan } from "@/lib/bluejax-billing";
 
-const returnUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3008";
+const getAppUrl = () => {
+    if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
+    if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+    return "http://localhost:3002"; 
+};
+
+const returnUrl = getAppUrl();
 
 /**
  * Returns a BlueJax payment link URL for the given plan.

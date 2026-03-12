@@ -88,7 +88,16 @@ export async function sendVerificationEmail(email: string, code: string) {
     }
 }
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3008";
+const getAppUrl = () => {
+    if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
+    if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+    // Fallback to exactly what the host header/window.location provides if invoked client-side, 
+    // or hardcode for local dev fallback (though mail forms are usually submitted in production).
+    return "http://localhost:3002"; 
+};
+
+const APP_URL = getAppUrl();
 
 /**
  * Send a magic-link invitation email so staff can set their own password.
