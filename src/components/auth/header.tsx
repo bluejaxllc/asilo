@@ -22,7 +22,7 @@ export const Header = ({
                     <ShieldCheck className="h-6 w-6 text-white" />
                 </div>
                 <h1 className={cn(
-                    "text-3xl font-bold text-white",
+                    "text-3xl font-bold text-foreground",
                     font.className,
                 )}>
                     .blue_jax

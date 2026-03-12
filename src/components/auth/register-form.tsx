@@ -86,7 +86,7 @@ export const RegisterForm = () => {
                                             {...field}
                                             disabled={isPending}
                                             placeholder="Juan Pérez"
-                                            className="h-12 bg-card/5 border-border text-white placeholder:text-muted-foreground focus:border-blue-500 focus:ring-blue-500/20 rounded-xl"
+                                            className="h-12 bg-card/5 border-border text-foreground placeholder:text-muted-foreground focus:border-blue-500 focus:ring-blue-500/20 rounded-xl"
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -105,7 +105,7 @@ export const RegisterForm = () => {
                                             disabled={isPending}
                                             placeholder="ejemplo@correo.com"
                                             type="email"
-                                            className="h-12 bg-card/5 border-border text-white placeholder:text-muted-foreground focus:border-blue-500 focus:ring-blue-500/20 rounded-xl"
+                                            className="h-12 bg-card/5 border-border text-foreground placeholder:text-muted-foreground focus:border-blue-500 focus:ring-blue-500/20 rounded-xl"
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -124,7 +124,7 @@ export const RegisterForm = () => {
                                             disabled={isPending}
                                             placeholder="••••••••"
                                             type="password"
-                                            className="h-12 bg-card/5 border-border text-white placeholder:text-muted-foreground focus:border-blue-500 focus:ring-blue-500/20 rounded-xl"
+                                            className="h-12 bg-card/5 border-border text-foreground placeholder:text-muted-foreground focus:border-blue-500 focus:ring-blue-500/20 rounded-xl"
                                         />
                                     </FormControl>
                                     <FormMessage />
