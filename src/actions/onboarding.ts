@@ -2,10 +2,11 @@
 
 import * as z from "zod";
 import { db } from "@/lib/db";
-import bcrypt from "bcryptjs";
+import { randomBytes } from "crypto";
 import { revalidatePath } from "next/cache";
 import { OnboardingSchema } from "@/schemas";
 import { auth } from "@/auth";
+import { sendInviteEmail } from "@/lib/mail";
 
 export const completeOnboarding = async (values: z.infer<typeof OnboardingSchema>) => {
     try {
@@ -48,31 +49,53 @@ async function runOnboarding(values: z.infer<typeof OnboardingSchema>, facilityI
         data: { name: facilityName }
     });
 
-    // 2. Create staff accounts with random passwords
+    // 2. Send invite emails to staff (same flow as /api/staff)
+    const emailResults: string[] = [];
     if (staffEmails && staffEmails.length > 0) {
-        const crypto = await import('crypto');
+        // Get facility name for the email template
+        const facility = await db.facility.findUnique({
+            where: { id: facilityId },
+            select: { name: true }
+        });
+        const fName = facility?.name || facilityName || "Retiro BlueJax";
+
         for (const email of staffEmails) {
             if (!email || email === userEmail) continue;
 
+            // Check if user already exists
             const existing = await db.user.findUnique({ where: { email } });
-            if (!existing) {
-                const randomPassword = crypto.randomBytes(16).toString('hex');
-                const hashedPassword = await bcrypt.hash(randomPassword, 10);
-                await db.user.create({
-                    data: {
-                        email,
-                        name: email.split("@")[0],
-                        role: "STAFF",
-                        password: hashedPassword,
-                        facilityId
-                    }
-                });
-            } else if (!existing.facilityId) {
-                // User exists but has no facility, assign them
-                await db.user.update({
-                    where: { email },
-                    data: { facilityId, role: "STAFF" }
-                });
+            if (existing) {
+                emailResults.push(`${email}: ya registrado`);
+                continue;
+            }
+
+            // Delete any old invite for this email
+            await db.inviteToken.deleteMany({ where: { email } });
+
+            // Generate a secure invite token
+            const token = randomBytes(32).toString("hex");
+            const name = email.split("@")[0];
+
+            // Create the invite token (expires in 72 hours)
+            await db.inviteToken.create({
+                data: {
+                    email,
+                    name,
+                    token,
+                    role: "STAFF",
+                    facilityId,
+                    expires: new Date(Date.now() + 72 * 60 * 60 * 1000),
+                }
+            });
+
+            // Send the invitation email
+            try {
+                await sendInviteEmail(email, name, token, fName);
+                emailResults.push(`${email}: invitación enviada ✓`);
+            } catch (mailError) {
+                console.error("[ONBOARDING] Email send failed for", email, mailError);
+                emailResults.push(`${email}: guardado (email fallido)`);
+                // Still continue — the invite token is saved, can be resent later
             }
         }
     }
@@ -93,5 +116,9 @@ async function runOnboarding(values: z.infer<typeof OnboardingSchema>, facilityI
     // 4. Force Next.js to re-fetch the layout
     revalidatePath("/admin", "layout");
 
-    return { success: "¡Configuración completada!" };
+    const summary = emailResults.length > 0
+        ? `¡Configuración completada! ${emailResults.join(", ")}`
+        : "¡Configuración completada!";
+
+    return { success: summary };
 }
