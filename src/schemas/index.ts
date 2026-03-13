@@ -22,6 +22,7 @@ export const RegisterSchema = z.object({
     role: z.string().optional(),
     plan: z.enum(["FREE", "CORE", "ENTERPRISE"]).optional(),
     facilityName: z.string().optional(),
+    staffMembers: z.string().optional(), // JSON string of [{email, role}]
 });
 
 export const PatientSchema = z.object({

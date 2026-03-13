@@ -148,6 +148,7 @@ model PendingRegistration {
   role           String   @default("ADMIN")
   facilityName   String?
   plan           String?
+  staffMembers   String?  // JSON array of {email, role} for team invites
   createdAt      DateTime @default(now())
 }
 

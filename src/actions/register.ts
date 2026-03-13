@@ -15,7 +15,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
         return { error: "Campos inválidos!" };
     }
 
-    const { email, password, name, role, plan, facilityName } = validatedFields.data;
+    const { email, password, name, role, plan, facilityName, staffMembers } = validatedFields.data;
 
     // Check if a verified user already exists
     const existingUser = await db.user.findUnique({
@@ -41,6 +41,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
             role: userRole,
             facilityName: facilityName || null,
             plan: plan || null,
+            staffMembers: staffMembers || null,
         },
         create: {
             email,
@@ -49,6 +50,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
             role: userRole,
             facilityName: facilityName || null,
             plan: plan || null,
+            staffMembers: staffMembers || null,
         },
     });
 
