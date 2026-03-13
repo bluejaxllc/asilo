@@ -1,7 +1,12 @@
+const { config } = require('dotenv');
+const { resolve } = require('path');
+config({ path: resolve(__dirname, '../.env') });
+
 const { PrismaClient } = require('@prisma/client');
 const db = new PrismaClient();
 
 async function main() {
+    console.log("Using Database URL:", process.env.DATABASE_URL?.split('@')[1] || "None");
     const emailsToDelete = ['contacto@bluejax.ai', 'test@bluejax.ai', 'test123@test.com'];
     
     for (const email of emailsToDelete) {
@@ -30,15 +35,12 @@ async function main() {
             
             // Delete the user
             await db.user.delete({ where: { id: user.id } });
-            console.log(`Deleted user ${email}`);
+            console.log(`Deleted user ${email} from Production DB`);
             
-            // Check if they were the only admin of a facility, maybe delete the facility too? 
-            // For now just leave the facility as it might have other things, or we can check:
             if (user.facilityId) {
                 const otherUsers = await db.user.count({ where: { facilityId: user.facilityId } });
                 if (otherUsers === 0) {
                     console.log(`Facility ${user.facilityId} is now empty. Deleting it too...`);
-                    // gotta delete patients first
                     const patients = await db.patient.findMany({ where: { facilityId: user.facilityId } });
                     for (const p of patients) {
                         await db.dailyLog.deleteMany({ where: { patientId: p.id }});
@@ -50,9 +52,11 @@ async function main() {
                     console.log(`Deleted empty facility`);
                 }
             }
+        } else {
+            console.log(`User ${email} not found in DB.`);
         }
     }
-    console.log("Cleanup complete!");
+    console.log("Production DB Cleanup complete!");
 }
 
 main().catch(console.error).finally(() => db.$disconnect());
